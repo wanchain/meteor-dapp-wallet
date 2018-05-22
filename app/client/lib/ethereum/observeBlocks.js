@@ -50,7 +50,6 @@ var getLedger = function () {
 
 };
 
-
 /**
 Update wallet balances
 
@@ -164,11 +163,13 @@ observeLatestBlocks = function(){
     // check peer count
     Session.setDefault('peerCount', 0);
     Session.setDefault('ledgerConnect', false);
+
     getLedger();
     getPeerCount();
 
     clearInterval(peerCountIntervalId);
     peerCountIntervalId = setInterval(function() {
-        getPeerCount()
+        getPeerCount();
+        getLedger();
     }, 1000);
 };
