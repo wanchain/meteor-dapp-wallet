@@ -7,6 +7,15 @@ Update the peercount
 */
 var getPeerCount = function() {
 
+    web3.net.getPeerCount(function(e, res) {
+        if(!e)
+            Session.set('peerCount', res);
+    });
+
+};
+
+var getLedger = function () {
+
     web3.wan.getListWallets(function (error, result) {
 
         if (!error) {
@@ -39,10 +48,6 @@ var getPeerCount = function() {
 
     });
 
-    web3.net.getPeerCount(function(e, res) {
-        if(!e)
-            Session.set('peerCount', res);
-    });
 };
 
 
@@ -159,6 +164,7 @@ observeLatestBlocks = function(){
     // check peer count
     Session.setDefault('peerCount', 0);
     Session.setDefault('ledgerConnect', false);
+    getLedger();
     getPeerCount();
 
     clearInterval(peerCountIntervalId);
