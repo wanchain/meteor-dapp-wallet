@@ -1,22 +1,22 @@
 /**
-Template Controllers
+ Template Controllers
 
-@module Templates
-*/
-
-/**
-The account template
-
-@class [template] elements_account
-@constructor
-*/
+ @module Templates
+ */
 
 /**
-Block required until a transaction is confirmed.
+ The account template
 
-@property blocksForConfirmation
-@type Number
-*/
+ @class [template] elements_account
+ @constructor
+ */
+
+/**
+ Block required until a transaction is confirmed.
+
+ @property blocksForConfirmation
+ @type Number
+ */
 var blocksForConfirmation = 12;
 
 var accountClipboardEventHandler = function(e){
@@ -24,9 +24,7 @@ var accountClipboardEventHandler = function(e){
 
     function copyAddress(){
 
-        var typeClass = e.target.name;
-
-        var copyTextarea = document.querySelector('.copyable-address' + typeClass.toString());
+        var copyTextarea = document.querySelector('.copyable-address' + e.target.name);
 
         var selection = window.getSelection();
         var range = document.createRange();
@@ -65,14 +63,14 @@ Template['elements_account'].rendered = function(){
 
 Template['elements_account'].helpers({
     /**
-    Get the current account
+     Get the current account
 
-    @method (account)
-    */
+     @method (account)
+     */
     'account': function(){
-    	  var account = EthAccounts.findOne(this.account);
+        var account = EthAccounts.findOne(this.account);
 
-    	  if (account && FlowRouter.getRouteName() === 'dashboard') {
+        if (account && FlowRouter.getRouteName() === 'dashboard') {
 
             account.hrefType = true;
 
@@ -89,10 +87,10 @@ Template['elements_account'].helpers({
         return account;
     },
     /**
-    Get all tokens
+     Get all tokens
 
-    @method (tokens)
-    */
+     @method (tokens)
+     */
     'tokens': function(){
         var query = {};
         query['balances.'+ this._id] = {$exists: true};
@@ -107,10 +105,10 @@ Template['elements_account'].helpers({
     },
 
     /**
-    Get the tokens balance
+     Get the tokens balance
 
-    @method (formattedTokenBalance)
-    */
+     @method (formattedTokenBalance)
+     */
     'formattedTokenBalance': function(e){
         var account = Template.parentData(2);
 
@@ -125,25 +123,25 @@ Template['elements_account'].helpers({
                 balance = new BigNumber(balance).toFixed(2);
             }
 
-            return balance + '<span> ' + this.symbol + '</span>';
+            return `${balance} <span>${this.symbol}</span>`;
 
         } else {
             return false;
         }
     },
     /**
-    Get the name
+     Get the name
 
-    @method (name)
-    */
+     @method (name)
+     */
     'name': function(){
         return this.name || TAPi18n.__('wallet.accounts.defaultName');
     },
     /**
-    Account was just added. Return true and remove the "new" field.
+     Account was just added. Return true and remove the "new" field.
 
-    @method (new)
-    */
+     @method (new)
+     */
     'new': function() {
         if(this.new) {
             // remove the "new" field
@@ -158,24 +156,24 @@ Template['elements_account'].helpers({
         }
     },
     /**
-    Should the wallet show disabled
+     Should the wallet show disabled
 
-    @method (creating)
-    */
+     @method (creating)
+     */
     'creating': function(){
         return (!this.address || this.imported || (blocksForConfirmation >= EthBlocks.latest.number - (this.creationBlock - 1) && EthBlocks.latest.number - (this.creationBlock - 1) >= 0));
     },
     /**
-    Returns the confirmations
+     Returns the confirmations
 
-    @method (totalConfirmations)
-    */
+     @method (totalConfirmations)
+     */
     'totalConfirmations': blocksForConfirmation,
     /**
-    Checks whether the transaction is confirmed ot not.
+     Checks whether the transaction is confirmed ot not.
 
-    @method (unConfirmed)
-    */
+     @method (unConfirmed)
+     */
     'unConfirmed': function() {
         if(!this.address || !this.creationBlock || this.createdIdentifier)
             return false;
@@ -190,16 +188,16 @@ Template['elements_account'].helpers({
             : false;
     },
     /**
-    Displays ENS names with triangles
-    @method (nameDisplay)
-    */
+     Displays ENS names with triangles
+     @method (nameDisplay)
+     */
     'displayName': function(){
         return this.ens ? this.name.split('.').slice(0, -1).reverse().join(' ▸ ') : this.name;
     },
     /**
-    Adds class about ens
-    @method (ensClass)
-    */
+     Adds class about ens
+     @method (ensClass)
+     */
     'ensClass': function(){
         return this.ens ?  'ens-name' : 'not-ens-name';
     },
@@ -211,10 +209,10 @@ Template['elements_account'].helpers({
 
 Template['elements_account'].events({
     /**
-    Field test the speed wallet is rendered
+     Field test the speed wallet is rendered
 
-    @event click button.show-data
-    */
+     @event click button.show-data
+     */
     'click .wallet-box': function(e){
         console.time('renderAccountPage');
     },

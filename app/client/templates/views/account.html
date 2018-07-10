@@ -11,7 +11,7 @@
         </h1>
         <div class="dapp-container accounts-page">
             <div class="accounts-page-summary">
-	              <!--account detail-->
+                <!--account detail-->
                 <div class="viwes-account-header" style="padding: 0 20px;">
                     <div class="header-span" style="position: relative;top: 40px;">
                         {{> dapp_identicon identity=address}}
@@ -21,15 +21,15 @@
                             {{#if ens}}
                                 <span>{{displayName.substr 0 26}}</span>
                             {{else}}
-                                <p style="min-height: 49px;"><em class="edit-name" id="edit-name">{{displayName.substr 0 26}}</em>
-                                    <img class="wanchain-edit edit-icon"/>
+                            <p style="margin: 0 20px;"><em class="edit-name" id="edit-name">{{displayName.substr 0 26}}</em>
+                                <img class="wanchain-edit edit-icon" style="position: inherit;"/>
 
-                                    {{#unless isWaddress}}
-                                        <div class="ledger-account" style="top: 67px;margin-left: 26px;">
-                                            <img/>
-                                            <span style="top: 0px;">Ledger Account</span>
-                                        </div>
-                                    {{/unless}}
+                                {{#unless isWaddress}}
+                                    <div class="ledger-account" style=" top: 40px; position: relative;">
+                                        <img/>
+                                        <span style="top: 0px;">{{$.Session.get "hardwareAccount"}}</span>
+                                    </div>
+                                {{/unless}}
 
                                 </p>
                             {{/if}}
@@ -50,19 +50,19 @@
                         </p>
 
                         <div class="clear"></div>
-                        <div class="viwes-account-nav">
-                            <p style="position: absolute;left: -100px;">
-                                {{#if hrefType}}
-                                    <a  href="{{pathFor route='sendTo' address=(toChecksumAddress address)}}" title="{{toChecksumAddress address}}">
-                                        <img class=" wanchain-transfer"/>
-                                    <p style="margin: 0;margin-left: -5px;font-size: 14px;color: #929cb8;">{{i18n 'views.account.transfer'}}</p>
-                                    </a>
-                                {{else}}
-                                    <a style="cursor: pointer" title="{{toChecksumAddress address}}" class="transfer">
-                                        <img class=" wanchain-transfer"/>
-                                        <p style="margin: 0;margin-left: -8px;font-size: 14px;color: #929cb8;">{{i18n 'views.account.transfer'}}</p>
-                                    </a>
-                                {{/if}}
+                        <div class="viwes-account-nav" style="top: 20px;">
+                        <p style="position: absolute;left: -100px;">
+                            {{#if hrefType}}
+                                <a  href="{{pathFor route='sendTo' address=(toChecksumAddress address)}}" title="{{toChecksumAddress address}}">
+                                    <img class=" wanchain-transfer"/>
+                                <p style="margin: 0;margin-left: -5px;font-size: 14px;color: #929cb8;">{{i18n 'views.account.transfer'}}</p>
+                                </a>
+                            {{else}}
+                                <a style="cursor: pointer" title="{{toChecksumAddress address}}" class="transfer">
+                                    <img class=" wanchain-transfer"/>
+                                    <p style="margin: 0;margin-left: -8px;font-size: 14px;color: #929cb8;">{{i18n 'views.account.transfer'}}</p>
+                                </a>
+                            {{/if}}
                             </p>
 
                             {{#if isWaddress}}
@@ -78,64 +78,64 @@
                     </header>
                 </div>
 
-	              <!--Balance-->
-	              <div class="viwes-account-header">
-		              <h1 class="account-h1"><div class="viwes-account-line"></div><strong>{{i18n 'views.account.balacne.title'}}</strong></h1>
-		              <div>
-                          <div class="viwes-account-balance-left">
-                              <img/>
+                <!--Balance-->
+                <div class="viwes-account-header">
+                    <h1 class="account-h1"><div class="viwes-account-line"></div><strong>{{i18n 'views.account.balacne.title'}}</strong></h1>
+                    <div>
+                        <div class="viwes-account-balance-left">
+                            <img/>
 
-                              <div class="account-balance-wan col-4">
-                                  <strong>{{> elements_balance balance=balance changeUnit=true showAllDecimals=true}}</strong>
-                                  <span class="balance-span">{{i18n 'views.account.balacne.des'}}</span>
-                              </div>
+                            <div class="account-balance-wan col-4">
+                                <strong>{{> elements_balance balance=balance changeUnit=true showAllDecimals=true}}</strong>
+                                <span class="balance-span">{{i18n 'views.account.balacne.des'}}</span>
+                            </div>
 
-                              {{#if isWaddress}}
-                                  <div class="account-balance-wan">
-                                      <strong>{{> elements_balance balance=(TemplateVar.get "otasValue") changeUnit=true}}</strong>
-                                      <span class="balance-span">{{i18n 'views.account.balacne.ota'}}
-                                          {{#if TemplateVar.get "otasValue"}}
-                                              {{#if hrefType}}
-                                                  <a href="{{pathFor route='otaRefund' address=theAddress}}" style="font-weight: 400;">{{i18n 'views.account.balacne.refund'}}</a>
-                                              {{else}}
-                                                  <a class="refund" style="cursor: pointer;font-weight: 400;">{{i18n 'views.account.balacne.refund'}}</a>
-                                              {{/if}}
+                            {{#if isWaddress}}
+                                <div class="account-balance-wan">
+                                    <strong>{{> elements_balance balance=(TemplateVar.get "otasValue") changeUnit=true}}</strong>
+                                    <span class="balance-span">{{i18n 'views.account.balacne.ota'}}
+                                        {{#if TemplateVar.get "otasValue"}}
+                                            {{#if hrefType}}
+                                                <a href="{{pathFor route='otaRefund' address=theAddress}}" style="font-weight: 400;">{{i18n 'views.account.balacne.refund'}}</a>
+                                            {{else}}
+                                                <a class="refund" style="cursor: pointer;font-weight: 400;">{{i18n 'views.account.balacne.refund'}}</a>
+                                            {{/if}}
 
-                                          {{/if}}
+                                        {{/if}}
                                       </span>
-                                  </div>
-                              {{/if}}
+                                </div>
+                            {{/if}}
 
-                          </div>
-                      </div>
+                        </div>
+                    </div>
 
-                      <div class="row col-12" style="margin: 0 0 20px;">
-                          {{#if TemplateVar.get "tokenLength"}}<hr class="viwes-account-balance-hr"/>{{/if}}
-                          {{#each tokens}}
-                              <div class="viwes-account-balance-right col-3">
-                                  <div class="circle-dot"></div><span id="views_account_token_balance">{{{balance}}}</span>
-                                  <span class="views_account_token">{{name}}</span>
-                              </div>
-                          {{/each}}
-                          {{#if TemplateVar.get "tokenLength"}}<hr class="viwes-account-balance-hr"/>{{/if}}
-                      </div>
-	              </div>
+                    <div class="row col-12" style="margin: 0 0 20px;">
+                        {{#if TemplateVar.get "tokenLength"}}<hr class="viwes-account-balance-hr"/>{{/if}}
+                        {{#each tokens}}
+                            <div class="viwes-account-balance-right col-3">
+                                <div class="circle-dot"></div><span id="views_account_token_balance">{{{balance}}}</span>
+                                <span class="views_account_token">{{name}}</span>
+                            </div>
+                        {{/each}}
+                        {{#if TemplateVar.get "tokenLength"}}<hr class="viwes-account-balance-hr"/>{{/if}}
+                    </div>
+                </div>
             </div>
         </div>
 
-	    <div class="dapp-clear-fix"></div>
+        <div class="dapp-clear-fix"></div>
     {{/with}}
 
-		<!--transaction list-->
-		<div class="viwes-account-header">
-            <h1 class="account-h1" style="margin-top: 0"><div class="viwes-account-line"></div><strong>{{i18n 'views.account.transaction.title'}}</strong></h1>
-			{{#if allTransactions}}
-				{{> elements_transactions_table limit=5 address=theAddress}}
-            {{else}}
-                <div class="wanchain-notransaction" style="">
-                    <img />
-                    <p>NO TRANSACTION RECORD</p>
-                </div>
-			{{/if}}
-		</div>
+    <!--transaction list-->
+    <div class="viwes-account-header">
+        <h1 class="account-h1" style="margin-top: 0"><div class="viwes-account-line"></div><strong>{{i18n 'views.account.transaction.title'}}</strong></h1>
+        {{#if allTransactions}}
+            {{> elements_transactions_table limit=5 address=theAddress}}
+        {{else}}
+            <div class="wanchain-notransaction" style="">
+                <img />
+                <p>NO TRANSACTION RECORD</p>
+            </div>
+        {{/if}}
+    </div>
 </template>

@@ -314,11 +314,24 @@ Template['views_send'].helpers({
             if (accounts[0]) {
                 accounts[0].isWaddress = true;
                 if (parseInt(hasAccount.waddress, 16) === 0) {
-                    TemplateVar.set('isWaddress', '0x00');
+
+                    // Ledger
+                    if (Session.get('hardwareAccount').match('Ledger')) {
+                        TemplateVar.set('isWaddress', '0x11');
+                    }
+                    // Trezor
+                    else if (Session.get('hardwareAccount').match('Trezor')) {
+                        TemplateVar.set('isWaddress', '0x12');
+                    }
+                    // other
+                    else {
+                        TemplateVar.set('isWaddress', '0x00');
+                    }
+
                     accounts[0].isWaddress = false;
                 }
 
-                if (!accounts[0].isWaddress && !Session.get('ledgerConnect')) {
+                if (!accounts[0].isWaddress && !Session.get('hardwareConnect')) {
                     FlowRouter.go('/');
                     return;
                 }
@@ -589,7 +602,7 @@ Template['views_send'].events({
 
             checkOverDailyLimit(template.find('select[name="dapp-select-account"].send-from').value, wei, template);
 
-        // token
+            // token
         } else {
 
             var token = Tokens.findOne({address: TemplateVar.get('selectedToken')}),

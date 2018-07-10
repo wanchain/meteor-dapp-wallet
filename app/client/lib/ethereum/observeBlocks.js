@@ -1,10 +1,10 @@
 var peerCountIntervalId = null;
 
 /**
-Update the peercount
+ Update the peercount
 
-@method getPeerCount
-*/
+ @method getPeerCount
+ */
 var getPeerCount = function() {
 
     web3.net.getPeerCount(function(e, res) {
@@ -14,7 +14,7 @@ var getPeerCount = function() {
 
 };
 
-var getLedger = function () {
+var getHardware = function () {
 
     web3.wan.getListWallets(function (error, result) {
 
@@ -22,27 +22,47 @@ var getLedger = function () {
             var account = result[result.length -1];
 
             if (account) {
-                if (account.url.indexOf('ledger://') >= 0) {
+                // trezor
+                if (account.url.indexOf('trezor://') >= 0) {
                     if (account.status.indexOf('online') >= 0) {
-                        Session.set('ledgerConnect', true);
+                        Session.set('hardwareConnect', true);
+                        Session.set('hardwareAccount', 'Trezor Account');
                     } else {
-                        if (Session.get('ledgerConnect')) {
-                            Session.set('ledgerConnect', false);
+                        if (Session.get('hardwareConnect')) {
+                            Session.set('hardwareConnect', false);
+                            Session.set('hardwareAccount', '');
                         }
                     }
-                } else {
-                    if (Session.get('ledgerConnect')) {
-                        Session.set('ledgerConnect', false);
+                }
+                // ledger
+                else if (account.url.indexOf('ledger://') >= 0) {
+                    if (account.status.indexOf('online') >= 0) {
+                        Session.set('hardwareConnect', true);
+                        Session.set('hardwareAccount', 'Ledger Account');
+                    } else {
+                        if (Session.get('hardwareConnect')) {
+                            Session.set('hardwareConnect', false);
+                            Session.set('hardwareAccount', '');
+                        }
+                    }
+                }
+                // other
+                else {
+                    if (Session.get('hardwareConnect')) {
+                        Session.set('hardwareConnect', false);
+                        Session.set('hardwareAccount', '');
                     }
                 }
             } else {
-                if (Session.get('ledgerConnect')) {
-                    Session.set('ledgerConnect', false);
+                if (Session.get('hardwareConnect')) {
+                    Session.set('hardwareConnect', false);
+                    Session.set('hardwareAccount', '');
                 }
             }
         } else {
-            if (Session.get('ledgerConnect')) {
-                Session.set('ledgerConnect', false);
+            if (Session.get('hardwareConnect')) {
+                Session.set('hardwareConnect', false);
+                Session.set('hardwareAccount', '');
             }
         }
 
@@ -51,10 +71,10 @@ var getLedger = function () {
 };
 
 /**
-Update wallet balances
+ Update wallet balances
 
-@method updateBalances
-*/
+ @method updateBalances
+ */
 updateBalances = function() {
     // UPDATE ALL BALANCES (incl. Tokens)
     var walletsAndContracts = Wallets.find().fetch().concat(CustomContracts.find().fetch());
@@ -68,12 +88,12 @@ updateBalances = function() {
                     // is of type wallet
                     if(account.creationBlock) {
                         Wallets.update(account._id, {$set: {
-                            balance: res.toString(10)
-                        }});
+                                balance: res.toString(10)
+                            }});
                     } else {
                         CustomContracts.update(account._id, {$set: {
-                            balance: res.toString(10)
-                        }});
+                                balance: res.toString(10)
+                            }});
                     }
                 }
             });
@@ -97,7 +117,7 @@ updateBalances = function() {
         if (!account.ensCheck || (account.ensCheck && now - account.ensCheck > 10*60*1000)) {
             Helpers.getENSName(account.address, function(err, name, returnedAddr) {
 
-                if (!err && account.address.toLowerCase() == returnedAddr){
+                if (!err && account.address.toLowerCase() === returnedAddr){
                     EthAccounts.update({address: account.address}, {$set:{ name: name, ens: true, ensCheck: now}});
                     CustomContracts.update({address: account.address}, {$set:{ name: name, ens: true, ensCheck: now}});
                     Wallets.update({address: account.address}, {$set:{ name: name, ens: true, ensCheck: now}});
@@ -143,10 +163,10 @@ updateBalances = function() {
 
 
 /**
-Observe the latest blocks
+ Observe the latest blocks
 
-@method observeLatestBlocks
-*/
+ @method observeLatestBlocks
+ */
 observeLatestBlocks = function(){
 
     // update balances on start
@@ -162,14 +182,14 @@ observeLatestBlocks = function(){
 
     // check peer count
     Session.setDefault('peerCount', 0);
-    Session.setDefault('ledgerConnect', false);
+    Session.setDefault('hardwareConnect', false);
 
-    getLedger();
+    getHardware();
     getPeerCount();
 
     clearInterval(peerCountIntervalId);
     peerCountIntervalId = setInterval(function() {
         getPeerCount();
-        getLedger();
+        getHardware();
     }, 1000);
 };
