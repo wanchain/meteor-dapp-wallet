@@ -93,7 +93,11 @@ class crossBtcOperators{
 
     lockWbtc(chainType,parameters,callback) {
         this.invokeOperator(new crossOperator('lockWbtc',parameters,chainType,callback));
-    }
+    };
+
+    redeemWbtc(chainType,parameters,callback) {
+        this.invokeOperator(new crossOperator('redeemWbtc',parameters,chainType,callback));
+    };
 
 
 }

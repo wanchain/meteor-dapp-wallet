@@ -68,7 +68,12 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                 // release x in wan
                 console.log('release X Chain 2: ', this.Chain);
 
-                mist.WETH2ETH().sendRefundTrans(this.trans, password_input, function (err,data) {
+                let params = this.trans;
+                params.btcPassword = password_input;
+
+                console.log('params: ', params);
+
+                mist.BTC2WBTC().redeemWbtc('BTC', params, function (err,data) {
                     if (err) {
                         Helpers.showError(err);
                         EthElements.Modal.hide();
@@ -104,15 +109,15 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                 // revoke in wan
                 console.log('revoke Chain 2: ', this.Chain);
 
-                mist.WETH2ETH().sendRevokeTrans(this.trans, password_input, this.trans.x, function (err,data) {
-                    if (err) {
-                        Helpers.showError(err);
-                        EthElements.Modal.hide();
-                    } else {
-                        EthElements.Modal.hide();
-                        waitingMoment();
-                    }
-                });
+                // mist.WETH2ETH().sendRevokeTrans(this.trans, password_input, this.trans.x, function (err,data) {
+                //     if (err) {
+                //         Helpers.showError(err);
+                //         EthElements.Modal.hide();
+                //     } else {
+                //         EthElements.Modal.hide();
+                //         waitingMoment();
+                //     }
+                // });
             }
         }
 
