@@ -101,6 +101,13 @@ Template['views_btcTowbtc'].events({
 
     'change #toweth-storeman': function (event) {
         event.preventDefault();
+
+        _.each(TemplateVar.get('storemanGroup'), function (value, index) {
+            if (value.ethAddress === event.target.value) {
+                TemplateVar.set('storemanWan', value.wanAddress);
+            }
+        });
+
         TemplateVar.set('storeman', event.target.value);
     },
 
@@ -118,6 +125,7 @@ Template['views_btcTowbtc'].events({
             storemanWan = TemplateVar.get('storemanWan'),
             to = TemplateVar.get('to'),
             amount = TemplateVar.get('amount');
+
 
         if(!storeman) {
             return GlobalNotification.warning({
