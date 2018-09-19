@@ -271,8 +271,8 @@ Template['views_ethToweth'].events({
 
 
                 let trans = {
-                    from: from, amount: amount.toString(10), storemanGroup: storeman,
-                    cross: to, gas: estimatedGas, gasPrice: gasPrice
+                    from: from, amount: amount.toString(10), storeman: storeman,
+                    to: to, gasLimit: estimatedGas, gasPrice: gasPrice
                 };
                 // console.log('trans: ', trans);
 
@@ -294,7 +294,6 @@ Template['views_ethToweth'].events({
                                 fee: fee,
                                 data: getLockTransData.lockTransData,
                                 trans: trans,
-                                secretX: getLockTransData.secretX,
                                 chain: 'ETH',
                                 symbol: 'ETH'
                             },

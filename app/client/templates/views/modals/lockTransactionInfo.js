@@ -31,7 +31,7 @@ Template['views_modals_unlockTransactionInfo'].events({
         if (this.chain === 'ETH') {
             console.log('ETH chain: ', this.chain);
 
-            mist.ETH2WETH().sendLockTrans(this.trans, password_input, this.secretX, function (err,data) {
+            mist.ETH2WETH().sendLockTrans(this.trans, password_input, function (err,data) {
                 if (err) {
                     Helpers.showError(err);
                     EthElements.Modal.hide();
@@ -43,7 +43,7 @@ Template['views_modals_unlockTransactionInfo'].events({
         } else {
             console.log('WAN chain: ', this.chain);
 
-            mist.WETH2ETH().sendLockTrans(this.trans, password_input, this.secretX, function (err,data) {
+            mist.WETH2ETH().sendLockTrans(this.trans, password_input, function (err,data) {
                 if (err) {
                     Helpers.showError(err);
                     EthElements.Modal.hide();

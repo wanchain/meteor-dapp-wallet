@@ -307,8 +307,8 @@ Template['views_wethToeth'].events({
 
 
                 let trans = {
-                    from: from, amount: amount.toString(10), storemanGroup: storeman,
-                    cross: to, gas: estimatedGas, gasPrice: gasPrice, value: valueFee
+                    from: from, amount: amount.toString(10), storeman: storeman,
+                  to: to, gasLimit: estimatedGas, gasPrice: gasPrice, value: valueFee
                 };
 
                 // console.log('trans: ', trans);
@@ -331,7 +331,6 @@ Template['views_wethToeth'].events({
                                 fee: fee,
                                 data: getLockTransData.lockTransData,
                                 trans: trans,
-                                secretX: getLockTransData.secretX,
                                 valueFee: valueFee,
                                 chain: 'WAN',
                                 symbol: 'WETH'

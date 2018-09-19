@@ -9,10 +9,42 @@ const defaultGasprice = 180000000000;
 let InterID;
 
 const stateDict = {
-    'sentHashPending': 1, 'sentHashConfirming': 2, 'waitingCross': 3, 'waitingCrossConfirming': 4,
-    'waitingX': 5,'sentXPending': 6, 'sentXConfirming': 7, 'refundFinished': 8,
-    'waitingRevoke': 9,'sentRevokePending': 10, 'sentRevokeConfirming': 11, 'revokeFinished': 12,
-    'sentHashFailed': 13, 'suspending': 14
+
+  "ApproveSending":1,
+  "ApproveSendFail":2,
+  "ApproveSendFailAfterRetries":3,
+  "ApproveSent":4,
+  "Approved":5,
+
+  "LockSending":6,
+  "LockSendFail":7,
+  "LockSendFailAfterRetries":8,
+  "LockSent":9,
+  "Locked":10,
+
+  "BuddyLocked":11,
+  "RefundSending":12,
+  "RefundSendFail":13,
+  "RefundSendFailAfterRetries":14,
+  "RefundSent":15,
+
+  "Refunded":16,
+  "RevokeSending":17,
+  "RevokeSendFail":18,
+  "RevokeSendFailAfterRetries":19,
+  "RevokeSent":20,
+  "Revoked":21
+
+  // 'ApproveSending': 1, 'ApproveSent': 2, 'Approved': 3,
+  // 'LockSending': 4,
+  // 'waitingX': 5,'sentXPending': 6, 'sentXConfirming': 7, 'refundFinished': 8,
+  // 'waitingRevoke': 9,'sentRevokePending': 10, 'sentRevokeConfirming': 11, 'revokeFinished': 12,
+  // 'sentHashFailed': 13, 'suspending': 14
+
+    // 'sentHashPending': 1, 'sentHashConfirming': 2, 'waitingCross': 3, 'waitingCrossConfirming': 4,
+    // 'waitingX': 5,'sentXPending': 6, 'sentXConfirming': 7, 'refundFinished': 8,
+    // 'waitingRevoke': 9,'sentRevokePending': 10, 'sentRevokeConfirming': 11, 'revokeFinished': 12,
+    // 'sentHashFailed': 13, 'suspending': 14
 };
 
 function resultEach(template, result) {
@@ -127,79 +159,90 @@ Template['elements_cross_transactions_table'].helpers({
             let smallStyle = 'display: block; color: #4b90f7;';
 
             _.each(TemplateVar.get('crosschainList'), function (value, index) {
-                if (value.chain === 'ETH') {
-                    value.fromText = `<small style="${smallStyle}">ETH</small>`;
-                    value.toText = `<small style="${smallStyle}">WAN</small>`;
-                    value.symbol = 'ETH';
-                } else if (value.chain === 'WAN') {
-                    value.fromText = `<small style="${smallStyle}">WAN</small>`;
-                    value.toText = `<small style="${smallStyle}">ETH</small>`;
-                    value.symbol = 'WETH';
-                }
+                // if (value.chain === 'ETH') {
+                    value.fromText = `<small style="${smallStyle}">${value.srcChainType}</small>`;
+                    value.toText = `<small style="${smallStyle}">${value.dstChainType}</small>`;
+                    // value.symbol = 'ETH';
+                // } else if (value.chain === 'WAN') {
+                //     value.fromText = `<small style="${smallStyle}">WAN</small>`;
+                //     value.toText = `<small style="${smallStyle}">ETH</small>`;
+                //     value.symbol = 'WETH';
+                // }
 
                 let style = 'display: block; font-size: 18px; background-color: transparent;';
 
-                // Release
-                if (stateDict[value.status] === 5) {
-                    style += 'color: #920b1c;';
+              value.operation = `<h2 style="${style}">${value.status}</h2>`;
 
-                    value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
-                    value.state = 'To be confirmed';
-                }
-                // suspending
-                else if (stateDict[value.status] === 14) {
-                    value.operation = `<h2 style="${style}">Cancel</h2>`;
-                    value.state = 'To be cancelled in ' + value.htlcdate;
-                }
-                // Revoke
-                else if (stateDict[value.status] === 9) {
-                    style += 'color: #920b1c;';
-                    value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
-                    value.state = 'To be cancelled';
-                }
-                // Release or Revoke finished
-                else if (stateDict[value.status] === 8 || stateDict[value.status] === 12) {
-                    if (stateDict[value.status] === 8) {
-                        value.state = 'Success';
-                    } else {
-                        value.state = 'Cancelled';
-                    }
+              value.htlcdate="--";
+              value.time = "--";
+              // from
+              value.crossAdress = value.to;
+              value.symbol = value.srcChainType;
+              value.value = web3.fromWei(value.contractValue);
+              value.state = value.status;
 
-                    value.operation = `<h2 style="${style}"></h2>`;
-                }
-                // locking
-                else if (stateDict[value.status] >= 1 && stateDict[value.status] <= 4) {
-                    if (stateDict[value.status] === 1) {
-                        value.state = 'Pending';
-                    } else if (stateDict[value.status] >= 2){
-                        value.state = 'Cross-Tx ' + (stateDict[value.status] - 1).toString() +  '/4';
-                    }
-                    value.operation = `<h2 style="${style}">Confirm</h2>`;
-                }
-                // Releasing
-                else if (stateDict[value.status] >= 6 && stateDict[value.status] <= 7) {
-                    value.state = 'Confirming ' + (stateDict[value.status] - 5).toString() +  '/3';
-                    value.operation = `<h2 style="${style}"></h2>`;
-                }
-                // Revoking
-                else if (stateDict[value.status] >= 10 && stateDict[value.status] <= 11) {
-                    value.state = 'Cancelling ' + (stateDict[value.status] - 9).toString() +  '/3';
-                    value.operation = `<h2 style="${style}"></h2>`;
-                }
-                // Failed
-                else if (stateDict[value.status] === 13) {
-                    value.state = 'Failed';
-                    value.operation = `<h2 style="${style}"></h2>`;
-                }
+              // Release
+                // if (stateDict[value.status] === 5) {
+                //     style += 'color: #920b1c;';
+                //
+                //     value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
+                //     value.state = 'To be confirmed';
+                // }
+                // // suspending
+                // else if (stateDict[value.status] === 14) {
+                //     value.operation = `<h2 style="${style}">Cancel</h2>`;
+                //     value.state = 'To be cancelled in ' + value.htlcdate;
+                // }
+                // // Revoke
+                // else if (stateDict[value.status] === 9) {
+                //     style += 'color: #920b1c;';
+                //     value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
+                //     value.state = 'To be cancelled';
+                // }
+                // // Release or Revoke finished
+                // else if (stateDict[value.status] === 8 || stateDict[value.status] === 12) {
+                //     if (stateDict[value.status] === 8) {
+                //         value.state = 'Success';
+                //     } else {
+                //         value.state = 'Cancelled';
+                //     }
+                //
+                //     value.operation = `<h2 style="${style}"></h2>`;
+                // }
+                //
+                // // locking
+                // else if (stateDict[value.status] >= 1 && stateDict[value.status] <= 4) {
+                //     if (stateDict[value.status] === 1) {
+                //         value.state = 'Pending';
+                //     } else if (stateDict[value.status] >= 2){
+                //         value.state = 'Cross-Tx ' + (stateDict[value.status] - 1).toString() +  '/4';
+                //     }
+                //     value.operation = `<h2 style="${style}">Confirm</h2>`;
+                // }
+                // // Releasing
+                // else if (stateDict[value.status] >= 6 && stateDict[value.status] <= 7) {
+                //     value.state = 'Confirming ' + (stateDict[value.status] - 5).toString() +  '/3';
+                //     value.operation = `<h2 style="${style}"></h2>`;
+                // }
+                // // Revoking
+                // else if (stateDict[value.status] >= 10 && stateDict[value.status] <= 11) {
+                //     value.state = 'Cancelling ' + (stateDict[value.status] - 9).toString() +  '/3';
+                //     value.operation = `<h2 style="${style}"></h2>`;
+                // }
+                // // Failed
+                // else if (stateDict[value.status] === 13) {
+                //     value.state = 'Failed';
+                //     value.operation = `<h2 style="${style}"></h2>`;
+                // }
                 // normal
-                else {
-                    value.state = 'Success';
-                    value.crossAdress = value.to;
-                    value.htlcdate = '--';
-                    value.fromText = `<small style="${smallStyle}">ETH</small>`;
-                    value.toText = `<small style="${smallStyle}">ETH</small>`;
-                    value.operation = `<h2 style="${style}"></h2>`;
-                }
+                // else {
+                //     value.state = 'Success';
+                //     value.crossAdress = value.to;
+                //     value.htlcdate = '--';
+                //     value.fromText = `<small style="${smallStyle}">ETH</small>`;
+                //     value.toText = `<small style="${smallStyle}">ETH</small>`;
+                //     value.operation = `<h2 style="${style}"></h2>`;
+                // }
 
                 crosschainList.push(value);
             });
@@ -209,6 +252,7 @@ Template['elements_cross_transactions_table'].helpers({
     },
 
 });
+
 
 Template['elements_cross_transactions_table'].events({
 
@@ -222,7 +266,7 @@ Template['elements_cross_transactions_table'].events({
 
         if (show_data) {
             if (!show_data.HashX) {
-                show_data.HashX = show_data.txhash;
+                show_data.HashX = show_data.hashX;
             }
 
             if (show_data.chain === 'ETH') {
@@ -307,28 +351,29 @@ Template['elements_cross_transactions_table'].events({
                         show_data.symbol = 'ETH';
 
                         // release x in wan
-                        mist.ETH2WETH().getRefundTransData(trans, function (err,getRefundTransData) {
-                            if (err) {
-                                Helpers.showError(err);
-                            } else {
-                                mist.WETH2ETH().getBalance(show_data.crossAdress.toLowerCase(), function (err,coinBalance) {
-                                    if (err) {
-                                        Helpers.showError(err);
-                                    } else {
-                                        transData = getRefundTransData.refundTransData;
-                                        let fee = new BigNumber(getGas * gasPrice);
-
-                                        if(fee.gt(new BigNumber(coinBalance, 10)))
-                                            return GlobalNotification.warning({
-                                                content: 'Insufficient WAN balance in your TO account',
-                                                duration: 2
-                                            });
-
-                                        showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
-                                    }
-                                });
-                            }
-                        });
+                        //#####################################################
+                        // mist.ETH2WETH().getRefundTransData(trans, function (err,getRefundTransData) {
+                        //     if (err) {
+                        //         Helpers.showError(err);
+                        //     } else {
+                        //         mist.WETH2ETH().getBalance(show_data.crossAdress.toLowerCase(), function (err,coinBalance) {
+                        //             if (err) {
+                        //                 Helpers.showError(err);
+                        //             } else {
+                        //                 transData = getRefundTransData.refundTransData;
+                        //                 let fee = new BigNumber(getGas * gasPrice);
+                        //
+                        //                 if(fee.gt(new BigNumber(coinBalance, 10)))
+                        //                     return GlobalNotification.warning({
+                        //                         content: 'Insufficient WAN balance in your TO account',
+                        //                         duration: 2
+                        //                     });
+                        //
+                        //                 showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
+                        //             }
+                        //         });
+                        //     }
+                        // });
 
                     }
                 })
@@ -348,29 +393,30 @@ Template['elements_cross_transactions_table'].events({
                         show_data.symbol = 'WETH';
 
                         // release x in eth
-                        mist.WETH2ETH().getRefundTransData(trans, function (err,getRefundTransData) {
-                            if (err) {
-                                Helpers.showError(err);
-                            } else {
-                                // coinBalance = await Helpers.promisefy(mist.WETH2ETH().getBalance, [show_data.crossAdress.toLowerCase()], mist.WETH2ETH());
-                                mist.ETH2WETH().getBalance(show_data.crossAdress.toLowerCase(), function (err,coinBalance) {
-                                    if (err) {
-                                        Helpers.showError(err);
-                                    } else {
-                                        transData = getRefundTransData.refundTransData;
-                                        let fee = new BigNumber(getGas * gasPrice);
-
-                                        if(fee.gt(new BigNumber(coinBalance, 10)))
-                                            return GlobalNotification.warning({
-                                                content: 'Insufficient ETH balance in your TO account',
-                                                duration: 2
-                                            });
-
-                                        showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
-                                    }
-                                });
-                            }
-                        });
+                        //###################################
+                        // mist.WETH2ETH().getRefundTransData(trans, function (err,getRefundTransData) {
+                        //     if (err) {
+                        //         Helpers.showError(err);
+                        //     } else {
+                        //         // coinBalance = await Helpers.promisefy(mist.WETH2ETH().getBalance, [show_data.crossAdress.toLowerCase()], mist.WETH2ETH());
+                        //         mist.ETH2WETH().getBalance(show_data.crossAdress.toLowerCase(), function (err,coinBalance) {
+                        //             if (err) {
+                        //                 Helpers.showError(err);
+                        //             } else {
+                        //                 transData = getRefundTransData.refundTransData;
+                        //                 let fee = new BigNumber(getGas * gasPrice);
+                        //
+                        //                 if(fee.gt(new BigNumber(coinBalance, 10)))
+                        //                     return GlobalNotification.warning({
+                        //                         content: 'Insufficient ETH balance in your TO account',
+                        //                         duration: 2
+                        //                     });
+                        //
+                        //                 showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
+                        //             }
+                        //         });
+                        //     }
+                        // });
 
                     }
                 })
@@ -403,28 +449,29 @@ Template['elements_cross_transactions_table'].events({
                         // revoke x in eth
                         console.log('getRevokeTransData ETH: ', show_data.chain);
 
-                        mist.ETH2WETH().getRevokeTransData(trans, function (err,getRevokeTransData) {
-                            if (err) {
-                                Helpers.showError(err);
-                            } else {
-                                mist.ETH2WETH().getBalance(show_data.from.toLowerCase(), function (err,coinBalance) {
-                                    if (err) {
-                                        Helpers.showError(err);
-                                    } else {
-                                        transData = getRevokeTransData.revokeTransData;
-                                        let fee = new BigNumber(getGas * gasPrice);
-
-                                        if(fee.gt(new BigNumber(coinBalance, 10)))
-                                            return GlobalNotification.warning({
-                                                content: 'Insufficient ETH balance in your FROM Account',
-                                                duration: 2
-                                            });
-
-                                        showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
-                                    }
-                                });
-                            }
-                        });
+                        //###########################################
+                        // mist.ETH2WETH().getRevokeTransData(trans, function (err,getRevokeTransData) {
+                        //     if (err) {
+                        //         Helpers.showError(err);
+                        //     } else {
+                        //         mist.ETH2WETH().getBalance(show_data.from.toLowerCase(), function (err,coinBalance) {
+                        //             if (err) {
+                        //                 Helpers.showError(err);
+                        //             } else {
+                        //                 transData = getRevokeTransData.revokeTransData;
+                        //                 let fee = new BigNumber(getGas * gasPrice);
+                        //
+                        //                 if(fee.gt(new BigNumber(coinBalance, 10)))
+                        //                     return GlobalNotification.warning({
+                        //                         content: 'Insufficient ETH balance in your FROM Account',
+                        //                         duration: 2
+                        //                     });
+                        //
+                        //                 showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
+                        //             }
+                        //         });
+                        //     }
+                        // });
                     }
                 })
 
@@ -448,28 +495,29 @@ Template['elements_cross_transactions_table'].events({
                         // revoke x in wan
                         console.log('getRevokeTransData WAN: ', show_data.chain);
 
-                        mist.WETH2ETH().getRevokeTransData(trans, function (err,getRevokeTransData) {
-                            if (err) {
-                                Helpers.showError(err);
-                            } else {
-                                mist.WETH2ETH().getBalance(show_data.from.toLowerCase(), function (err,coinBalance) {
-                                    if (err) {
-                                        Helpers.showError(err);
-                                    } else {
-                                        transData = getRevokeTransData.revokeTransData;
-                                        let fee = new BigNumber(getGas * gasPrice);
-
-                                        if(fee.gt(new BigNumber(coinBalance, 10)))
-                                            return GlobalNotification.warning({
-                                                content: 'Insufficient WAN balance in your FROM account',
-                                                duration: 2
-                                            });
-
-                                        showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
-                                    }
-                                });
-                            }
-                        });
+                        //#################################
+                        // mist.WETH2ETH().getRevokeTransData(trans, function (err,getRevokeTransData) {
+                        //     if (err) {
+                        //         Helpers.showError(err);
+                        //     } else {
+                        //         mist.WETH2ETH().getBalance(show_data.from.toLowerCase(), function (err,coinBalance) {
+                        //             if (err) {
+                        //                 Helpers.showError(err);
+                        //             } else {
+                        //                 transData = getRevokeTransData.revokeTransData;
+                        //                 let fee = new BigNumber(getGas * gasPrice);
+                        //
+                        //                 if(fee.gt(new BigNumber(coinBalance, 10)))
+                        //                     return GlobalNotification.warning({
+                        //                         content: 'Insufficient WAN balance in your FROM account',
+                        //                         duration: 2
+                        //                     });
+                        //
+                        //                 showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
+                        //             }
+                        //         });
+                        //     }
+                        // });
                     }
                 })
             }

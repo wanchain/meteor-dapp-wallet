@@ -77,8 +77,8 @@ class crossChainOperators{
         this.invokeOperator(operator);
     }
 
-    sendLockTrans(trans,password,secretX, callback){
-        let operator = new crossOperator('sendLockTrans',{tx:trans,secretX:secretX, password:password},this.getOriginChainType(),callback);
+    sendLockTrans(trans,password, callback){
+        let operator = new crossOperator('sendLockTrans',{tx:trans, password:password},this.getOriginChainType(),callback);
         this.invokeOperator(operator);
     }
 
