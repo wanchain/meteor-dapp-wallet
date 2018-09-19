@@ -62,7 +62,7 @@ function showQuestion(show_data, trans, transType) {
             from: show_data.from,
             to: show_data.to,
             storeman: show_data.storeman,
-            crossAdress: show_data.crossAdress,
+            crossAddress: show_data.crossAddress,
             amount: show_data.balance,
             trans: trans,
             transType: transType,
@@ -205,7 +205,7 @@ Template['elements_cross_transactions_table_btc'].helpers({
                 // normal
                 else {
                     value.state = 'Success';
-                    value.crossAdress = value.to;
+                    value.crossAddress = value.to;
                     value.htlcdate = '--';
                     value.fromText = `<small style="${smallStyle}">BTC</small>`;
                     value.toText = `<small style="${smallStyle}">BTC</small>`;
@@ -247,7 +247,7 @@ Template['elements_cross_transactions_table_btc'].events({
                 data: {
                     HashX: show_data.HashX,
                     chain: show_data.chain,
-                    crossAdress: show_data.crossAdress,
+                    crossAddress: show_data.crossAddress,
                     from: show_data.from,
                     lockTxHash: show_data.lockTxHash,
                     refundTxHash: show_data.refundTxHash,
@@ -298,7 +298,7 @@ Template['elements_cross_transactions_table_btc'].events({
 
                 trans = {
                     lockTxHash: show_data.lockTxHash, amount: show_data.value.toString(10),
-                    storemanGroup: show_data.storeman, cross: show_data.crossAdress,
+                    storemanGroup: show_data.storeman, cross: show_data.crossAddress,
                     X: show_data.x
                 };
 
@@ -310,7 +310,7 @@ Template['elements_cross_transactions_table_btc'].events({
                 show_data.symbol = 'WBTC';
 
                 trans = {
-                    HashX: show_data.HashX, crossAddress: show_data.crossAdress
+                    HashX: show_data.HashX, crossAddress: show_data.crossAddress
                 };
 
                 showQuestion(show_data, trans, transType);
@@ -330,7 +330,7 @@ Template['elements_cross_transactions_table_btc'].events({
 
                 trans = {
                     from: show_data.from, amount: show_data.value.toString(10),
-                    storemanGroup: show_data.storeman, cross: show_data.crossAdress,
+                    storemanGroup: show_data.storeman, cross: show_data.crossAddress,
                     HashX: show_data.HashX,
                 };
 

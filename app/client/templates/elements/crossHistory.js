@@ -236,7 +236,7 @@ Template['elements_cross_transactions_table'].events({
                 data: {
                     HashX: show_data.HashX,
                     chain: show_data.chain,
-                    crossAdress: show_data.crossAdress,
+                    crossAddress: show_data.crossAdress,
                     from: show_data.from,
                     lockTxHash: show_data.lockTxHash,
                     refundTxHash: show_data.refundTxHash,

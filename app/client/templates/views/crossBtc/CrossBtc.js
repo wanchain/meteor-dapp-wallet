@@ -14,9 +14,11 @@ let InterID;
              let resultHex = web3.toHex(result);
 
              if(!oldAddressList || oldResultHex !== resultHex) {
-                 Session.set('btcAddressList', result);
-                 TemplateVar.set(template,'btcAccounts',result.address);
-                 TemplateVar.set(template,'btcBalance',result.balance);
+                 if (result) {
+                     Session.set('btcAddressList', result);
+                     TemplateVar.set(template,'btcAccounts',result.address);
+                     TemplateVar.set(template,'btcBalance',result.balance);
+                 }
              }
          }
      });
