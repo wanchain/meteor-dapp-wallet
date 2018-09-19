@@ -93,7 +93,7 @@ FlowRouter.route('/contracts', {
 });
 
 
-FlowRouter.route('/crosschain', {
+FlowRouter.route('/crosschain/eth', {
     name: 'crosschain',
     action: function(params, queryParams) {
         BlazeLayout.render('layout_main', {
@@ -101,6 +101,15 @@ FlowRouter.route('/crosschain', {
             main: 'views_crosschain_main'
         });
     }
+});
+FlowRouter.route('/crosschain/erc20', {
+  name: 'crosschain_erc20',
+  action: function(params, queryParams) {
+    BlazeLayout.render('layout_main', {
+      header: 'layout_header',
+      main: 'views_crosschain_erc20_main'
+    });
+  }
 });
 
 
