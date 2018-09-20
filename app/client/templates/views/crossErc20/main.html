@@ -81,15 +81,15 @@
     </nav>
 
     {{#if $eq ($.Session.get "clickButton") 1}}
-        {{> views_crosschain_erc20}}
+        {{> views_crosschain_erc20 symbol=getSymbol tokenOrigAddr=tokenOrigAddr }}
     {{/if}}
 
     {{#if $eq ($.Session.get "clickButton") 2}}
-        {{> views_erc20Towerc20}}
+        {{> views_erc20Towerc20 symbol=getSymbol tokenOrigAddr=tokenOrigAddr}}
     {{/if}}
 
     {{#if $eq ($.Session.get "clickButton") 3}}
-        {{> views_werc20Toerc20}}
+        {{> views_werc20Toerc20 symbol=getSymbol tokenOrigAddr=tokenOrigAddr }}
     {{/if}}
 
     {{#if $eq ($.Session.get "clickButton") 4}}

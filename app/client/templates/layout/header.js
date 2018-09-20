@@ -142,7 +142,6 @@ Template['layout_header'].helpers({
     },
 
     'tokenAccounts': function () {
-        console.log("########################",TemplateVar.get('tokenAccounts'));
         return TemplateVar.get('tokenAccounts');
     }
 });

@@ -102,16 +102,24 @@ FlowRouter.route('/crosschain/eth', {
         });
     }
 });
-FlowRouter.route('/crosschain/erc20/:tokenOrigAddr/:symbol', {
-  name: 'crosschain_erc20',
+FlowRouter.route('/crosschain/erc20_forward/:tokenOrigAddr/:symbol', {
+  name: 'crosschain_erc20_forward',
   action: function(params, queryParams) {
-    BlazeLayout.render('layout_main', {
-      header: 'layout_header',
-      main: 'views_crosschain_erc20_main'
-    });
+      BlazeLayout.render('layout_main', {
+          header: 'layout_header',
+          main: 'views_crosschain_erc20_forward'
+      });
   }
 });
-
+FlowRouter.route('/crosschain/erc20/:tokenOrigAddr/:symbol', {
+    name: 'crosschain_erc20',
+    action: function(params, queryParams) {
+        BlazeLayout.render('layout_main', {
+            header: 'layout_header',
+            main: 'views_crosschain_erc20_main'
+        });
+    }
+});
 
 /**
 The send route.
