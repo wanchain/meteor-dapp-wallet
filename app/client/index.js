@@ -135,41 +135,41 @@ Meteor.startup(function() {
             });
 
           // erc20
-            mist.ERC202WERC20().getWerc20Token(function (err, unicornToken) {
-                if(!err) {
-                      Meteor.setTimeout(function(){
+          //   mist.ERC202WERC20().getWerc20Token(function (err, unicornToken) {
+          //       if(!err) {
+          //             Meteor.setTimeout(function(){
+          //
+          //                 let tokenId = Helpers.makeId('token', unicornToken.address);
+          //                   let dapp_hasWerc20Token = Tokens.findOne(tokenId);
+          //
+          //                     if (dapp_hasWerc20Token === undefined) {
+          //
+          //                         if (dapp_hasWerc20Token === undefined) {
+          //                             let dapp_isWerc20 = Tokens.findOne({isWerc20: 1});
+          //
+          //                             if (dapp_isWerc20 !== undefined) {
+          //                                 Tokens.remove(dapp_isWerc20._id);
+          //                             }
+          //
+          //                             Tokens.upsert(tokenId, {
+          //                                 $set: {
+          //                                     address: unicornToken.address,
+          //                                     name: unicornToken.name,
+          //                                     symbol: unicornToken.symbol,
+          //                                     balances: {},
+          //                                     decimals: unicornToken.decimals,
+          //                                     isWbtc: 1
+          //                                 }
+          //                             });
+          //                         }
+          //                     }
+          //                   }, 2000);
+          //         } else {
+          //             console.log('getWethToken err: ', err);
+          //         }
+          //   });
 
-                          let tokenId = Helpers.makeId('token', unicornToken.address);
-                            let dapp_hasWerc20Token = Tokens.findOne(tokenId);
-
-                              if (dapp_hasWerc20Token === undefined) {
-
-                                  if (dapp_hasWerc20Token === undefined) {
-                                      let dapp_isWerc20 = Tokens.findOne({isWerc20: 1});
-
-                                      if (dapp_isWerc20 !== undefined) {
-                                          Tokens.remove(dapp_isWerc20._id);
-                                      }
-
-                                      Tokens.upsert(tokenId, {
-                                          $set: {
-                                              address: unicornToken.address,
-                                              name: unicornToken.name,
-                                              symbol: unicornToken.symbol,
-                                              balances: {},
-                                              decimals: unicornToken.decimals,
-                                              isWbtc: 1
-                                          }
-                                      });
-                                  }
-                              }
-                            }, 2000);
-                  } else {
-                      console.log('getWethToken err: ', err);
-                  }
-            });
-
-            }
+        }
 
     });
 

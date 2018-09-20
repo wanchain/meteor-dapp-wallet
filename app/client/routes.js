@@ -102,7 +102,7 @@ FlowRouter.route('/crosschain/eth', {
         });
     }
 });
-FlowRouter.route('/crosschain/erc20', {
+FlowRouter.route('/crosschain/erc20/:tokenOrigAddr/:symbol', {
   name: 'crosschain_erc20',
   action: function(params, queryParams) {
     BlazeLayout.render('layout_main', {

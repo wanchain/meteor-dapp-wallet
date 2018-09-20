@@ -68,12 +68,13 @@
                         <a href="{{pathFor route='/crosschain/eth'}}" style="margin: 0;padding: 0;">
                             <li class="Cross" id="eth"><span></span>ETH</li>
                         </a>
-                        <a href="{{pathFor route='/crosschain/erc20'}}" style="margin: 0;padding: 0;">
-                            <li class="Cross" id="erc20"><span></span>ERC20</li>
-                        </a>
-                        <a href="{{pathFor route='/crosschain/erc20/2'}}" style="margin: 0;padding: 0;">
-                            <li class="Cross" id="erc202"><span></span>ERC202</li>
-                        </a>
+                        {{#if tokenAccounts}}
+                        {{#each tokenAccounts}}
+                            <a href="{{pathFor route='crosschain_erc20' tokenOrigAddr=tokenOrigAddr symbol=symbol}}" style="margin: 0;padding: 0;">
+                                <li class="Cross" id="erc20{{@index}}"><span></span>{{symbol}}</li>
+                            </a>
+                        {{/each}}
+                        {{/if}}
                     </ul>
                 </div>
             </li>

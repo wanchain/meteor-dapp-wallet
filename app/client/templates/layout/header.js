@@ -13,6 +13,30 @@ The header template
 
 Template['layout_header'].onCreated(function(){
     var template = this;
+
+    Meteor.setTimeout(function(){
+
+        if(!Session.get('isShowModal')) {
+
+            mist.ERC202WERC20().getRegErc20Tokens(function(err, ret) {
+
+                if (!err){
+                    for (let tokenAccount of ret){
+                        mist.ERC202WERC20().getErc20SymbolInfo(tokenAccount.tokenOrigAddr,(error,result) =>{
+                            if (!error){
+                                tokenAccount.symbol = result;
+                                TemplateVar.set(template,'tokenAccounts',ret);
+                            }
+                        });
+                    }
+
+                }
+
+            });
+        } else {
+            console.log('isShowModal: ', Session.get('isShowModal'));
+        }
+    }, 1000);
 });
 
 
@@ -115,6 +139,11 @@ Template['layout_header'].helpers({
             Helpers.rerun["1s"].tick();
             return TAPi18n.__('wallet.app.texts.timeSinceBlock');
         }
+    },
+
+    'tokenAccounts': function () {
+        console.log("########################",TemplateVar.get('tokenAccounts'));
+        return TemplateVar.get('tokenAccounts');
     }
 });
 
