@@ -269,19 +269,19 @@ Template['views_werc20Toerc20'].events({
 
 
         // console.log('amount', amount);
-        // if(! amount) {
-        //     return GlobalNotification.warning({
-        //         content: 'Please enter a valid amount',
-        //         duration: 2
-        //     });
-        // }
-        //
-        // if(amount.eq(new BigNumber(0))) {
-        //     return GlobalNotification.warning({
-        //         content: 'Please enter a valid amount',
-        //         duration: 2
-        //     });
-        // }
+        if(! amount) {
+            return GlobalNotification.warning({
+                content: 'Please enter a valid amount',
+                duration: 2
+            });
+        }
+
+        if(amount.eq(new BigNumber(0))) {
+            return GlobalNotification.warning({
+                content: 'Please enter a valid amount',
+                duration: 2
+            });
+        }
 
         const amountSymbol = amount.toString().split('.')[1];
         if (amountSymbol && amountSymbol.length >=19) {
