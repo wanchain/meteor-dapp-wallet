@@ -5,7 +5,7 @@
         <div class="viwes-account-header">
             <h1 class="account-h1" style="margin-top: 0; padding-left:0;"><div class="viwes-account-line"></div><strong>{{symbol}} Accounts Overview</strong></h1>
             {{#if addressList}}
-                {{> elements_erc20_account_table addressList=addressList tokenAddr=tokenOrigAddr symbol=symbol}}
+                {{> elements_erc20_account_table addressList=addressList tokenAddr=tokenOrigAddr chainType=chainType symbol=symbol}}
             {{else}}
                 <div class="wanchain-notransaction" style="">
                     <img />

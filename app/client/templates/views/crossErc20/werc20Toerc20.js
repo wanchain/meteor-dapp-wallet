@@ -12,8 +12,12 @@
 const defaultGasprice = 180000000000;
 
 // Set basic variables
-Template['views_wethToeth'].onCreated(function(){
+Template['views_werc20Toerc20'].onCreated(function(){
     var template = this;
+    TemplateVar.set(template, 'symbol', this.data.symbol);
+    TemplateVar.set(template, 'chainType', this.data.chainType);
+    TemplateVar.set(template, 'tokenOrigAddr', this.data.tokenOrigAddr);
+    TemplateVar.set(template, 'tokenWanAddr', this.data.tokenWanAddr);
 
     TemplateVar.set(template, 'amount', 0);
     TemplateVar.set(template, 'feeMultiplicator', 0);
@@ -35,9 +39,10 @@ Template['views_wethToeth'].onCreated(function(){
 
     // wan accounts token balance
     let wanAddressList = Session.get('wanAddressList');
-
-    mist.WETH2ETH().getMultiTokenBalance(wanAddressList, (err, result) => {
-        TemplateVar.set(template,'wethBalance',result);
+    let self = this;
+    let chainType = this.data.chainType;
+    mist.WERC202ERC20(chainType).getMultiTokenBalance(wanAddressList,self.data.tokenWanAddr,(err, result) => {
+        TemplateVar.set(template,'werc20Balance',result);
 
         if (!err) {
             let result_list = [];
@@ -62,13 +67,13 @@ Template['views_wethToeth'].onCreated(function(){
     });
 
     // weth => eth storeman
-    mist.WETH2ETH().getStoremanGroups(function (err,data) {
+    mist.WERC202ERC20(chainType).getStoremanGroups(self.data.tokenOrigAddr,function (err,data) {
         EthElements.Modal.hide();
 
         if (!err) {
-            // console.log('WETH2ETH storeman', data);
+            // console.log('WERC202ERC20 storeman', data);
             if (data.length > 0) {
-                TemplateVar.set(template,'storeman',data[0].wanAddress);
+                TemplateVar.set(template,'storeman',data[0].smgWanAddr);
                 TemplateVar.set(template,'txFeeRatio',data[0].txFeeRatio);
 
                 TemplateVar.set(template,'storemanGroup',data);
@@ -79,7 +84,7 @@ Template['views_wethToeth'].onCreated(function(){
     });
 
     // get wan chain gas price
-    mist.WETH2ETH().getGasPrice('WAN', function (err,data) {
+    mist.WERC202ERC20(chainType).getGasPrice(function (err,data) {
         if (!err) {
             // console.log('WAN gasPrice', data);
             // console.log(data.LockGas, data.RefundGas, data.RevokeGas, data.gasPrice);
@@ -96,7 +101,7 @@ Template['views_wethToeth'].onCreated(function(){
     });
 
     // get wan2coin ratio
-    mist.ETH2WETH().getCoin2WanRatio('ETH', function (err,data) {
+    mist.ERC202WERC20(chainType).getCoin2WanRatio('ETH', function (err,data) {
         if (!err) {
             data ? TemplateVar.set(template,'wan2CoinRatio',data) : TemplateVar.set(template,'wan2CoinRatio',20);
         }
@@ -105,7 +110,7 @@ Template['views_wethToeth'].onCreated(function(){
 });
 
 
-Template['views_wethToeth'].helpers({
+Template['views_werc20Toerc20'].helpers({
     'ethAccounts': function(){
         return TemplateVar.get('wanList');
     },
@@ -118,7 +123,7 @@ Template['views_wethToeth'].helpers({
 
         let result = [];
         _.each(TemplateVar.get('storemanGroup'), function (value, index) {
-            if (value.wanAddress === TemplateVar.get('storeman')) {
+            if (value.smgWanAddr === TemplateVar.get('storeman')) {
 
                 let outboundQuota = web3.fromWei(value.outboundQuota, 'ether');
                 let quota = web3.fromWei(value.quota, 'ether');
@@ -146,7 +151,7 @@ Template['views_wethToeth'].helpers({
 });
 
 
-Template['views_wethToeth'].events({
+Template['views_werc20Toerc20'].events({
 
     'keyup input[name="amount"], change input[name="amount"], input input[name="amount"]': function(event){
         event.preventDefault();
@@ -264,19 +269,19 @@ Template['views_wethToeth'].events({
 
 
         // console.log('amount', amount);
-        if(! amount) {
-            return GlobalNotification.warning({
-                content: 'Please enter a valid amount',
-                duration: 2
-            });
-        }
-
-        if(amount.eq(new BigNumber(0))) {
-            return GlobalNotification.warning({
-                content: 'Please enter a valid amount',
-                duration: 2
-            });
-        }
+        // if(! amount) {
+        //     return GlobalNotification.warning({
+        //         content: 'Please enter a valid amount',
+        //         duration: 2
+        //     });
+        // }
+        //
+        // if(amount.eq(new BigNumber(0))) {
+        //     return GlobalNotification.warning({
+        //         content: 'Please enter a valid amount',
+        //         duration: 2
+        //     });
+        // }
 
         const amountSymbol = amount.toString().split('.')[1];
         if (amountSymbol && amountSymbol.length >=19) {
@@ -286,14 +291,16 @@ Template['views_wethToeth'].events({
             });
         }
 
-        let wethBalance = TemplateVar.get('wethBalance')[from.toLowerCase()];
-        // let wanBalance = await Helpers.promisefy(mist.WETH2ETH().getBalance, [from.toLowerCase()], mist.WETH2ETH());
+        let werc20Balance = TemplateVar.get('werc20Balance')[from.toLowerCase()];
+        let symbol = TemplateVar.get('symbol');
+        let chainType = TemplateVar.get('chainType');
+        let tokenOrigAddr = TemplateVar.get('tokenOrigAddr');
 
-        mist.WETH2ETH().getBalance(from.toLowerCase(), function (err,wanBalance) {
+        mist.WERC202ERC20(chainType).getBalance(from.toLowerCase(), function (err,wanBalance) {
             if (!err) {
-                if(new BigNumber(EthTools.toWei(amount), 10).gt(new BigNumber(wethBalance, 10)))
+                if(new BigNumber(EthTools.toWei(amount), 10).gt(new BigNumber(werc20Balance, 10)))
                     return GlobalNotification.warning({
-                        content: 'Insufficient WETH balance in your FROM account',
+                        content: `Insufficient W${symbol} balance in your FROM account`,
                         duration: 2
                     });
 
@@ -314,36 +321,39 @@ Template['views_wethToeth'].events({
 
                 // console.log('trans: ', trans);
 
-                mist.WETH2ETH().getLockTransData(trans, function (err,getLockTransData) {
-                    // console.log('getLockTransData: ', getLockTransData);
+                mist.WERC202ERC20(chainType).getApproveTransData(tokenOrigAddr,chainType, trans, function (err,getApproveTransData) {
+                    mist.WERC202ERC20(chainType).getLockTransData(tokenOrigAddr,chainType, trans, function (err,getLockTransData) {
+                        // console.log('getLockTransData: ', getLockTransData);
+                        if (!err) {
+                            Session.set('isShowModal', true);
 
-                    if (!err) {
-                        Session.set('isShowModal', true);
-
-                        EthElements.Modal.question({
-                            template: 'views_modals_unlockTransactionInfo',
-                            data: {
-                                from: from,
-                                to: to,
-                                amount: amount,
-                                gasPrice: gasPrice,
-                                chooseGasPrice: chooseGasPrice,
-                                estimatedGas: estimatedGas,
-                                fee: fee,
-                                data: getLockTransData.lockTransData,
-                                trans: trans,
-                                valueFee: valueFee,
-                                chain: 'WAN',
-                                symbol: 'WETH'
-                            },
-                        },{
-                            class: 'send-transaction-info',
-                            closeable: false,
-                        });
-                    } else {
-                        Helpers.showError(err);
-                    }
-
+                            EthElements.Modal.question({
+                                template: 'views_modals_unlock_erc20TransactionInfo',
+                                data: {
+                                    from: from,
+                                    to: to,
+                                    amount: amount,
+                                    gasPrice: gasPrice,
+                                    chooseGasPrice: chooseGasPrice,
+                                    estimatedGas: estimatedGas,
+                                    fee: fee,
+                                    valueFee: valueFee,
+                                    approveData: getApproveTransData.approveTransData,
+                                    lockData: getLockTransData.lockTransData,
+                                    tokenOrigAddr: tokenOrigAddr,
+                                    trans: trans,
+                                    chain: 'WAN',
+                                    chainType:chainType,
+                                    symbol: symbol
+                                },
+                            },{
+                                class: 'send-transaction-info',
+                                closeable: false,
+                            });
+                        } else {
+                            Helpers.showError(err);
+                        }
+                    });
                 });
 
             }

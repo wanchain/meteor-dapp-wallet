@@ -5,8 +5,9 @@
 
 let InterID;
 
- const getAddressList = function(template) {
-    mist.ERC202WERC20().getAddressList('ETH', function (err, addressList) {
+ const getAddressList = function(template,chainType) {
+
+    mist.ERC202WERC20(chainType).getAddressList(chainType, function (err, addressList) {
             if (! err) {
                 let oldAddressList = TemplateVar.get(template, 'addressList');
 
@@ -21,7 +22,7 @@ let InterID;
             }
         });
 
-    mist.ERC202WERC20().getAddressList('WAN', function (err, wanAddressList) {
+    mist.ERC202WERC20(chainType).getAddressList('WAN', function (err, wanAddressList) {
         EthElements.Modal.hide();
 
         if (!err) {
@@ -43,14 +44,16 @@ Template['views_crosschain_erc20'].onCreated(function () {
 
     EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
-    TemplateVar.set(template,'tokenOrigAddr',template.data.tokenOrigAddr);
-    TemplateVar.set(template,'symbol',template.data.symbol);
+    TemplateVar.set(template, 'symbol', this.data.symbol);
+    TemplateVar.set(template, 'chainType', this.data.chainType);
+    TemplateVar.set(template, 'tokenOrigAddr', this.data.tokenOrigAddr);
 
-    getAddressList(template);
+    let chainType = this.data.chainType;
+    getAddressList(template,chainType);
 
     InterID = Meteor.setInterval(function(){
         if(!Session.get('isShowModal')) {
-            getAddressList(template);
+            getAddressList(template,chainType);
         } else {
             console.log('isShowModal: ', Session.get('isShowModal'));
         }

@@ -11,11 +11,24 @@ Template['views_crosschain_erc20_main'].onCreated(function () {
     let template = this;
     let symbol = FlowRouter.getParam('symbol');
     let tokenOrigAddr = FlowRouter.getParam('tokenOrigAddr');
+    let tokenWanAddr = FlowRouter.getParam('tokenWanAddr');
+    let chainType = FlowRouter.getParam('chainType');
 
+    console.log("############################################");
+    console.log("tokenOrigAddr:",tokenOrigAddr);
+    console.log("tokenWanAddr:",tokenWanAddr);
+    console.log("chainType:",chainType);
+    console.log("symbol:",symbol);
+    console.log("############################################");
+    TemplateVar.set(template,"chainType",chainType);
     TemplateVar.set(template,"symbol",symbol);
     TemplateVar.set(template,"tokenOrigAddr",tokenOrigAddr);
+    TemplateVar.set(template,"tokenWanAddr",tokenWanAddr);
 });
 Template['views_crosschain_erc20_main'].helpers({
+    "chainType" : function () {
+        return TemplateVar.get("chainType");
+    },
     "getSymbol" : function () {
         return TemplateVar.get("symbol");
     },
@@ -24,6 +37,9 @@ Template['views_crosschain_erc20_main'].helpers({
     },
     "tokenOrigAddr" : function () {
         return TemplateVar.get("tokenOrigAddr");
+    },
+    "tokenWanAddr" : function () {
+        return TemplateVar.get("tokenWanAddr");
     }
 });
 

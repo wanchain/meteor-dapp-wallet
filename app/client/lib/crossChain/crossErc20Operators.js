@@ -50,44 +50,34 @@ class crossChainOperators{
     listHistory(addrList, callback){
         this.invokeOperator(new crossOperator('listHistory',{addrList:addrList},this.getOriginChainType(),callback));
     }
-    getLockTransData(trans,callback){
-        let operator = new crossOperator('getLockTransData',{tx:trans},this.getOriginChainType(),callback);
+    getApproveTransData(tokenOrigAddr,tokenChainType,trans,callback){
+        let operator = new crossOperator('getApproveTransData',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType},this.getOriginChainType() ,callback);
         this.invokeOperator(operator);
     }
-    getRefundTransData(trans,callback){
-        let operator = new crossOperator('getRefundTransData',{tx:trans},this.getCrossChainType(),callback);
+    getLockTransData(tokenOrigAddr,tokenChainType,trans,callback){
+        let operator = new crossOperator('getLockTransData',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType},this.getOriginChainType(),callback);
         this.invokeOperator(operator);
     }
-    getRevokeTransData(trans,callback){
-        let operator = new crossOperator('getRevokeTransData',{tx:trans},this.getOriginChainType(),callback);
+    getRefundTransData(tokenOrigAddr,tokenChainType,trans,callback){
+        let operator = new crossOperator('getRefundTransData',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType},this.getCrossChainType(),callback);
         this.invokeOperator(operator);
     }
-
-    signLockTrans(trans,password,secretX, callback){
-        let operator = new crossOperator('signLockTrans',{tx:trans,secretX:secretX, password:password},this.getOriginChainType(),callback);
-        this.invokeOperator(operator);
-    }
-
-    signRefundTrans(trans,password,secretX,callback){
-        let operator = new crossOperator('signUnLockTrans',{tx:trans,secretX:secretX, password:password},this.getCrossChainType(),callback);
-        this.invokeOperator(operator);
-    }
-    signRevokeTrans(trans,password,secretX,callback){
-        let operator = new crossOperator('signRevokeTrans',{tx:trans,secretX:secretX, password:password},this.getOriginChainType(),callback);
+    getRevokeTransData(tokenOrigAddr,tokenChainType,trans,callback){
+        let operator = new crossOperator('getRevokeTransData',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType},this.getOriginChainType(),callback);
         this.invokeOperator(operator);
     }
 
-    sendLockTrans(trans,password, callback){
-        let operator = new crossOperator('sendLockTrans',{tx:trans, password:password},this.getOriginChainType(),callback);
+    sendLockTrans(tokenOrigAddr,tokenChainType, trans,password, callback){
+        let operator = new crossOperator('sendLockTrans',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType, password:password},this.getOriginChainType(),callback);
         this.invokeOperator(operator);
     }
 
-    sendRefundTrans(trans,password,callback){
-        let operator = new crossOperator('sendRefundTrans',{tx:trans, password:password},this.getCrossChainType(),callback);
+    sendRefundTrans(tokenOrigAddr,tokenChainType, trans,password,callback){
+        let operator = new crossOperator('sendRefundTrans',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType, password:password},this.getCrossChainType(),callback);
         this.invokeOperator(operator);
     }
-    sendRevokeTrans(trans,password,secretX,callback){
-        let operator = new crossOperator('sendRevokeTrans',{tx:trans,secretX:secretX, password:password},this.getOriginChainType(),callback);
+    sendRevokeTrans(tokenOrigAddr,tokenChainType, trans,password,callback){
+        let operator = new crossOperator('sendRevokeTrans',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType, password:password},this.getOriginChainType(),callback);
         this.invokeOperator(operator);
     }
     getCrossEthScAddress(callback){
@@ -96,8 +86,8 @@ class crossChainOperators{
     getErc20Token(callback){
         this.invokeOperator(new crossOperator('getWethToken',[],this.getOriginChainType(),callback));
     }
-    getStoremanGroups(callback){
-        this.invokeOperator(new crossOperator('syncStoremanGroups',[],this.getOriginChainType(),callback));
+    getStoremanGroups(tokenAddr, callback){
+        this.invokeOperator(new crossOperator('syncErc20StoremanGroups',{tokenAddr:tokenAddr}, this.getOriginChainType(),callback));
     }
     getBalance(address,callback){
         this.invokeOperator(new crossOperator('getBalance', [address],this.getOriginChainType(),callback));
@@ -105,8 +95,8 @@ class crossChainOperators{
     getMultiBalances(address,callback){
         this.invokeOperator(new crossOperator('getMultiBalances',[address],this.getOriginChainType(),callback));
     }
-    getMultiTokenBalance(addressList,tokenAddress,chainType,callback){
-        this.invokeOperator(new crossOperator('getMultiTokenBalance',{addressList:addressList,tokenAddress:tokenAddress},chainType,callback));
+    getMultiTokenBalance(addressList,tokenAddress,callback){
+        this.invokeOperator(new crossOperator('getMultiTokenBalance',{addressList:addressList,tokenAddress:tokenAddress},this.getOriginChainType(),callback));
     }
 
     getNonce(address,chainType, callback){
@@ -115,8 +105,8 @@ class crossChainOperators{
     getBlockNumber(callback){
         this.invokeOperator(new crossOperator('getBlockNumber',[],this.getOriginChainType(),callback));
     }
-    getGasPrice(chainType, callback){
-        this.invokeOperator(new crossOperator('getGasPrice',[],chainType,callback));
+    getGasPrice(callback){
+        this.invokeOperator(new crossOperator('getGasPrice',[],this.getOriginChainType(),callback));
     }
     getScEvent(address,topics,callback){
         this.invokeOperator(new crossOperator('getScEvent',[address,topics],this.getOriginChainType(),callback));
@@ -153,12 +143,14 @@ class crossChainOperators{
 if(typeof mist !== 'undefined')
 {
     let erc20CrossChain = new crossChainOperators('ERC202WERC20');
-    mist.ERC202WERC20 = function () {
+    mist.ERC202WERC20 = function (erc20Type) {
         erc20CrossChain.direction = directionEnum[0];
+        chainType[0]=erc20Type;
         return erc20CrossChain;
     };
-    mist.WERC202ERC20 = function () {
+    mist.WERC202ERC20 = function (erc20Type) {
         erc20CrossChain.direction = directionEnum[1];
+        chainType[0]=erc20Type;
         return erc20CrossChain;
     };
 }

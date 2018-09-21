@@ -40,14 +40,15 @@ Template['elements_erc20_account_table'].onCreated(function () {
 
     TemplateVar.set(template,'symbol',this.data.symbol);
 
-    mist.ERC202WERC20().getMultiTokenBalance(this.data.addressList,this.data.tokenAddr,'ETH', (err, result) => {
+    let chainType = this.data.chainType;
+    mist.ERC202WERC20(chainType).getMultiTokenBalance(this.data.addressList,this.data.tokenAddr, (err, result) => {
         // console.log('getMultiBalances', result);
         TemplateVar.set(template,'ethAccounts',result);
     });
 
     const self = this;
     InterID = Meteor.setInterval(function(){
-        mist.ERC202WERC20().getMultiTokenBalance(self.data.addressList,self.data.tokenAddr,'ETH', (err, result) => {
+        mist.ERC202WERC20(chainType).getMultiTokenBalance(self.data.addressList,self.data.tokenAddr, (err, result) => {
             let oldAddressList = TemplateVar.get(template, 'ethAccounts');
             let oldResultHex = web3.toHex(oldAddressList);
             let resultHex = web3.toHex(result);

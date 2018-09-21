@@ -36,7 +36,7 @@
                     color: #737B93;
                     {{/if}}
                         ">
-                    <span>{{getSymbol}} >> {{getWSymbol}}</span>
+                    <span>{{getSymbol}}({{chainType}}) >> {{getWSymbol}}(WAN)</span>
                 </a>
                 <div class="bottomBor" style="
                     {{#if $eq ($.Session.get "clickButton") 2}}
@@ -51,7 +51,7 @@
                     color: #737B93;
                     {{/if}}
                         ">
-                    <span>{{getWSymbol}} >> {{getSymbol}}</span>
+                    <span>{{getWSymbol}}(WAN) >> {{getSymbol}}({{chainType}})</span>
                 </a>
                 <div class="bottomBor" style="
                     {{#if $eq ($.Session.get "clickButton") 3}}
@@ -81,15 +81,15 @@
     </nav>
 
     {{#if $eq ($.Session.get "clickButton") 1}}
-        {{> views_crosschain_erc20 symbol=getSymbol tokenOrigAddr=tokenOrigAddr }}
+        {{> views_crosschain_erc20 chainType=chainType symbol=getSymbol tokenOrigAddr=tokenOrigAddr }}
     {{/if}}
 
     {{#if $eq ($.Session.get "clickButton") 2}}
-        {{> views_erc20Towerc20 symbol=getSymbol tokenOrigAddr=tokenOrigAddr}}
+        {{> views_erc20Towerc20 chainType=chainType symbol=getSymbol tokenOrigAddr=tokenOrigAddr}}
     {{/if}}
 
     {{#if $eq ($.Session.get "clickButton") 3}}
-        {{> views_werc20Toerc20 symbol=getSymbol tokenOrigAddr=tokenOrigAddr }}
+        {{> views_werc20Toerc20 chainType=chainType symbol=getSymbol tokenOrigAddr=tokenOrigAddr tokenWanAddr=tokenWanAddr }}
     {{/if}}
 
     {{#if $eq ($.Session.get "clickButton") 4}}

@@ -25,6 +25,7 @@ Template['layout_header'].onCreated(function(){
                         mist.ERC202WERC20().getErc20SymbolInfo(tokenAccount.tokenOrigAddr,(error,result) =>{
                             if (!error){
                                 tokenAccount.symbol = result;
+                                tokenAccount.chainType = 'ETH';
                                 TemplateVar.set(template,'tokenAccounts',ret);
                             }
                         });

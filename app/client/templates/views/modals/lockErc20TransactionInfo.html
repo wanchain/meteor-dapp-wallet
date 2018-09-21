@@ -1,0 +1,58 @@
+<template name="views_modals_unlock_erc20TransactionInfo">
+    <h1>Crosschain Transaction</h1>
+    <table class="dapp-zebraPou">
+        <tbody>
+            <tr>
+                <td>Amount</td>
+                <td>{{amount}} {{symbol}}</td>
+            </tr>
+            {{#if valueFee}}
+                <tr>
+                    <td>Transaction Fee</td>
+                    <td>{{valueFee}} WAN</td>
+                </tr>
+            {{/if}}
+
+            <tr>
+                <td>From:</td>
+                <td>{{from}}</td>
+            </tr>
+            <tr>
+                <td>To：</td>
+                <td>{{to}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
+
+    <p class="tx-info">
+        <small>+ {{i18n "wallet.send.estimatedFee"}}</small> {{fee}}
+        <br>
+        <small class="gas-price">
+            {{i18n "wallet.transactions.gasPrice"}} {{chooseGasPrice}}
+            <br>
+            {{i18n "wallet.send.texts.estimatedGas"}} {{estimatedGas}}
+        </small>
+    </p>
+
+    <p class="tx-info">
+        <small>Approve Data</small>
+        <pre>{{approveData}}</pre>
+    </p>
+    <p class="tx-info">
+        <small>Lock Data</small>
+        <pre>{{lockData}}</pre>
+    </p>
+
+    <input type="password" id="crosschain-psd"
+           disabled="{{TemplateVar.get "isButton"}}"
+           placeholder="{{TemplateVar.get "passwdType"}}" style="width: 100%;"/>
+
+    <div class="dapp-modal-buttons">
+        <button class="cancel-cross" disabled="{{TemplateVar.get "isButton"}}">CANCEL</button>
+        <button class="ok-cross dapp-primary-button"
+                disabled="{{TemplateVar.get "isButton"}}"
+        >OK</button>
+    </div>
+
+</template>
