@@ -22,8 +22,18 @@ Template['views_btcsend'].onCreated(function(){
         EthElements.Modal.hide();
 
         if (!err) {
-            TemplateVar.set(template,'btcAccounts',result.address);
-            TemplateVar.set(template,'btcBalance',result.balance);
+            if (new  BigNumber(result.balance).gt(0)) {
+                TemplateVar.set(template,'btcAccounts',result.address);
+                TemplateVar.set(template,'btcBalance',result.balance);
+            } else {
+                Session.set('clickButton', 1);
+
+                return GlobalNotification.warning({
+                    content: 'No btc balance.',
+                    duration: 5
+                });
+            }
+
         } else {
             Session.set('clickButton', 1);
         }
@@ -111,7 +121,7 @@ Template['views_btcsend'].events({
             });
         }
 
-        if(new BigNumber(amount).gt(new BigNumber(TemplateVar.get('btcBalance'), 10))) {
+        if(new BigNumber(amount).gte(new BigNumber(TemplateVar.get('btcBalance'), 10))) {
             return GlobalNotification.warning({
                 content: 'Insufficient balance',
                 duration: 2

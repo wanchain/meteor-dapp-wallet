@@ -9,8 +9,6 @@
  @constructor
  */
 
-const defaultGasprice = 180000000000;
-
 // Set basic variables
 Template['views_wbtcTobtc'].onCreated(function(){
     var template = this;
@@ -32,6 +30,13 @@ Template['views_wbtcTobtc'].onCreated(function(){
         });
 
         TemplateVar.set(template, 'addressList', ethaddress);
+    } else {
+        Session.set('clickButton', 1);
+
+        return GlobalNotification.warning({
+            content: 'No btc account, please create new account first.',
+            duration: 5
+        });
     }
 
 
@@ -49,8 +54,16 @@ Template['views_wbtcTobtc'].onCreated(function(){
             });
 
             if (result_list.length > 0) {
-                TemplateVar.set(template,'wanList',result_list);
-                TemplateVar.set(template,'from',result_list[0].address);
+                TemplateVar.set(template, 'wanList',result_list);
+                TemplateVar.set(template, 'from',result_list[0].address);
+                TemplateVar.set(template, 'wbtcBalance', result_list[0].balance);
+            } else {
+                Session.set('clickButton', 1);
+
+                return GlobalNotification.warning({
+                    content: 'No Wan account.',
+                    duration: 5
+                });
             }
 
         }
@@ -145,6 +158,16 @@ Template['views_wbtcTobtc'].events({
 
     'change #toweth-from': function (event) {
         event.preventDefault();
+
+        let wanList = TemplateVar.get('wanList');
+
+        _.each(wanList, function (account, index) {
+            if (account.address.toLowerCase() === event.target.value) {
+                console.log('account.balance: ', account.balance);
+                TemplateVar.set('wbtcBalance', account.balance);
+            }
+        });
+
         TemplateVar.set('from', event.target.value);
     },
 
@@ -175,7 +198,8 @@ Template['views_wbtcTobtc'].events({
             txFeeRatio = TemplateVar.get('txFeeRatio'),
             to = TemplateVar.get('to'),
             amount = TemplateVar.get('amount'),
-            valueFee = TemplateVar.get('coverCharge');
+            valueFee = TemplateVar.get('coverCharge'),
+            wbtcBalance = TemplateVar.get('wbtcBalance');
 
         if (!from && !storeman && !valueFee) {
             EthElements.Modal.hide();
@@ -218,13 +242,20 @@ Template['views_wbtcTobtc'].events({
             });
         }
 
-        // const amountSymbol = amount.toString().split('.')[1];
-        // if (amountSymbol && amountSymbol.length >=19) {
-        //     return GlobalNotification.warning({
-        //         content: 'Amount not valid',
-        //         duration: 2
-        //     });
-        // }
+        if(amount.gt(new BigNumber(wbtcBalance))) {
+            return GlobalNotification.warning({
+                content: 'Please enter a valid amount',
+                duration: 2
+            });
+        }
+
+        const amountSymbol = amount.toString().split('.')[1];
+        if (amountSymbol && amountSymbol.length >=9) {
+            return GlobalNotification.warning({
+                content: 'Amount not valid',
+                duration: 2
+            });
+        }
 
 
         mist.WETH2ETH().getBalance(from.toLowerCase(), function (err,wanBalance) {

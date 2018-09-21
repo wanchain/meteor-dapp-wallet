@@ -4,8 +4,6 @@ Template Controllers
 @module Templates
 */
 
-const defaultGasprice = 180000000000;
-
 let InterID;
 
 const stateDict = {
@@ -229,7 +227,7 @@ Template['elements_cross_transactions_table_btc'].events({
         Session.set('isShowModal', true);
 
         let show_data = TemplateVar.get('crosschainList')[id];
-        console.log('show_data: ', show_data);
+        // console.log('show_data: ', show_data);
 
         if (show_data) {
             if (!show_data.HashX) {

@@ -30,6 +30,13 @@ Template['views_btcTowbtc'].onCreated(function(){
 
         TemplateVar.set(template, 'wanAddressList', wanaddress);
         TemplateVar.set(template, 'to', wanaddress[0].address);
+    } else {
+        Session.set('clickButton', 1);
+
+        return GlobalNotification.warning({
+            content: 'No Wan account, please create new account first.',
+            duration: 5
+        });
     }
 
     // btc => wbtc storeman
@@ -164,13 +171,13 @@ Template['views_btcTowbtc'].events({
             });
         }
 
-        // const amountSymbol = amount.toString().split('.')[1];
-        // if (amountSymbol && amountSymbol.length >=19) {
-        //     return GlobalNotification.warning({
-        //         content: 'Amount not valid',
-        //         duration: 2
-        //     });
-        // }
+        const amountSymbol = amount.toString().split('.')[1];
+        if (amountSymbol && amountSymbol.length >=9) {
+            return GlobalNotification.warning({
+                content: 'Amount not valid',
+                duration: 2
+            });
+        }
 
 
         mist.BTC2WBTC().getBtcMultiBalances('BTC', (err, result) => {
@@ -185,6 +192,13 @@ Template['views_btcTowbtc'].events({
                 if(btcBalance.eq(new BigNumber(0))) {
                     return GlobalNotification.warning({
                         content: 'btc address no balance',
+                        duration: 2
+                    });
+                }
+
+                if(btcBalance.lte(new BigNumber(amount))) {
+                    return GlobalNotification.warning({
+                        content: 'No Enough Balance.',
                         duration: 2
                     });
                 }
