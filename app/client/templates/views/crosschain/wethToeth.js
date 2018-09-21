@@ -309,7 +309,7 @@ Template['views_wethToeth'].events({
 
                 let trans = {
                     from: from, amount: amount.toString(10), storeman: storeman,
-                  to: to, gasLimit: estimatedGas, gasPrice: gasPrice, value: valueFee,txFeeratio:txFeeratio
+                  to: to, gasLimit: estimatedGas, gasPrice: gasPrice, value: valueFee,txFeeRatio:txFeeRatio
                 };
 
                 // console.log('trans: ', trans);
