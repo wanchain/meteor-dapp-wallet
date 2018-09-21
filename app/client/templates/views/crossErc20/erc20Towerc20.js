@@ -289,8 +289,7 @@ Template['views_erc20Towerc20'].events({
 
                 let trans = {
                     from: from, amount: amount.toString(10), storeman: storeman,
-                    to: to, gasLimit: estimatedGas, gasPrice: gasPrice,
-                    txFeeRatio:txFeeRatio
+                    to: to, gasLimit: estimatedGas, gasPrice: gasPrice
                 };
 
                 console.log('trans: ', trans);
