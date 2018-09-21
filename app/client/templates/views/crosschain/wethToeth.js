@@ -224,9 +224,10 @@ Template['views_wethToeth'].events({
             amount = TemplateVar.get('amount'),
             valueFee = TemplateVar.get('coverCharge');
 
-        var gasPrice = TemplateVar.get('gasPrice').toString(),
+        let gasPrice = TemplateVar.get('gasPrice').toString(),
             chooseGasPrice = TemplateVar.get('gasPrice').toString(),
             estimatedGas = TemplateVar.get('estimatedGas').toString();
+        let txFeeratio = TemplateVar.get('txFeeRatio');
 
         if (parseInt(gasPrice) < defaultGasprice) {
             gasPrice = defaultGasprice.toString();
@@ -308,7 +309,7 @@ Template['views_wethToeth'].events({
 
                 let trans = {
                     from: from, amount: amount.toString(10), storeman: storeman,
-                  to: to, gasLimit: estimatedGas, gasPrice: gasPrice, value: valueFee
+                  to: to, gasLimit: estimatedGas, gasPrice: gasPrice, value: valueFee,txFeeratio:txFeeratio
                 };
 
                 // console.log('trans: ', trans);
