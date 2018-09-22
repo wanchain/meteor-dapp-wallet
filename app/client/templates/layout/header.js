@@ -18,11 +18,11 @@ Template['layout_header'].onCreated(function(){
 
         if(!Session.get('isShowModal')) {
 
-            mist.ERC202WERC20().getRegErc20Tokens(function(err, ret) {
+            mist.ERC202WERC20("ETH").getRegErc20Tokens(function(err, ret) {
 
                 if (!err){
                     for (let tokenAccount of ret){
-                        mist.ERC202WERC20().getErc20SymbolInfo(tokenAccount.tokenOrigAddr,(error,result) =>{
+                        mist.ERC202WERC20("ETH").getErc20SymbolInfo(tokenAccount.tokenOrigAddr,(error,result) =>{
                             if (!error){
                                 tokenAccount.symbol = result;
                                 tokenAccount.chainType = 'ETH';

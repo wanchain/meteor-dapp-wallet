@@ -1,8 +1,8 @@
 /**
-Template Controllers
+ Template Controllers
 
-@module Templates
-*/
+ @module Templates
+ */
 
 const defaultGasprice = 180000000000;
 
@@ -10,36 +10,41 @@ let InterID;
 
 const stateDict = {
 
-  "ApproveSending":1,
-  "ApproveSendFail":2,
-  "ApproveSendFailAfterRetries":3,
-  "ApproveSent":4,
-  "Approved":5,
 
-  "LockSending":6,
-  "LockSendFail":7,
-  "LockSendFailAfterRetries":8,
-  "LockSent":9,
-  "Locked":10,
+    "ApproveSending": "ApproveSending",
+    "ApproveSendFail": "ApproveSendFail",
+    "ApproveSendFailAfterRetries": "ApproveSendFailAfterRetries",
+    "ApproveSent": "ApproveSent",
+    "Approved": "Approved",
 
-  "BuddyLocked":11,
-  "RefundSending":12,
-  "RefundSendFail":13,
-  "RefundSendFailAfterRetries":14,
-  "RefundSent":15,
+    "LockSending": "LockSending",
+    "LockSendFail": "LockSendFail",
+    "LockSendFailAfterRetries": "LockSendFailAfterRetries",
+    "LockSent": "LockSent",
+    "Locked": "Locked",
 
-  "Refunded":16,
-  "RevokeSending":17,
-  "RevokeSendFail":18,
-  "RevokeSendFailAfterRetries":19,
-  "RevokeSent":20,
-  "Revoked":21
+    "BuddyLocked": "BuddyLocked",
 
-  // 'ApproveSending': 1, 'ApproveSent': 2, 'Approved': 3,
-  // 'LockSending': 4,
-  // 'waitingX': 5,'sentXPending': 6, 'sentXConfirming': 7, 'refundFinished': 8,
-  // 'waitingRevoke': 9,'sentRevokePending': 10, 'sentRevokeConfirming': 11, 'revokeFinished': 12,
-  // 'sentHashFailed': 13, 'suspending': 14
+    // "confirm"
+    // "cancel"
+
+    "RefundSending": "RefundSending",
+    "RefundSendFail": "RefundSendFail",
+    "RefundSendFailAfterRetries": "RefundSendFailAfterRetries",
+    "RefundSent": "RefundSent",
+    "Refunded": "Refunded",
+
+    "RevokeSending": "RevokeSending",
+    "RevokeSendFail": "RevokeSendFail",
+    "RevokeSendFailAfterRetries": "RevokeSendFailAfterRetries",
+    "RevokeSent": "RevokeSent",
+    "Revoked": "Revoked"
+
+    // 'ApproveSending': 1, 'ApproveSent': 2, 'Approved': 3,
+    // 'LockSending': 4,
+    // 'waitingX': 5,'sentXPending': 6, 'sentXConfirming': 7, 'refundFinished': 8,
+    // 'waitingRevoke': 9,'sentRevokePending': 10, 'sentRevokeConfirming': 11, 'revokeFinished': 12,
+    // 'sentHashFailed': 13, 'suspending': 14
 
     // 'sentHashPending': 1, 'sentHashConfirming': 2, 'waitingCross': 3, 'waitingCrossConfirming': 4,
     // 'waitingX': 5,'sentXPending': 6, 'sentXConfirming': 7, 'refundFinished': 8,
@@ -48,41 +53,103 @@ const stateDict = {
 };
 
 function resultEach(template, result) {
+
     _.each(result, function (value, index) {
-        delete value.meta;
 
-        if (Helpers.isNumber(value.time)) {
-
-            let nowTime = new Date().Format('yyyy-MM-dd hh:mm:ss:S');
-            let nowTimestamp =  Math.round(new Date(nowTime).getTime());
-
-            // HTLCtime
-            let endTimestamp= value.HTLCtime;
-
-            if (endTimestamp > nowTimestamp) {
-
-                if (stateDict[value.status] === 8 || stateDict[value.status] === 12 || stateDict[value.status] === 13) {
-                    value.htlcdate = `<span>${Helpers.timeStamp2String(endTimestamp)}</span>`;
-                } else {
-                    // console.log('endTimestamp,', endTimestamp);
-                    // console.log('nowTimestamp,', nowTimestamp);
-                    value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endTimestamp - nowTimestamp)}</span>`;
-                }
-            } else {
-
-                if (stateDict[value.status] === 8 || stateDict[value.status] === 12 || stateDict[value.status] === 13) {
-                    value.htlcdate = `<span>${Helpers.timeStamp2String(endTimestamp)}</span>`;
-                } else {
-                    value.htlcdate = "<span style='color: red'>00 h, 00 min</span>";
-                }
-            }
-            value.time = Helpers.timeStamp2String(value.time);
-        } else {
-            value.htlcdate = `<span>${value.time}</span>`;
-        }
+        // if (Helpers.isNumber(value.buddyLockedTime)) {
+        //
+        //     let nowTime = new Date().Format('yyyy-MM-dd hh:mm:ss:S');
+        //     let nowTimestamp = Math.round(new Date(nowTime).getTime());
+        //
+        //     // HTLCtime
+        //     let endTimestamp = Number(value.buddyLockedTime) + lockedInTime;
+        //
+        //
+        //
+        //
+        //
+        //     if (endTimestamp > nowTimestamp) {
+        //
+        //         if (value.status === stateDict.Refunded || value.status === stateDict.Revoked) {
+        //             value.htlcdate = `<span>${Helpers.timeStamp2String(endTimestamp)}</span>`;
+        //         } else {
+        //             // console.log('endTimestamp,', endTimestamp);
+        //             // console.log('nowTimestamp,', nowTimestamp);
+        //             value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endTimestamp - nowTimestamp)}</span>`;
+        //         }
+        //     } else {
+        //
+        //         if (value.status === stateDict.Refunded || value.status === stateDict.Revoked) {
+        //             value.htlcdate = `<span>${Helpers.timeStamp2String(endTimestamp)}</span>`;
+        //         } else {
+        //             value.htlcdate = "<span style='color: red'>00 h, 00 min</span>";
+        //         }
+        //     }
+        //     value.lockedTime = Helpers.timeStamp2String(value.lockedTime);
+        // } else {
+        //     value.htlcdate = `<span>${Helpers.timeStamp2String(endTimestamp)}</span>`;
+        // }
 
     });
 }
+
+
+function canRefund(record){
+    let retResult={};
+    let lockedTime          = Number(record.lockedTime);
+    let buddyLockedTime     = Number(record.buddyLockedTime);
+    let status              = record.status;
+    let buddyLockedTimeOut  = Number(record.buddyLockedTimeOut);
+
+
+    //global.lockedTime
+    if(status !== 'BuddyLocked'){
+        retResult.code    = false;
+        retResult.result  = "waiting buddy lock";
+        return retResult;
+    }
+    let currentTime                 =  Number(Date.now())/1000; //unit s
+
+    if(currentTime>buddyLockedTime  && currentTime<buddyLockedTimeOut){
+        retResult.code    = true;
+        return retResult;
+    }else{
+        retResult.code    = false;
+        retResult.result  = "Hash lock time is not meet.";
+        return retResult;
+    }
+}
+
+function canRevoke(record){
+    if (!record.lockedTime){
+        retResult.code    = false;
+        retResult.result  = "need waiting bolck number.";
+        return retResult;
+    }
+    let retResult={};
+    let lockedTime          = Number(record.lockedTime);
+    let buddyLockedTime     = Number(record.buddyLockedTime);
+    let status              = record.status;
+    let htlcTimeOut         = Number(record.htlcTimeOut);
+
+    if(status !== 'BuddyLocked' && status !== 'Locked' ){
+        retResult.code    = false;
+        retResult.result  = "Can not revoke,staus is not BuddyLocked or Locked";
+        return retResult;
+    }
+    let currentTime             =   Number(Date.now())/1000;
+
+    if(currentTime>htlcTimeOut){
+        retResult.code    = true;
+        return retResult;
+    }else{
+        retResult.code    = false;
+        retResult.result  = "Hash lock time is not meet.";
+        return retResult;
+    }
+}
+
+
 
 function showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType) {
 
@@ -102,46 +169,55 @@ function showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transT
             data: transData,
             trans: trans,
             transType: transType,
-            Chain: show_data.chain,
+            Chain: show_data.srcChainType,
             symbol: show_data.symbol,
             fromText: show_data.fromText,
             toText: show_data.toText
         },
-    },{
+    }, {
         class: 'send-transaction-info',
         closeable: false
     });
 }
 
 
-Template['elements_cross_transactions_table'].onCreated(function(){
+Template['elements_cross_transactions_table'].onCreated(function () {
     let template = this;
 
-    mist.ETH2WETH().listHistory(this.data.addressList.concat(this.data.wanAddressList), (err, result) => {
-
-        resultEach(template, result);
-
-        Session.set('oldCrosschainList', result);
-        TemplateVar.set(template, 'crosschainList', result);
-    });
-
     const self = this;
-    InterID = Meteor.setInterval(function(){
+    // mist.ETH2WETH().getLockedInTime(function (err,lockedInTime) {
+    //     lockedInTime = Number(lockedInTime);
+    //     TemplateVar.set(template, 'lockedInTime', lockedInTime);
+
+
         mist.ETH2WETH().listHistory(self.data.addressList.concat(self.data.wanAddressList), (err, result) => {
+
             resultEach(template, result);
 
-            let oldCrosschainResult = Session.get('oldCrosschainList');
-            let oldResultHex = web3.toHex(oldCrosschainResult);
-            let resultHex = web3.toHex(result);
-
-            if(!oldCrosschainResult || oldResultHex !== resultHex ) {
-                // console.log('update history transaction: ',oldResultHex !== resultHex);
-                Session.set('oldCrosschainList', result);
-                TemplateVar.set(template, 'crosschainList', result);
-            }
+            Session.set('oldCrosschainList', result);
+            TemplateVar.set(template, 'crosschainList', result);
         });
 
-    }, 10000);
+
+        InterID = Meteor.setInterval(function () {
+            mist.ETH2WETH().listHistory(self.data.addressList.concat(self.data.wanAddressList), (err, result) => {
+                resultEach(template, result);
+
+                let oldCrosschainResult = Session.get('oldCrosschainList');
+                let oldResultHex = web3.toHex(oldCrosschainResult);
+                let resultHex = web3.toHex(result);
+
+                if (!oldCrosschainResult || oldResultHex !== resultHex) {
+                    // console.log('update history transaction: ',oldResultHex !== resultHex);
+                    Session.set('oldCrosschainList', result);
+                    TemplateVar.set(template, 'crosschainList', result);
+                }
+            });
+
+        }, 10000);
+
+    // });
+
 
 });
 
@@ -159,29 +235,145 @@ Template['elements_cross_transactions_table'].helpers({
             let smallStyle = 'display: block; color: #4b90f7;';
 
             _.each(TemplateVar.get('crosschainList'), function (value, index) {
-                // if (value.chain === 'ETH') {
-                    value.fromText = `<small style="${smallStyle}">${value.srcChainType}</small>`;
-                    value.toText = `<small style="${smallStyle}">${value.dstChainType}</small>`;
-                    // value.symbol = 'ETH';
-                // } else if (value.chain === 'WAN') {
-                //     value.fromText = `<small style="${smallStyle}">WAN</small>`;
-                //     value.toText = `<small style="${smallStyle}">ETH</small>`;
-                //     value.symbol = 'WETH';
-                // }
+                console.log("value:",JSON.stringify(value));
 
                 let style = 'display: block; font-size: 18px; background-color: transparent;';
 
-              value.operation = `<h2 style="${style}">${value.status}</h2>`;
+                value.fromText = `<small style="${smallStyle}">${value.srcChainType}</small>`;
+                value.toText = `<small style="${smallStyle}">${value.dstChainType}</small>`;
 
-              value.htlcdate="--";
-              value.time = "--";
-              // from
-              value.crossAdress = value.to;
-              value.symbol = value.srcChainType;
-              value.value = web3.fromWei(value.contractValue);
-              value.state = value.status;
+                if (value.srcChainType ==='WAN'){
 
-              // Release
+                    if (value.tokenStand ==='E20'){
+                        value.toText = `<small style="${smallStyle}">${value.tokenSymbol}(${value.dstChainType})</small>`;
+                    }
+
+                }else {
+                    if (value.tokenStand ==='E20'){
+                        value.fromText = `<small style="${smallStyle}">${value.tokenSymbol}(${value.srcChainType})</small>`;
+                    }
+
+                }
+
+
+                value.htlcdate = value.buddyLockedTime? Helpers.timeStamp2String(value.buddyLockedTime):"--";
+                value.time = value.lockedTime? Helpers.timeStamp2String(value.lockedTime):"--";
+
+                value.crossAdress = value.to;
+
+                if (value.srcChainType ==='WAN') {
+                    value.symbol = `W${value.tokenSymbol}`;
+                }else{
+                    value.symbol = value.tokenSymbol;
+                }
+                value.value = web3.fromWei(value.contractValue);
+                value.state = value.status;
+                value.operation = `<h2 style="${style}">${value.status}</h2>`;
+                // value.state
+
+
+                if (value.status === stateDict.ApproveSending) {
+                    value.operation = `<h2 style="${style}">Approve</h2>`;
+                    value.state = 'Pending';
+                    // value.state = 'Cross-Tx 1/3'
+                }
+                else if (value.status === stateDict.ApproveSendFail) {
+                    value.operation = `<h2 style="${style}">Approve</h2>`;
+                }
+                else if (value.status === stateDict.ApproveSendFailAfterRetries) {
+                    value.operation = `<h2 style="${style}">Approve</h2>`;
+                }
+                else if (value.status === stateDict.ApproveSent) {
+                    value.operation = `<h2 style="${style}">Approve</h2>`;
+                    value.state = 'Cross-Tx 2/7';
+                }
+                else if (value.status === stateDict.Approved) {
+                    value.state = 'Cross-Tx 3/7';
+                }
+                else if (value.status === stateDict.LockSending) {
+                    value.operation = `<h2 style="${style}">Lock</h2>`;
+                    value.state = 'Cross-Tx 4/7';
+                }
+                else if (value.status === stateDict.LockSendFail) {
+
+                }
+                else if (value.status === stateDict.LockSendFailAfterRetries) {
+
+                }
+                else if (value.status === stateDict.LockSent) {
+                    value.state = 'Cross-Tx 5/7';
+                }
+                else if (value.status === stateDict.Locked) {
+                    value.state = 'Cross-Tx 6/7';
+
+                    let isCanRevoke = canRevoke(value).code;
+                    console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
+                    if (isCanRevoke) {
+                        style += 'color: #920b1c;';
+                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
+                        value.state = 'To be cancelled';
+                    }
+
+                }
+                else if (value.status === stateDict.BuddyLocked) {
+                    value.state = 'Cross-Tx 7/7';
+
+                    let isCanRefund = canRefund(value).code;
+                    let isCanRevoke = canRevoke(value).code;
+                    console.log("BuddyLocked:::::::::::isCanRefund:",isCanRefund);
+                    console.log("BuddyLocked:::::::::::isCanRevoke:",isCanRevoke);
+
+                    if (isCanRefund) {
+                        style += 'color: #920b1c;';
+                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
+                        value.state = 'To be confirmed';
+                    } else {
+                        if (!isCanRevoke) {
+                            // style += 'color: #920b1c;';
+                            value.operation = `<h2 id = ${index} style="${style}">Cancel</h2>`;
+                            value.state = 'To be cancelled';
+                        } else {
+                            style += 'color: #920b1c;';
+                            value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
+                            value.state = 'To be cancelled';
+                        }
+
+                    }
+
+                }
+                else if (value.status === stateDict.RefundSending) {
+                    value.state = 'Confirming 1/3';
+                }
+                else if (value.status === stateDict.RefundSendFail) {
+
+                }
+                else if (value.status === stateDict.RefundSendFailAfterRetries) {
+
+                }
+                else if (value.status === stateDict.RefundSent) {
+                    value.state = 'Confirming 2/3';
+                }
+                else if (value.status === stateDict.Refunded) {
+                    value.state = 'Confirming 3/3';
+                }
+                else if (value.status === stateDict.RevokeSending) {
+                    value.state = 'Cancelling 1/3';
+                }
+                else if (value.status === stateDict.RevokeSendFail) {
+
+                }
+                else if (value.status === stateDict.RevokeSendFailAfterRetries) {
+
+                }
+                else if (value.status === stateDict.RevokeSent) {
+                    value.state = 'Cancelling 2/3';
+                }
+                else if (value.status === stateDict.Revoked) {
+                    value.state = 'Cancelling 3/3';
+                }
+
+
+                // Release
                 // if (stateDict[value.status] === 5) {
                 //     style += 'color: #920b1c;';
                 //
@@ -269,17 +461,17 @@ Template['elements_cross_transactions_table'].events({
                 show_data.HashX = show_data.hashX;
             }
 
-            if (show_data.chain === 'ETH') {
-                show_data.symbol = 'ETH';
-            } else if (show_data.chain === 'WAN') {
-                show_data.symbol = 'WETH';
+            if (show_data.srcChainType ==='WAN') {
+                show_data.symbol = `W${show_data.tokenSymbol}`;
+            }else{
+                show_data.symbol = show_data.tokenSymbol;
             }
 
             EthElements.Modal.show({
                 template: 'views_modals_crosstransactionInfo',
                 data: {
                     HashX: show_data.HashX,
-                    chain: show_data.chain,
+                    chain: show_data.srcChainType,
                     crossAdress: show_data.crossAdress,
                     from: show_data.from,
                     lockTxHash: show_data.lockTxHash,
@@ -313,213 +505,231 @@ Template['elements_cross_transactions_table'].events({
         let trans;
         let transType;
 
-        console.log('show_data.status: ', show_data.status);
+        console.log('show_data: ', JSON.stringify(show_data));
 
         // suspending
-        if (stateDict[show_data.status] === 14) {
+        if (show_data.status === stateDict.RevokeSending) {
             return GlobalNotification.warning({
                 content: 'Transaction locked now, please retry cancellation later',
                 duration: 2
             });
         }
-        // release X
-        else if (stateDict[show_data.status] === 5) {
-            transType = 'releaseX';
 
-            trans = {
-                lockTxHash: show_data.lockTxHash, amount: show_data.value.toString(10),
-                storemanGroup: show_data.storeman, cross: show_data.crossAdress,
-                X: show_data.x
-            };
-
-            // release X eth => weth
-            if (show_data.chain === 'ETH') {
-                mist.ETH2WETH().getGasPrice('WAN', function (err,getGasPrice) {
-                    if (err) {
-                        Helpers.showError(err);
-                    } else {
-                        getGas = getGasPrice.RefundGas;
-                        gasPrice = getGasPrice.gasPrice;
-
-                        if (gasPrice < defaultGasprice) {
-                            gasPrice = defaultGasprice
-                        }
-
-                        trans.gas = getGas;
-                        trans.gasPrice = gasPrice;
-
-                        show_data.symbol = 'ETH';
-
-                        // release x in wan
-                        //#####################################################
-                        // mist.ETH2WETH().getRefundTransData(trans, function (err,getRefundTransData) {
-                        //     if (err) {
-                        //         Helpers.showError(err);
-                        //     } else {
-                        //         mist.WETH2ETH().getBalance(show_data.crossAdress.toLowerCase(), function (err,coinBalance) {
-                        //             if (err) {
-                        //                 Helpers.showError(err);
-                        //             } else {
-                        //                 transData = getRefundTransData.refundTransData;
-                        //                 let fee = new BigNumber(getGas * gasPrice);
-                        //
-                        //                 if(fee.gt(new BigNumber(coinBalance, 10)))
-                        //                     return GlobalNotification.warning({
-                        //                         content: 'Insufficient WAN balance in your TO account',
-                        //                         duration: 2
-                        //                     });
-                        //
-                        //                 showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
-                        //             }
-                        //         });
-                        //     }
-                        // });
-
-                    }
-                })
-            }
-            // release X weth => eth
-            else if (show_data.chain === 'WAN') {
-                mist.ETH2WETH().getGasPrice('ETH', function (err,getGasPrice) {
-                    if (err) {
-                        Helpers.showError(err);
-                    } else {
-                        getGas = getGasPrice.RefundGas;
-                        gasPrice = getGasPrice.gasPrice;
-
-                        trans.gas = getGas;
-                        trans.gasPrice = gasPrice;
-
-                        show_data.symbol = 'WETH';
-
-                        // release x in eth
-                        //###################################
-                        // mist.WETH2ETH().getRefundTransData(trans, function (err,getRefundTransData) {
-                        //     if (err) {
-                        //         Helpers.showError(err);
-                        //     } else {
-                        //         // coinBalance = await Helpers.promisefy(mist.WETH2ETH().getBalance, [show_data.crossAdress.toLowerCase()], mist.WETH2ETH());
-                        //         mist.ETH2WETH().getBalance(show_data.crossAdress.toLowerCase(), function (err,coinBalance) {
-                        //             if (err) {
-                        //                 Helpers.showError(err);
-                        //             } else {
-                        //                 transData = getRefundTransData.refundTransData;
-                        //                 let fee = new BigNumber(getGas * gasPrice);
-                        //
-                        //                 if(fee.gt(new BigNumber(coinBalance, 10)))
-                        //                     return GlobalNotification.warning({
-                        //                         content: 'Insufficient ETH balance in your TO account',
-                        //                         duration: 2
-                        //                     });
-                        //
-                        //                 showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
-                        //             }
-                        //         });
-                        //     }
-                        // });
-
-                    }
-                })
-            }
+        if (show_data.srcChainType ==='WAN') {
+            show_data.symbol = `W${show_data.tokenSymbol}`;
+        }else{
+            show_data.symbol = show_data.tokenSymbol;
         }
 
-        // revoke
-        else if (stateDict[show_data.status] === 9) {
 
-            transType = 'revoke';
 
-            trans = {
-                from: show_data.from, amount: show_data.value.toString(10),
-                storemanGroup: show_data.storeman, cross: show_data.crossAdress,
-                X: show_data.x,
-            };
+        if (show_data.tokenStand==='ERC20') {
 
-            // revoke eth => weth
-            if (show_data.chain === 'ETH') {
-                mist.ETH2WETH().getGasPrice('ETH', function (err,getGasPrice) {
-                    if (err) {
-                        Helpers.showError(err);
-                    } else {
-                        getGas = getGasPrice.RevokeGas;
-                        gasPrice = getGasPrice.gasPrice;
 
-                        trans.gas = getGas;
-                        trans.gasPrice = gasPrice;
+        } else if (show_data.tokenStand === 'ETH'){
 
-                        // revoke x in eth
-                        console.log('getRevokeTransData ETH: ', show_data.chain);
+            if (show_data.status === stateDict.BuddyLocked) {
+                transType = 'releaseX';
 
-                        //###########################################
-                        // mist.ETH2WETH().getRevokeTransData(trans, function (err,getRevokeTransData) {
-                        //     if (err) {
-                        //         Helpers.showError(err);
-                        //     } else {
-                        //         mist.ETH2WETH().getBalance(show_data.from.toLowerCase(), function (err,coinBalance) {
-                        //             if (err) {
-                        //                 Helpers.showError(err);
-                        //             } else {
-                        //                 transData = getRevokeTransData.revokeTransData;
-                        //                 let fee = new BigNumber(getGas * gasPrice);
-                        //
-                        //                 if(fee.gt(new BigNumber(coinBalance, 10)))
-                        //                     return GlobalNotification.warning({
-                        //                         content: 'Insufficient ETH balance in your FROM Account',
-                        //                         duration: 2
-                        //                     });
-                        //
-                        //                 showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
-                        //             }
-                        //         });
-                        //     }
-                        // });
-                    }
-                })
+                trans = {
+                    lockTxHash: show_data.lockTxHash, amount: show_data.contractValue.toString(10),
+                    storemanGroup: show_data.storeman, cross: show_data.to,
+                    x: show_data.x,hashX: show_data.hashX
+                };
+
+
+
+                // release X eth => weth
+                if (show_data.srcChainType === 'ETH') {
+                    mist.ETH2WETH().getGasPrice('WAN', function (err, getGasPrice) {
+                        if (err) {
+                            Helpers.showError(err);
+                        } else {
+                            getGas = getGasPrice.RefundGas;
+                            gasPrice = getGasPrice.gasPrice;
+
+                            if (gasPrice < defaultGasprice) {
+                                gasPrice = defaultGasprice
+                            }
+
+                            trans.gasLimit = getGas;
+                            trans.gasPrice = gasPrice;
+
+                            show_data.symbol = 'ETH';
+
+                            // release x in wan
+                            //#####################################################
+                            mist.ETH2WETH().getRefundTransData(trans, function (err,getRefundTransData) {
+                                if (err) {
+                                    Helpers.showError(err);
+                                } else {
+
+                                    mist.WETH2ETH().getBalance(show_data.to.toLowerCase(), function (err,coinBalance) {
+                                        if (err) {
+                                            Helpers.showError(err);
+                                        } else {
+                                            transData = getRefundTransData.refundTransData;
+                                            let fee = new BigNumber(getGas * gasPrice);
+
+                                            if(fee.gt(new BigNumber(coinBalance, 10)))
+                                                return GlobalNotification.warning({
+                                                    content: 'Insufficient WAN balance in your TO account',
+                                                    duration: 2
+                                                });
+
+                                            showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
+                                        }
+                                    });
+                                }
+                            });
+
+                        }
+                    })
+                }
+                // release X weth => eth
+                else if (show_data.srcChainType === 'WAN') {
+                    mist.WETH2ETH().getGasPrice('ETH', function (err, getGasPrice) {
+                        if (err) {
+                            Helpers.showError(err);
+                        } else {
+                            getGas = getGasPrice.RefundGas;
+                            gasPrice = getGasPrice.gasPrice;
+
+                            trans.gasLimit = getGas;
+                            trans.gasPrice = gasPrice;
+
+                            show_data.symbol = 'WETH';
+
+                            // release x in eth
+                            // ###################################
+                            mist.WETH2ETH().getRefundTransData(trans, function (err,getRefundTransData) {
+                                if (err) {
+                                    Helpers.showError(err);
+                                } else {
+                                    // coinBalance = await Helpers.promisefy(mist.WETH2ETH().getBalance, [show_data.crossAdress.toLowerCase()], mist.WETH2ETH());
+                                    mist.WETH2ETH().getBalance(show_data.crossAdress.toLowerCase(), function (err,coinBalance) {
+                                        if (err) {
+                                            Helpers.showError(err);
+                                        } else {
+                                            transData = getRefundTransData.refundTransData;
+                                            let fee = new BigNumber(getGas * gasPrice);
+
+                                            if(fee.gt(new BigNumber(coinBalance, 10)))
+                                                return GlobalNotification.warning({
+                                                    content: 'Insufficient ETH balance in your TO account',
+                                                    duration: 2
+                                                });
+
+                                            showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
+                                        }
+                                    });
+                                }
+                            });
+
+                        }
+                    })
+                }
 
             }
-            // revoke weth => eth
-            else if (show_data.chain === 'WAN') {
-                mist.ETH2WETH().getGasPrice('WAN', function (err,getGasPrice) {
-                    if (err) {
-                        Helpers.showError(err);
-                    } else {
-                        getGas = getGasPrice.RevokeGas;
-                        gasPrice = getGasPrice.gasPrice;
+            else if (show_data.status === "can revoke") {
+                transType = 'revoke';
 
-                        if (gasPrice < defaultGasprice) {
-                            gasPrice = defaultGasprice
+                trans = {
+                    from: show_data.from, amount: show_data.value.toString(10),
+                    storemanGroup: show_data.storeman, cross: show_data.crossAdress,
+                    x: show_data.x,
+                };
+
+                // revoke eth => weth
+                if (show_data.srcChainType === 'ETH') {
+                    mist.ETH2WETH().getGasPrice('ETH', function (err, getGasPrice) {
+                        if (err) {
+                            Helpers.showError(err);
+                        } else {
+                            getGas = getGasPrice.RevokeGas;
+                            gasPrice = getGasPrice.gasPrice;
+
+                            trans.gasLimit = getGas;
+                            trans.gasPrice = gasPrice;
+
+                            // revoke x in eth
+                            console.log('getRevokeTransData ETH: ', show_data.srcChainType);
+
+                            //###########################################
+                            // mist.ETH2WETH().getRevokeTransData(trans, function (err,getRevokeTransData) {
+                            //     if (err) {
+                            //         Helpers.showError(err);
+                            //     } else {
+                            //         mist.ETH2WETH().getBalance(show_data.from.toLowerCase(), function (err,coinBalance) {
+                            //             if (err) {
+                            //                 Helpers.showError(err);
+                            //             } else {
+                            //                 transData = getRevokeTransData.revokeTransData;
+                            //                 let fee = new BigNumber(getGas * gasPrice);
+                            //
+                            //                 if(fee.gt(new BigNumber(coinBalance, 10)))
+                            //                     return GlobalNotification.warning({
+                            //                         content: 'Insufficient ETH balance in your FROM Account',
+                            //                         duration: 2
+                            //                     });
+                            //
+                            //                 showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
+                            //             }
+                            //         });
+                            //     }
+                            // });
                         }
+                    })
 
-                        trans.gas = getGas;
-                        trans.gasPrice = gasPrice;
+                }
+                // revoke weth => eth
+               /* else if (show_data.srcChainType === 'WAN') {
+                    mist.ETH2WETH().getGasPrice('WAN', function (err, getGasPrice) {
+                        if (err) {
+                            Helpers.showError(err);
+                        } else {
+                            getGas = getGasPrice.RevokeGas;
+                            gasPrice = getGasPrice.gasPrice;
 
-                        // revoke x in wan
-                        console.log('getRevokeTransData WAN: ', show_data.chain);
+                            if (gasPrice < defaultGasprice) {
+                                gasPrice = defaultGasprice
+                            }
 
-                        //#################################
-                        // mist.WETH2ETH().getRevokeTransData(trans, function (err,getRevokeTransData) {
-                        //     if (err) {
-                        //         Helpers.showError(err);
-                        //     } else {
-                        //         mist.WETH2ETH().getBalance(show_data.from.toLowerCase(), function (err,coinBalance) {
-                        //             if (err) {
-                        //                 Helpers.showError(err);
-                        //             } else {
-                        //                 transData = getRevokeTransData.revokeTransData;
-                        //                 let fee = new BigNumber(getGas * gasPrice);
-                        //
-                        //                 if(fee.gt(new BigNumber(coinBalance, 10)))
-                        //                     return GlobalNotification.warning({
-                        //                         content: 'Insufficient WAN balance in your FROM account',
-                        //                         duration: 2
-                        //                     });
-                        //
-                        //                 showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
-                        //             }
-                        //         });
-                        //     }
-                        // });
-                    }
-                })
+                            trans.gas = getGas;
+                            trans.gasPrice = gasPrice;
+
+                            // revoke x in wan
+                            console.log('getRevokeTransData WAN: ', show_data.srcChainType);
+
+                            //#################################
+                            // mist.WETH2ETH().getRevokeTransData(trans, function (err,getRevokeTransData) {
+                            //     if (err) {
+                            //         Helpers.showError(err);
+                            //     } else {
+                            //         mist.WETH2ETH().getBalance(show_data.from.toLowerCase(), function (err,coinBalance) {
+                            //             if (err) {
+                            //                 Helpers.showError(err);
+                            //             } else {
+                            //                 transData = getRevokeTransData.revokeTransData;
+                            //                 let fee = new BigNumber(getGas * gasPrice);
+                            //
+                            //                 if(fee.gt(new BigNumber(coinBalance, 10)))
+                            //                     return GlobalNotification.warning({
+                            //                         content: 'Insufficient WAN balance in your FROM account',
+                            //                         duration: 2
+                            //                     });
+                            //
+                            //                 showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transType);
+                            //             }
+                            //         });
+                            //     }
+                            // });
+                        }
+                    })
+                }*/
+
+
+
             }
         }
 

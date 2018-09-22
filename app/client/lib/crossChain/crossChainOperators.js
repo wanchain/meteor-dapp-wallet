@@ -37,6 +37,9 @@ class crossChainOperators{
         }
         return false;
     }
+    listHistory(addrList, callback){
+        this.invokeOperator(new crossOperator('listHistory',{addrList:addrList},this.getOriginChainType(),callback));
+    }
 
     // signed
     sendRawTrans(trans,chainType,callback){
@@ -47,15 +50,13 @@ class crossChainOperators{
         let operator = new crossOperator('sendNormalTransaction',{tx:trans, passwd:passwd},chainType,callback);
         this.invokeOperator(operator);
     }
-    listHistory(addrList, callback){
-        this.invokeOperator(new crossOperator('listHistory',{addrList:addrList},this.getOriginChainType(),callback));
-    }
+
     getLockTransData(trans,callback){
         let operator = new crossOperator('getLockTransData',{tx:trans},this.getOriginChainType(),callback);
         this.invokeOperator(operator);
     }
     getRefundTransData(trans,callback){
-        let operator = new crossOperator('getRefundTransData',{tx:trans},this.getCrossChainType(),callback);
+        let operator = new crossOperator('getRefundTransData',{tx:trans},this.getOriginChainType(),callback);
         this.invokeOperator(operator);
     }
     getRevokeTransData(trans,callback){
@@ -83,7 +84,7 @@ class crossChainOperators{
     }
 
     sendRefundTrans(trans,password,callback){
-        let operator = new crossOperator('sendRefundTrans',{tx:trans, password:password},this.getCrossChainType(),callback);
+        let operator = new crossOperator('sendRefundTrans',{tx:trans, password:password},this.getOriginChainType(),callback);
         this.invokeOperator(operator);
     }
     sendRevokeTrans(trans,password,secretX,callback){

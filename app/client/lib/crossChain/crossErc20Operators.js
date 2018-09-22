@@ -50,6 +50,7 @@ class crossChainOperators{
     listHistory(addrList, callback){
         this.invokeOperator(new crossOperator('listHistory',{addrList:addrList},this.getOriginChainType(),callback));
     }
+
     getApproveTransData(tokenOrigAddr,tokenChainType,trans,callback){
         let operator = new crossOperator('getApproveTransData',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType},this.getOriginChainType() ,callback);
         this.invokeOperator(operator);
