@@ -42,14 +42,15 @@ Template['views_modals_lockBtcInfo'].events({
             });
         }
 
-        this.trans.btcPassword = password_input;
         this.trans.wanPassword = password_input_wan;
 
         TemplateVar.set('isButton', true);
         Session.set('isShowModal', false);
 
         if (this.chain === 'BTC') {
-            console.log('BTC chain: ', this.chain);
+            //lockBtc (btc)
+
+            this.trans.btcPassword = password_input;
 
             mist.BTC2WBTC().lockBtc('BTC', this.trans, function (err,data) {
                 if (err) {
@@ -62,7 +63,7 @@ Template['views_modals_lockBtcInfo'].events({
                 }
             });
         } else {
-            console.log('WAN chain: ', this.chain);
+            //lockWbtc (wan)
 
             mist.BTC2WBTC().lockWbtc('BTC', this.trans, function (err,data) {
                 if (err) {
