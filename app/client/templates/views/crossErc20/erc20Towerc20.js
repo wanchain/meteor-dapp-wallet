@@ -78,7 +78,7 @@ Template['views_erc20Towerc20'].onCreated(function(){
     });
 
     // eth chain  gas price
-    mist.ERC202WERC20(chainType).getGasPrice(function (err,data) {
+    mist.ERC202WERC20(chainType).getGasPrice(chainType,function (err,data) {
         if (!err) {
             // console.log(data.LockGas, data.RefundGas, data.RevokeGas, data.gasPrice);
             TemplateVar.set(template,'estimatedGas', data.LockGas);

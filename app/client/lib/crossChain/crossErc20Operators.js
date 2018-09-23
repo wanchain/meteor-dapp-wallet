@@ -60,7 +60,7 @@ class crossChainOperators{
         this.invokeOperator(operator);
     }
     getRefundTransData(tokenOrigAddr,tokenChainType,trans,callback){
-        let operator = new crossOperator('getRefundTransData',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType},this.getCrossChainType(),callback);
+        let operator = new crossOperator('getRefundTransData',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType},this.getOriginChainType(),callback);
         this.invokeOperator(operator);
     }
     getRevokeTransData(tokenOrigAddr,tokenChainType,trans,callback){
@@ -74,7 +74,7 @@ class crossChainOperators{
     }
 
     sendRefundTrans(tokenOrigAddr,tokenChainType, trans,password,callback){
-        let operator = new crossOperator('sendRefundTrans',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType, password:password},this.getCrossChainType(),callback);
+        let operator = new crossOperator('sendRefundTrans',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType, password:password},this.getOriginChainType(),callback);
         this.invokeOperator(operator);
     }
     sendRevokeTrans(tokenOrigAddr,tokenChainType, trans,password,callback){
@@ -106,8 +106,8 @@ class crossChainOperators{
     getBlockNumber(callback){
         this.invokeOperator(new crossOperator('getBlockNumber',[],this.getOriginChainType(),callback));
     }
-    getGasPrice(callback){
-        this.invokeOperator(new crossOperator('getGasPrice',[],this.getOriginChainType(),callback));
+    getGasPrice(chainType,callback){
+        this.invokeOperator(new crossOperator('getGasPrice',[],chainType,callback));
     }
     getScEvent(address,topics,callback){
         this.invokeOperator(new crossOperator('getScEvent',[address,topics],this.getOriginChainType(),callback));

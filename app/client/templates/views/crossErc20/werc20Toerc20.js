@@ -84,7 +84,7 @@ Template['views_werc20Toerc20'].onCreated(function(){
     });
 
     // get wan chain gas price
-    mist.WERC202ERC20(chainType).getGasPrice(function (err,data) {
+    mist.WERC202ERC20(chainType).getGasPrice("WAN",function (err,data) {
         if (!err) {
             // console.log('WAN gasPrice', data);
             // console.log(data.LockGas, data.RefundGas, data.RevokeGas, data.gasPrice);
