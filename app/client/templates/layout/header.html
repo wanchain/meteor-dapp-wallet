@@ -71,7 +71,7 @@
                         {{#if tokenAccounts}}
                         {{#each tokenAccounts}}
                             <a href="{{pathFor route='crosschain_erc20_forward' tokenOrigAddr=tokenOrigAddr tokenWanAddr=tokenWanAddr symbol=symbol decimals=decimals chainType=chainType}}" style="margin: 0;padding: 0;">
-                                <li class="Cross" id="erc20{{@index}}"><span></span>{{symbol}}</li>
+                                <li class="Cross" id="erc20{{@index}}"><span></span>{{symbol}}({{chainType}})</li>
                             </a>
                         {{/each}}
                         {{/if}}

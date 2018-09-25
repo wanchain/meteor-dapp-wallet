@@ -185,7 +185,7 @@ Template['views_modals_sendcrosschainReleaseX'].events({
             }
 
         }
-        else if (this.tokenStand === 'ERC20') {
+        else if (this.tokenStand === 'E20') {
             // releaseX
             if (this.transType === 'releaseX') {
                 releaseErc20(this,password_input);

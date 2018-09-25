@@ -53,64 +53,75 @@ const stateDict = {
 };
 
 
-function canRefund(record){
-    let retResult={};
-    let lockedTime          = Number(record.lockedTime);
-    let buddyLockedTime     = Number(record.buddyLockedTime);
-    let status              = record.status;
-    let buddyLockedTimeOut  = Number(record.buddyLockedTimeOut);
+function canRefund(record) {
+    let retResult = {};
+    if (!record.lockedTime) {
+        retResult.code = false;
+        retResult.result = "need waiting bolck number.";
+        return retResult;
+    }
+
+    let lockedTime = Number(record.lockedTime);
+    let buddyLockedTime = Number(record.buddyLockedTime);
+    let status = record.status;
+    let buddyLockedTimeOut = Number(record.buddyLockedTimeOut);
 
 
     //global.lockedTime
-    if(status !== 'BuddyLocked'){
-        retResult.code    = false;
-        retResult.result  = "waiting buddy lock";
+    if (status !== 'BuddyLocked') {
+        retResult.code = false;
+        retResult.result = "waiting buddy lock";
         return retResult;
     }
-    let currentTime                 =  Number(Date.now())/1000; //unit s
+    let currentTime = Number(Date.now()) / 1000; //unit s
 
-    if(currentTime>buddyLockedTime  && currentTime<buddyLockedTimeOut){
-        retResult.code    = true;
+    if (currentTime > buddyLockedTime && currentTime < buddyLockedTimeOut) {
+        retResult.code = true;
         return retResult;
-    }else{
-        retResult.code    = false;
-        retResult.result  = "Hash lock time is not meet.";
-        return retResult;
-    }
-}
-
-function canRevoke(record){
-    let retResult={};
-    if (!record.lockedTime){
-        retResult.code    = false;
-        retResult.result  = "need waiting bolck number.";
-        return retResult;
-    }
-
-    let lockedTime          = Number(record.lockedTime);
-    let buddyLockedTime     = Number(record.buddyLockedTime);
-    let status              = record.status;
-    let htlcTimeOut         = Number(record.htlcTimeOut);
-
-    if(status !== 'BuddyLocked' && status !== 'Locked' ){
-        retResult.code    = false;
-        retResult.result  = "Can not revoke,staus is not BuddyLocked or Locked";
-        return retResult;
-    }
-    let currentTime             =   Number(Date.now())/1000;
-
-    if(currentTime>htlcTimeOut){
-        retResult.code    = true;
-        return retResult;
-    }else{
-        retResult.code    = false;
-        retResult.result  = "Hash lock time is not meet.";
+    } else {
+        retResult.code = false;
+        retResult.result = "Hash lock time is not meet.";
         return retResult;
     }
 }
 
+function canRevoke(record) {
+    let retResult = {};
+    if (!record.lockedTime) {
+        retResult.code = false;
+        retResult.result = "need waiting bolck number.";
+        return retResult;
+    }
 
-function releaseEth2Weth(show_data,trans,transType){
+    let lockedTime = Number(record.lockedTime);
+    let buddyLockedTime = Number(record.buddyLockedTime);
+    let status = record.status;
+    let htlcTimeOut = Number(record.htlcTimeOut);
+
+    if (status !== stateDict.BuddyLocked
+        && status !== stateDict.Locked
+        && status !== stateDict.RefundSent
+        && status !== stateDict.RefundSending
+        && status !== stateDict.RefundSendFail
+        && status !== stateDict.RefundSendFailAfterRetries) {
+        retResult.code = false;
+        retResult.result = "Can not revoke,staus is not BuddyLocked or Locked";
+        return retResult;
+    }
+    let currentTime = Number(Date.now()) / 1000;
+
+    if (currentTime > htlcTimeOut) {
+        retResult.code = true;
+        return retResult;
+    } else {
+        retResult.code = false;
+        retResult.result = "Hash lock time is not meet.";
+        return retResult;
+    }
+}
+
+
+function releaseEth2Weth(show_data, trans, transType) {
     let getGas;
     let gasPrice;
     let transData;
@@ -132,20 +143,20 @@ function releaseEth2Weth(show_data,trans,transType){
             // show_data.symbol = 'ETH';
 
             // release x in wan
-            mist.ETH2WETH().getRefundTransData(trans, function (err,getRefundTransData) {
+            mist.ETH2WETH().getRefundTransData(trans, function (err, getRefundTransData) {
                 if (err) {
                     Helpers.showError(err);
                 } else {
 
                     // wan balance
-                    mist.WETH2ETH().getBalance(show_data.crossAdress.toLowerCase(), function (err,coinBalance) {
+                    mist.WETH2ETH().getBalance(show_data.crossAdress.toLowerCase(), function (err, coinBalance) {
                         if (err) {
                             Helpers.showError(err);
                         } else {
                             transData = getRefundTransData.refundTransData;
                             let fee = new BigNumber(getGas * gasPrice);
 
-                            if(fee.gt(new BigNumber(coinBalance, 10)))
+                            if (fee.gt(new BigNumber(coinBalance, 10)))
                                 return GlobalNotification.warning({
                                     content: 'Insufficient WAN balance in your TO account',
                                     duration: 2
@@ -161,7 +172,7 @@ function releaseEth2Weth(show_data,trans,transType){
     });
 }
 
-function releaseWeth2Eth(show_data,trans,transType) {
+function releaseWeth2Eth(show_data, trans, transType) {
     let getGas;
     let gasPrice;
     let transData;
@@ -179,20 +190,20 @@ function releaseWeth2Eth(show_data,trans,transType) {
             // show_data.symbol = 'WETH';
 
             // release x in eth
-            mist.WETH2ETH().getRefundTransData(trans, function (err,getRefundTransData) {
+            mist.WETH2ETH().getRefundTransData(trans, function (err, getRefundTransData) {
                 if (err) {
                     Helpers.showError(err);
                 } else {
 
                     //eth balance
-                    mist.ETH2WETH().getBalance(show_data.crossAdress.toLowerCase(), function (err,coinBalance) {
+                    mist.ETH2WETH().getBalance(show_data.crossAdress.toLowerCase(), function (err, coinBalance) {
                         if (err) {
                             Helpers.showError(err);
                         } else {
                             transData = getRefundTransData.refundTransData;
                             let fee = new BigNumber(getGas * gasPrice);
 
-                            if(fee.gt(new BigNumber(coinBalance, 10)))
+                            if (fee.gt(new BigNumber(coinBalance, 10)))
                                 return GlobalNotification.warning({
                                     content: 'Insufficient ETH balance in your TO account',
                                     duration: 2
@@ -208,7 +219,7 @@ function releaseWeth2Eth(show_data,trans,transType) {
     })
 }
 
-function revokeEth2Weth(show_data,trans,transType) {
+function revokeEth2Weth(show_data, trans, transType) {
     let getGas;
     let gasPrice;
     let transData;
@@ -227,18 +238,18 @@ function revokeEth2Weth(show_data,trans,transType) {
             // revoke x in eth
             console.log('getRevokeTransData ETH: ', show_data.srcChainType);
 
-            mist.ETH2WETH().getRevokeTransData(trans, function (err,getRevokeTransData) {
+            mist.ETH2WETH().getRevokeTransData(trans, function (err, getRevokeTransData) {
                 if (err) {
                     Helpers.showError(err);
                 } else {
-                    mist.ETH2WETH().getBalance(show_data.from.toLowerCase(), function (err,coinBalance) {
+                    mist.ETH2WETH().getBalance(show_data.from.toLowerCase(), function (err, coinBalance) {
                         if (err) {
                             Helpers.showError(err);
                         } else {
                             transData = getRevokeTransData.revokeTransData;
                             let fee = new BigNumber(getGas * gasPrice);
 
-                            if(fee.gt(new BigNumber(coinBalance, 10)))
+                            if (fee.gt(new BigNumber(coinBalance, 10)))
                                 return GlobalNotification.warning({
                                     content: 'Insufficient ETH balance in your FROM Account',
                                     duration: 2
@@ -253,7 +264,7 @@ function revokeEth2Weth(show_data,trans,transType) {
     })
 }
 
-function revokeWeth2Eth(show_data,trans,transType) {
+function revokeWeth2Eth(show_data, trans, transType) {
     let getGas;
     let gasPrice;
     let transData;
@@ -268,25 +279,25 @@ function revokeWeth2Eth(show_data,trans,transType) {
                 gasPrice = defaultGasprice
             }
 
-            trans.gas = getGas;
+            trans.gasLimit = getGas;
             trans.gasPrice = gasPrice;
 
             // show_data.symbol = 'WETH';
             // revoke x in wan
             console.log('getRevokeTransData WAN: ', show_data.srcChainType);
 
-            mist.WETH2ETH().getRevokeTransData(trans, function (err,getRevokeTransData) {
+            mist.WETH2ETH().getRevokeTransData(trans, function (err, getRevokeTransData) {
                 if (err) {
                     Helpers.showError(err);
                 } else {
-                    mist.WETH2ETH().getBalance(show_data.from.toLowerCase(), function (err,coinBalance) {
+                    mist.WETH2ETH().getBalance(show_data.from.toLowerCase(), function (err, coinBalance) {
                         if (err) {
                             Helpers.showError(err);
                         } else {
                             transData = getRevokeTransData.revokeTransData;
                             let fee = new BigNumber(getGas * gasPrice);
 
-                            if(fee.gt(new BigNumber(coinBalance, 10)))
+                            if (fee.gt(new BigNumber(coinBalance, 10)))
                                 return GlobalNotification.warning({
                                     content: 'Insufficient WAN balance in your FROM account',
                                     duration: 2
@@ -301,7 +312,7 @@ function revokeWeth2Eth(show_data,trans,transType) {
     })
 }
 
-function releaseErc202Werc20(show_data,trans,transType){
+function releaseErc202Werc20(show_data, trans, transType) {
     let getGas;
     let gasPrice;
     let transData;
@@ -324,20 +335,20 @@ function releaseErc202Werc20(show_data,trans,transType){
             // show_data.symbol = 'ETH';
 
             // release x in wan
-            mist.ERC202WERC20(show_data.tokenType).getRefundTransData(show_data.tokenAddr,show_data.tokenType,trans, function (err,getRefundTransData) {
+            mist.ERC202WERC20(show_data.tokenType).getRefundTransData(show_data.tokenAddr, show_data.tokenType, trans, function (err, getRefundTransData) {
                 if (err) {
                     Helpers.showError(err);
                 } else {
 
                     // WAN balance
-                    mist.WERC202ERC20("WAN").getBalance(show_data.crossAdress.toLowerCase(), function (err,coinBalance) {
+                    mist.WERC202ERC20("WAN").getBalance(show_data.crossAdress.toLowerCase(), function (err, coinBalance) {
                         if (err) {
                             Helpers.showError(err);
                         } else {
                             transData = getRefundTransData.refundTransData;
                             let fee = new BigNumber(getGas * gasPrice);
 
-                            if(fee.gt(new BigNumber(coinBalance, 10)))
+                            if (fee.gt(new BigNumber(coinBalance, 10)))
                                 return GlobalNotification.warning({
                                     content: 'Insufficient WAN balance in your TO account',
                                     duration: 2
@@ -353,7 +364,7 @@ function releaseErc202Werc20(show_data,trans,transType){
     });
 }
 
-function releaseWerc202Erc20(show_data,trans,transType){
+function releaseWerc202Erc20(show_data, trans, transType) {
     let getGas;
     let gasPrice;
     let transData;
@@ -372,20 +383,20 @@ function releaseWerc202Erc20(show_data,trans,transType){
             // show_data.symbol = 'WETH';
 
             // release x in eth
-            mist.WERC202ERC20(show_data.tokenType).getRefundTransData(show_data.tokenAddr,show_data.tokenType,trans, function (err,getRefundTransData) {
+            mist.WERC202ERC20(show_data.tokenType).getRefundTransData(show_data.tokenAddr, show_data.tokenType, trans, function (err, getRefundTransData) {
                 if (err) {
                     Helpers.showError(err);
                 } else {
 
                     // eth balance
-                    mist.ERC202WERC20(show_data.tokenType).getBalance(show_data.crossAdress.toLowerCase(), function (err,coinBalance) {
+                    mist.ERC202WERC20(show_data.tokenType).getBalance(show_data.crossAdress.toLowerCase(), function (err, coinBalance) {
                         if (err) {
                             Helpers.showError(err);
                         } else {
                             transData = getRefundTransData.refundTransData;
                             let fee = new BigNumber(getGas * gasPrice);
 
-                            if(fee.gt(new BigNumber(coinBalance, 10)))
+                            if (fee.gt(new BigNumber(coinBalance, 10)))
                                 return GlobalNotification.warning({
                                     content: `Insufficient ${show_data.tokenType} balance in your TO account`,
                                     duration: 2
@@ -401,7 +412,7 @@ function releaseWerc202Erc20(show_data,trans,transType){
     })
 }
 
-function revokeErc202Werc20(show_data,trans,transType) {
+function revokeErc202Werc20(show_data, trans, transType) {
     let getGas;
     let gasPrice;
     let transData;
@@ -421,18 +432,18 @@ function revokeErc202Werc20(show_data,trans,transType) {
             // revoke x in eth
             console.log('getRevokeTransData ETH: ', show_data.srcChainType);
 
-            mist.ERC202WERC20(show_data.tokenType).getRevokeTransData(show_data.tokenAddr,show_data.tokenType,trans, function (err,getRevokeTransData) {
+            mist.ERC202WERC20(show_data.tokenType).getRevokeTransData(show_data.tokenAddr, show_data.tokenType, trans, function (err, getRevokeTransData) {
                 if (err) {
                     Helpers.showError(err);
                 } else {
-                    mist.ERC202WERC20(show_data.tokenType).getBalance(show_data.from.toLowerCase(), function (err,coinBalance) {
+                    mist.ERC202WERC20(show_data.tokenType).getBalance(show_data.from.toLowerCase(), function (err, coinBalance) {
                         if (err) {
                             Helpers.showError(err);
                         } else {
                             transData = getRevokeTransData.revokeTransData;
                             let fee = new BigNumber(getGas * gasPrice);
 
-                            if(fee.gt(new BigNumber(coinBalance, 10)))
+                            if (fee.gt(new BigNumber(coinBalance, 10)))
                                 return GlobalNotification.warning({
                                     content: `Insufficient ${show_data.tokenType} balance in your FROM Account`,
                                     duration: 2
@@ -447,7 +458,7 @@ function revokeErc202Werc20(show_data,trans,transType) {
     })
 }
 
-function revokeWerc202Erc20(show_data,trans,transType) {
+function revokeWerc202Erc20(show_data, trans, transType) {
     let getGas;
     let gasPrice;
     let transData;
@@ -464,26 +475,26 @@ function revokeWerc202Erc20(show_data,trans,transType) {
                 gasPrice = defaultGasprice
             }
 
-            trans.gas = getGas;
+            trans.gasLimit = getGas;
             trans.gasPrice = gasPrice;
 
             // show_data.symbol = 'WETH';
             // revoke x in wan
             console.log('getRevokeTransData WAN: ', show_data.srcChainType);
 
-            mist.WERC202ERC20(show_data.tokenType).getRevokeTransData(show_data.tokenAddr,show_data.tokenType,trans, function (err,getRevokeTransData) {
+            mist.WERC202ERC20(show_data.tokenType).getRevokeTransData(show_data.tokenAddr, show_data.tokenType, trans, function (err, getRevokeTransData) {
                 if (err) {
                     Helpers.showError(err);
                 } else {
                     // get wan balance
-                    mist.WERC202ERC20(show_data.dstChainType).getBalance(show_data.from.toLowerCase(), function (err,coinBalance) {
+                    mist.WERC202ERC20(show_data.dstChainType).getBalance(show_data.from.toLowerCase(), function (err, coinBalance) {
                         if (err) {
                             Helpers.showError(err);
                         } else {
                             transData = getRevokeTransData.revokeTransData;
                             let fee = new BigNumber(getGas * gasPrice);
 
-                            if(fee.gt(new BigNumber(coinBalance, 10)))
+                            if (fee.gt(new BigNumber(coinBalance, 10)))
                                 return GlobalNotification.warning({
                                     content: 'Insufficient WAN balance in your FROM account',
                                     duration: 2
@@ -518,7 +529,7 @@ function showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transT
             transType: transType,
             Chain: show_data.srcChainType,
 
-            tokenAddr:show_data.tokenAddr,
+            tokenAddr: show_data.tokenAddr,
             tokenStand: show_data.tokenStand,// ETH/ERC20/BTC....
             tokenType: show_data.tokenType,// ETH/ETH/BTC....
             symbol: show_data.symbol,
@@ -576,38 +587,40 @@ Template['elements_cross_transactions_table'].helpers({
             let smallStyle = 'display: block; color: #4b90f7;';
 
             _.each(TemplateVar.get('crosschainList'), function (value, index) {
-                console.log("value:",JSON.stringify(value));
+                console.log("value:", JSON.stringify(value));
 
                 let style = 'display: block; font-size: 18px; background-color: transparent;';
 
                 value.fromText = `<small style="${smallStyle}">${value.srcChainType}</small>`;
                 value.toText = `<small style="${smallStyle}">${value.dstChainType}</small>`;
 
-                if (value.srcChainType ==='WAN'){
+                if (value.srcChainType === 'WAN') {
                     value.tokenAddr = value.dstChainAddr;
-                    value.tokenType=value.dstChainType;
-                    if (value.tokenStand ==='E20'){
+                    value.tokenType = value.dstChainType;
+                    if (value.tokenStand === 'E20') {
+                        value.fromText = `<small style="${smallStyle}">W${value.tokenSymbol}(${value.srcChainType})</small>`;
                         value.toText = `<small style="${smallStyle}">${value.tokenSymbol}(${value.dstChainType})</small>`;
                     }
 
-                }else {
+                } else {
                     value.tokenAddr = value.srcChainAddr;
-                    value.tokenType=value.srcChainType;
-                    if (value.tokenStand ==='E20'){
+                    value.tokenType = value.srcChainType;
+                    if (value.tokenStand === 'E20') {
                         value.fromText = `<small style="${smallStyle}">${value.tokenSymbol}(${value.srcChainType})</small>`;
+                        value.toText = `<small style="${smallStyle}">W${value.tokenSymbol}(${value.dstChainType})</small>`;
                     }
 
                 }
 
 
-                value.htlcdate = value.buddyLockedTime? Helpers.timeStamp2String(Number(value.buddyLockedTime)*1000):"--";
-                value.time = value.lockedTime? Helpers.timeStamp2String(Number(value.lockedTime)*1000):"--";
+                value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
+                value.time = value.lockedTime ? Helpers.timeStamp2String(Number(value.lockedTime) * 1000) : "--";
 
                 value.crossAdress = value.to;
 
-                if (value.srcChainType ==='WAN') {
+                if (value.srcChainType === 'WAN') {
                     value.symbol = `W${value.tokenSymbol}`;
-                }else{
+                } else {
                     value.symbol = value.tokenSymbol;
                 }
                 value.value = web3.fromWei(value.contractValue);
@@ -651,11 +664,15 @@ Template['elements_cross_transactions_table'].helpers({
                     value.state = 'Cross-Tx 6/7';
 
                     let isCanRevoke = canRevoke(value).code;
-                    console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
+                    value.htlcdate = value.htlcTimeOut ? Helpers.formatDuring(Number(value.htlcTimeOut) * 1000 - Date.now()) : "--";
+
+                    // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
                     if (isCanRevoke) {
                         style += 'color: #920b1c;';
                         value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
                         value.state = 'To be cancelled';
+                        value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
+
                     }
 
                 }
@@ -664,22 +681,25 @@ Template['elements_cross_transactions_table'].helpers({
 
                     let isCanRefund = canRefund(value).code;
                     let isCanRevoke = canRevoke(value).code;
-                    console.log("BuddyLocked:::::::::::isCanRefund:",isCanRefund);
-                    console.log("BuddyLocked:::::::::::isCanRevoke:",isCanRevoke);
+                    // console.log("BuddyLocked:::::::::::isCanRefund:",isCanRefund);
+                    // console.log("BuddyLocked:::::::::::isCanRevoke:",isCanRevoke);
 
                     if (isCanRefund) {
                         style += 'color: #920b1c;';
                         value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
                         value.state = 'To be confirmed';
+                        value.htlcdate = value.htlcTimeOut ? Helpers.formatDuring(Number(value.buddyLockedTimeOut) * 1000 - Date.now()) : "--";
                     } else {
                         if (!isCanRevoke) {
                             // style += 'color: #920b1c;';
                             value.operation = `<h2 id = ${index} style="${style}">Cancel</h2>`;
                             value.state = 'To be cancelled';
+                            value.htlcdate = value.htlcTimeOut ? Helpers.formatDuring(Number(value.htlcTimeOut) * 1000 - Date.now()) : "--";
                         } else {
                             style += 'color: #920b1c;';
                             value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
                             value.state = 'To be cancelled';
+                            value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
                         }
 
                     }
@@ -716,70 +736,6 @@ Template['elements_cross_transactions_table'].helpers({
                     value.state = 'Success';
                 }
 
-
-                // Release
-                // if (stateDict[value.status] === 5) {
-                //     style += 'color: #920b1c;';
-                //
-                //     value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
-                //     value.state = 'To be confirmed';
-                // }
-                // // suspending
-                // else if (stateDict[value.status] === 14) {
-                //     value.operation = `<h2 style="${style}">Cancel</h2>`;
-                //     value.state = 'To be cancelled in ' + value.htlcdate;
-                // }
-                // // Revoke
-                // else if (stateDict[value.status] === 9) {
-                //     style += 'color: #920b1c;';
-                //     value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
-                //     value.state = 'To be cancelled';
-                // }
-                // // Release or Revoke finished
-                // else if (stateDict[value.status] === 8 || stateDict[value.status] === 12) {
-                //     if (stateDict[value.status] === 8) {
-                //         value.state = 'Success';
-                //     } else {
-                //         value.state = 'Cancelled';
-                //     }
-                //
-                //     value.operation = `<h2 style="${style}"></h2>`;
-                // }
-                //
-                // // locking
-                // else if (stateDict[value.status] >= 1 && stateDict[value.status] <= 4) {
-                //     if (stateDict[value.status] === 1) {
-                //         value.state = 'Pending';
-                //     } else if (stateDict[value.status] >= 2){
-                //         value.state = 'Cross-Tx ' + (stateDict[value.status] - 1).toString() +  '/4';
-                //     }
-                //     value.operation = `<h2 style="${style}">Confirm</h2>`;
-                // }
-                // // Releasing
-                // else if (stateDict[value.status] >= 6 && stateDict[value.status] <= 7) {
-                //     value.state = 'Confirming ' + (stateDict[value.status] - 5).toString() +  '/3';
-                //     value.operation = `<h2 style="${style}"></h2>`;
-                // }
-                // // Revoking
-                // else if (stateDict[value.status] >= 10 && stateDict[value.status] <= 11) {
-                //     value.state = 'Cancelling ' + (stateDict[value.status] - 9).toString() +  '/3';
-                //     value.operation = `<h2 style="${style}"></h2>`;
-                // }
-                // // Failed
-                // else if (stateDict[value.status] === 13) {
-                //     value.state = 'Failed';
-                //     value.operation = `<h2 style="${style}"></h2>`;
-                // }
-                // normal
-                // else {
-                //     value.state = 'Success';
-                //     value.crossAdress = value.to;
-                //     value.htlcdate = '--';
-                //     value.fromText = `<small style="${smallStyle}">ETH</small>`;
-                //     value.toText = `<small style="${smallStyle}">ETH</small>`;
-                //     value.operation = `<h2 style="${style}"></h2>`;
-                // }
-
                 crosschainList.push(value);
             });
         }
@@ -805,9 +761,9 @@ Template['elements_cross_transactions_table'].events({
                 show_data.HashX = show_data.hashX;
             }
 
-            if (show_data.srcChainType ==='WAN') {
+            if (show_data.srcChainType === 'WAN') {
                 show_data.symbol = `W${show_data.tokenSymbol}`;
-            }else{
+            } else {
                 show_data.symbol = show_data.tokenSymbol;
             }
 
@@ -859,89 +815,93 @@ Template['elements_cross_transactions_table'].events({
             });
         }
 
-        if (show_data.srcChainType ==='WAN') {
+        if (show_data.srcChainType === 'WAN') {
             show_data.symbol = `W${show_data.tokenSymbol}`;
-        }else{
+        } else {
             show_data.symbol = show_data.tokenSymbol;
         }
 
+        if (show_data.tokenStand === 'E20') {
 
+            let isCanRefund = canRefund(show_data).code;
+            let isCanRevoke = canRevoke(show_data).code;
 
-        if (show_data.tokenStand==='ERC20') {
-            if (show_data.status === stateDict.BuddyLocked) {
-                let isCanRefund = canRefund(show_data).code;
-                let isCanRevoke = canRevoke(show_data).code;
+            console.log("isCanRefund:", isCanRefund, "isCanRevoke:", isCanRevoke);
 
-                trans = {
-                    lockTxHash: show_data.lockTxHash, amount: show_data.contractValue.toString(10),
-                    storemanGroup: show_data.storeman, cross: show_data.crossAdress,
-                    x: show_data.x,hashX: show_data.hashX
-                };
+            trans = {
+                lockTxHash: show_data.lockTxHash, amount: show_data.contractValue.toString(10),
+                storemanGroup: show_data.storeman, cross: show_data.crossAdress,
+                x: show_data.x, hashX: show_data.hashX
+            };
 
-                if (isCanRefund){
-                    transType = 'releaseX';
-                    // release X erc20 => werc20
-                    if (show_data.srcChainType !== 'WAN') {
-                        releaseErc202Werc20(show_data,trans,transType);
-                    }
-                    // release X werc20 => erc20
-                    else {
-                        releaseWerc202Erc20(show_data,trans,transType);
-                    }
-                }else if (isCanRevoke){
-                    transType = 'revoke';
-
-                    // revoke X erc20 => werc20
-                    if (show_data.srcChainType !== 'WAN') {
-                        revokeErc202Werc20(show_data,trans,transType);
-                    }
-                    // revoke X werc20 => erc20
-                    else {
-                        revokeWerc202Erc20(show_data,trans,transType);
-                    }
+            if (isCanRefund) {
+                transType = 'releaseX';
+                // release X erc20 => werc20
+                if (show_data.srcChainType !== 'WAN') {
+                    releaseErc202Werc20(show_data, trans, transType);
                 }
+                // release X werc20 => erc20
+                else {
+                    releaseWerc202Erc20(show_data, trans, transType);
+                }
+            } else if (isCanRevoke) {
+                transType = 'revoke';
+
+                // revoke X erc20 => werc20
+                if (show_data.srcChainType !== 'WAN') {
+                    revokeErc202Werc20(show_data, trans, transType);
+                }
+                // revoke X werc20 => erc20
+                else {
+                    revokeWerc202Erc20(show_data, trans, transType);
+                }
+            } else {
+                return GlobalNotification.warning({
+                    content: 'Can not operate',
+                    duration: 2
+                });
             }
 
-        } else if (show_data.tokenStand === 'ETH'){
 
-            if (show_data.status === stateDict.BuddyLocked) {
-                let isCanRefund = canRefund(show_data).code;
-                let isCanRevoke = canRevoke(show_data).code;
+        } else if (show_data.tokenStand === 'ETH') {
 
-                trans = {
-                    lockTxHash: show_data.lockTxHash, amount: show_data.contractValue.toString(10),
-                    storemanGroup: show_data.storeman, cross: show_data.crossAdress,
-                    x: show_data.x,hashX: show_data.hashX
-                };
+            let isCanRefund = canRefund(show_data).code;
+            let isCanRevoke = canRevoke(show_data).code;
 
-                if (isCanRefund){
-                    transType = 'releaseX';
-                    // release X eth => weth
-                    if (show_data.srcChainType !== 'WAN') {
-                        releaseEth2Weth(show_data,trans,transType);
-                    }
-                    // release X weth => eth
-                    else{
-                        releaseWeth2Eth(show_data,trans,transType);
-                    }
-                }else if (isCanRevoke){
-                    transType = 'revoke';
+            trans = {
+                lockTxHash: show_data.lockTxHash, amount: show_data.contractValue.toString(10),
+                storemanGroup: show_data.storeman, cross: show_data.crossAdress,
+                x: show_data.x, hashX: show_data.hashX
+            };
 
-                    // revoke X eth => weth
-                    if (show_data.srcChainType !== 'WAN') {
-                        revokeEth2Weth(show_data,trans,transType);
-                    }
-                    // revoke X weth => eth
-                    else {
-                        revokeWeth2Eth(show_data,trans,transType);
-                    }
-                }else{
-                    return GlobalNotification.warning({
-                        content: 'Can not operate',
-                        duration: 2
-                    });
+            if (isCanRefund) {
+                transType = 'releaseX';
+                // release X eth => weth
+                if (show_data.srcChainType !== 'WAN') {
+                    releaseEth2Weth(show_data, trans, transType);
                 }
+                // release X weth => eth
+                else {
+                    releaseWeth2Eth(show_data, trans, transType);
+                }
+            } else if (isCanRevoke) {
+                transType = 'revoke';
+
+                // revoke X eth => weth
+                if (show_data.srcChainType !== 'WAN') {
+                    revokeEth2Weth(show_data, trans, transType);
+                }
+                // revoke X weth => eth
+                else {
+                    revokeWeth2Eth(show_data, trans, transType);
+                }
+            } else {
+                return GlobalNotification.warning({
+                    content: 'Can not operate',
+                    duration: 2
+                });
             }
+
 
         }
 
