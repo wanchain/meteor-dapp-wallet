@@ -6,7 +6,6 @@
 
 const defaultGasprice = 180000000000;
 
-let InterID;
 
 const stateDict = {
 
@@ -236,7 +235,7 @@ function revokeEth2Weth(show_data, trans, transType) {
 
             // show_data.symbol = 'ETH';
             // revoke x in eth
-            console.log('getRevokeTransData ETH: ', show_data.srcChainType);
+            // console.log('getRevokeTransData ETH: ', show_data.srcChainType);
 
             mist.ETH2WETH().getRevokeTransData(trans, function (err, getRevokeTransData) {
                 if (err) {
@@ -284,7 +283,7 @@ function revokeWeth2Eth(show_data, trans, transType) {
 
             // show_data.symbol = 'WETH';
             // revoke x in wan
-            console.log('getRevokeTransData WAN: ', show_data.srcChainType);
+            // console.log('getRevokeTransData WAN: ', show_data.srcChainType);
 
             mist.WETH2ETH().getRevokeTransData(trans, function (err, getRevokeTransData) {
                 if (err) {
@@ -430,7 +429,7 @@ function revokeErc202Werc20(show_data, trans, transType) {
 
             // show_data.symbol = 'ETH';
             // revoke x in eth
-            console.log('getRevokeTransData ETH: ', show_data.srcChainType);
+            // console.log('getRevokeTransData ETH: ', show_data.srcChainType);
 
             mist.ERC202WERC20(show_data.tokenType).getRevokeTransData(show_data.tokenAddr, show_data.tokenType, trans, function (err, getRevokeTransData) {
                 if (err) {
@@ -480,7 +479,7 @@ function revokeWerc202Erc20(show_data, trans, transType) {
 
             // show_data.symbol = 'WETH';
             // revoke x in wan
-            console.log('getRevokeTransData WAN: ', show_data.srcChainType);
+            // console.log('getRevokeTransData WAN: ', show_data.srcChainType);
 
             mist.WERC202ERC20(show_data.tokenType).getRevokeTransData(show_data.tokenAddr, show_data.tokenType, trans, function (err, getRevokeTransData) {
                 if (err) {
@@ -542,6 +541,40 @@ function showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transT
     });
 }
 
+function resultEach(template, result) {
+    _.each(result, function (value, index) {
+
+        if (value.htlcTimeOut) {
+            let nowTime = new Date().Format('yyyy-MM-dd hh:mm:ss:S');
+            let nowTimestamp =  Math.round(new Date(nowTime).getTime());
+
+
+            // HTLCtime
+            let endTimestamp = Number(value.htlcTimeOut)*1000;
+            //let buddyLockedTimeOut = Number(value.buddyLockedTimeOut)*1000;
+
+
+            if (endTimestamp > nowTimestamp) {
+                if(value.status ===stateDict.Locked ||value.status ===stateDict.BuddyLocked || value.status ===stateDict.RefundSending ){
+                    value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endTimestamp - nowTimestamp)}</span>`;
+                }
+                else{
+                    value.htlcdate = `<span style="color: #1ec89a">${Helpers.timeStamp2String(endTimestamp)}</span>`;
+                }
+
+            }else{
+                value.htlcdate = `<span style="color: #1ec89a">${Helpers.timeStamp2String(endTimestamp)}</span>`;
+            }
+
+
+        }else{
+            value.htlcdate = `<span style="color: #1ec89a">--</span>`;
+        }
+
+    });
+}
+
+let InterID;
 
 Template['elements_cross_transactions_table'].onCreated(function () {
     let template = this;
@@ -549,6 +582,7 @@ Template['elements_cross_transactions_table'].onCreated(function () {
     const self = this;
 
     mist.ETH2WETH().listHistory(self.data.addressList.concat(self.data.wanAddressList), (err, result) => {
+        resultEach(template, result);
 
         Session.set('oldCrosschainList', result);
         TemplateVar.set(template, 'crosschainList', result);
@@ -557,6 +591,7 @@ Template['elements_cross_transactions_table'].onCreated(function () {
 
     InterID = Meteor.setInterval(function () {
         mist.ETH2WETH().listHistory(self.data.addressList.concat(self.data.wanAddressList), (err, result) => {
+            resultEach(template, result)
 
             let oldCrosschainResult = Session.get('oldCrosschainList');
             let oldResultHex = web3.toHex(oldCrosschainResult);
@@ -587,7 +622,7 @@ Template['elements_cross_transactions_table'].helpers({
             let smallStyle = 'display: block; color: #4b90f7;';
 
             _.each(TemplateVar.get('crosschainList'), function (value, index) {
-                console.log("value:", JSON.stringify(value));
+                // console.log("value:", JSON.stringify(value));
 
                 let style = 'display: block; font-size: 18px; background-color: transparent;';
 
@@ -688,7 +723,7 @@ Template['elements_cross_transactions_table'].helpers({
                         style += 'color: #920b1c;';
                         value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
                         value.state = 'To be confirmed';
-                        value.htlcdate = value.htlcTimeOut ? Helpers.formatDuring(Number(value.buddyLockedTimeOut) * 1000 - Date.now()) : "--";
+                        value.htlcdate = value.buddyLockedTimeOut ? Helpers.formatDuring(Number(value.buddyLockedTimeOut) * 1000 - Date.now()) : "--";
                     } else {
                         if (!isCanRevoke) {
                             // style += 'color: #920b1c;';
@@ -733,7 +768,7 @@ Template['elements_cross_transactions_table'].helpers({
                     value.state = 'Cancelling 2/3';
                 }
                 else if (value.status === stateDict.Revoked) {
-                    value.state = 'Success';
+                    value.state = 'Cancelled';
                 }
 
                 crosschainList.push(value);
@@ -754,7 +789,7 @@ Template['elements_cross_transactions_table'].events({
         Session.set('isShowModal', true);
 
         let show_data = TemplateVar.get('crosschainList')[id];
-        console.log('show_data: ', show_data);
+        // console.log('show_data: ', show_data);
 
         if (show_data) {
             if (!show_data.HashX) {
@@ -805,7 +840,7 @@ Template['elements_cross_transactions_table'].events({
         let trans;
         let transType;
 
-        console.log('show_data: ', JSON.stringify(show_data));
+        // console.log('show_data: ', JSON.stringify(show_data));
 
         // suspending
         if (show_data.status === stateDict.RevokeSending) {
@@ -826,7 +861,7 @@ Template['elements_cross_transactions_table'].events({
             let isCanRefund = canRefund(show_data).code;
             let isCanRevoke = canRevoke(show_data).code;
 
-            console.log("isCanRefund:", isCanRefund, "isCanRevoke:", isCanRevoke);
+            // console.log("isCanRefund:", isCanRefund, "isCanRevoke:", isCanRevoke);
 
             trans = {
                 lockTxHash: show_data.lockTxHash, amount: show_data.contractValue.toString(10),
