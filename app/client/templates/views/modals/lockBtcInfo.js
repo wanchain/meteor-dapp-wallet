@@ -24,24 +24,6 @@ Template['views_modals_lockBtcInfo'].events({
             });
         }
 
-        let password_input = document.getElementById('crosschain-psd').value;
-
-        if(!password_input) {
-            EthElements.Modal.hide();
-            return GlobalNotification.warning({
-                content: 'Empty btc password, please enter one',
-                duration: 2
-            });
-        }
-
-        if(password_input.length <8) {
-            EthElements.Modal.hide();
-            return GlobalNotification.warning({
-                content: 'password too short',
-                duration: 2
-            });
-        }
-
         this.trans.wanPassword = password_input_wan;
 
         TemplateVar.set('isButton', true);
@@ -49,6 +31,24 @@ Template['views_modals_lockBtcInfo'].events({
 
         if (this.chain === 'BTC') {
             //lockBtc (btc)
+
+            let password_input = document.getElementById('crosschain-psd').value;
+
+            if(!password_input) {
+                EthElements.Modal.hide();
+                return GlobalNotification.warning({
+                    content: 'Empty btc password, please enter one',
+                    duration: 2
+                });
+            }
+
+            if(password_input.length <8) {
+                EthElements.Modal.hide();
+                return GlobalNotification.warning({
+                    content: 'password too short',
+                    duration: 2
+                });
+            }
 
             this.trans.btcPassword = password_input;
 
