@@ -168,7 +168,7 @@ Meteor.startup(function() {
                                                 $set: {
                                                     address: unicornToken.address,
                                                     name: unicornToken.name,
-                                                    symbol: unicornToken.symbol,
+                                                    symbol: `W${unicornToken.symbol}`,
                                                     balances: {},
                                                     decimals: unicornToken.decimals,
                                                     isWerc20: 1
