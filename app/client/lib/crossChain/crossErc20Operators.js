@@ -123,8 +123,8 @@ class crossChainOperators{
         this.invokeOperator(new crossOperator('getCoin2WanRatio',{},chainType,callback));
     }
 
-    getWerc20Token(callback){
-        this.invokeOperator(new crossOperator('getWerc20Token',[],this.getOriginChainType(),callback));
+    getWerc20TokenAddressList(callback){
+        this.invokeOperator(new crossOperator('getWerc20TokenAddressList',[],this.getOriginChainType(),callback));
     }
     getRegErc20Tokens(callback){
         this.invokeOperator(new crossOperator('getRegErc20Tokens',{},this.getOriginChainType(),callback));

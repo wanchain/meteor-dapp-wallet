@@ -108,6 +108,7 @@ Meteor.startup(function() {
 
                 if(!err) {
                     Meteor.setTimeout(function(){
+
                         let tokenId = Helpers.makeId('token', unicornToken.address);
                         let dapp_hasWethToken = Tokens.findOne(tokenId);
 
@@ -135,39 +136,59 @@ Meteor.startup(function() {
             });
 
           // erc20
-          //   mist.ERC202WERC20().getWerc20Token(function (err, unicornToken) {
-          //       if(!err) {
-          //             Meteor.setTimeout(function(){
-          //
-          //                 let tokenId = Helpers.makeId('token', unicornToken.address);
-          //                   let dapp_hasWerc20Token = Tokens.findOne(tokenId);
-          //
-          //                     if (dapp_hasWerc20Token === undefined) {
-          //
-          //                         if (dapp_hasWerc20Token === undefined) {
-          //                             let dapp_isWerc20 = Tokens.findOne({isWerc20: 1});
-          //
-          //                             if (dapp_isWerc20 !== undefined) {
-          //                                 Tokens.remove(dapp_isWerc20._id);
-          //                             }
-          //
-          //                             Tokens.upsert(tokenId, {
-          //                                 $set: {
-          //                                     address: unicornToken.address,
-          //                                     name: unicornToken.name,
-          //                                     symbol: unicornToken.symbol,
-          //                                     balances: {},
-          //                                     decimals: unicornToken.decimals,
-          //                                     isWbtc: 1
-          //                                 }
-          //                             });
-          //                         }
-          //                     }
-          //                   }, 2000);
-          //         } else {
-          //             console.log('getWethToken err: ', err);
-          //         }
-          //   });
+            mist.ERC202WERC20().getWerc20TokenAddressList(function (err, result) {
+                if(!err) {
+                    Meteor.setTimeout(function () {
+
+                        _.each(result, async function (tokenAddress, index) {
+
+                            const _tokenAddress = tokenAddress;
+                            let unicornToken = {};
+                            unicornToken.address = _tokenAddress;
+
+                            // check if the token has information about itself asynchrounously
+                            var tokenInstance = TokenContract.at(tokenAddress);
+
+                            tokenInstance.symbol(function(e, symbol){
+                                unicornToken.symbol = symbol;
+
+                                tokenInstance.name(function(e, name){
+                                    unicornToken.name = name;
+                                    tokenInstance.decimals(function(e, decimals){
+                                        unicornToken.decimals = Number(decimals);
+
+                                        console.log("unicornToken:",unicornToken);
+
+                                        let tokenId = Helpers.makeId('token', unicornToken.address);
+                                        let dapp_hasWerc20Token = Tokens.findOne(tokenId);
+
+                                        if (dapp_hasWerc20Token === undefined) {
+
+                                            Tokens.upsert(tokenId, {
+                                                $set: {
+                                                    address: unicornToken.address,
+                                                    name: unicornToken.name,
+                                                    symbol: unicornToken.symbol,
+                                                    balances: {},
+                                                    decimals: unicornToken.decimals,
+                                                    isWerc20: 1
+                                                }
+                                            });
+                                        }
+
+
+                                    });
+                                });
+                            });
+
+
+                        });
+
+                    }, 2000);
+                  } else {
+                      console.log('getWethToken err: ', err);
+                  }
+            });
 
         }
 
