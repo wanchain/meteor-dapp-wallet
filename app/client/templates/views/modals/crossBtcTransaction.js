@@ -3,7 +3,7 @@ function waitingMoment() {
     setTimeout(() => {
         Session.set('clickButton', 1);
         EthElements.Modal.hide();
-    }, 5000);
+    }, 10000);
 }
 
 Template['views_modals_sendcrossBtcReleaseX'].onCreated(function(){
@@ -59,7 +59,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        EthElements.Modal.hide();
+                        // EthElements.Modal.hide();
                         waitingMoment();
                     }
                 });
@@ -76,7 +76,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        EthElements.Modal.hide();
+                        // EthElements.Modal.hide();
                         waitingMoment();
                     }
                 });
@@ -99,7 +99,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        EthElements.Modal.hide();
+                        // EthElements.Modal.hide();
                         waitingMoment();
                     }
                 });
@@ -115,7 +115,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        EthElements.Modal.hide();
+                        // EthElements.Modal.hide();
                         waitingMoment();
                     }
                 });
