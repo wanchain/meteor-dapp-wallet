@@ -17,12 +17,7 @@ function waitingMoment(X) {
             }
         });
 
-    }, 5000);
-
-    // setTimeout(() => {
-    //     Session.set('clickButton', 1);
-    //     EthElements.Modal.hide();
-    // }, 10000);
+    }, 10000);
 }
 
 Template['views_modals_sendcrossBtcReleaseX'].onCreated(function(){
@@ -61,6 +56,9 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
         TemplateVar.set('isButton', true);
         Session.set('isShowModal', false);
 
+        let params = {};
+        params.x = this.trans.X;
+
         // releaseX
         if (this.transType === 'releaseX') {
 
@@ -68,9 +66,8 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
 
                 // release x in btc
                 console.log('release X Chain 1: ', this.Chain);
-                let params = {};
+
                 params.crossAddress = this.trans.cross;
-                params.x = this.trans.X;
                 params.wanPassword = password_input;
 
                 mist.BTC2WBTC().redeemBtc('BTC', params, function (err,data) {
@@ -78,7 +75,6 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        // EthElements.Modal.hide();
                         waitingMoment(params.x);
                     }
                 });
@@ -95,8 +91,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        // EthElements.Modal.hide();
-                        waitingMoment();
+                        waitingMoment(params.x);
                     }
                 });
             }
@@ -118,9 +113,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        console.log('data:::', data);
-                        // EthElements.Modal.hide();
-                        waitingMoment();
+                        waitingMoment(params.x);
                     }
                 });
             } else {
@@ -135,8 +128,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        // EthElements.Modal.hide();
-                        waitingMoment();
+                        waitingMoment(params.x);
                     }
                 });
 
