@@ -141,7 +141,7 @@ Meteor.startup(function () {
                         _.each(result, function (tokenAddress, index) {
 
                             const _tokenAddress = tokenAddress;
-                            let giunicornToken = {};
+                            let unicornToken = {};
                             unicornToken.address = _tokenAddress;
 
                             // check if the token has information about itself asynchrounously

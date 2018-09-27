@@ -12,8 +12,7 @@ Template['elements_tokenBox'].helpers({
     @method (formattedTotalBalance)
     */
     'formattedTotalBalance': function(e){
-        console.log("formattedTotalBalance::::::::::::::::::::::::::::this.balances:",this.balances);
-        console.log("formattedTotalBalance::::::::::::::::::::::::::::this.decimals:",this.decimals);
+
         // Get wallets and accounts, but not contracts
         var walletsAndAccounts = _.map(Wallets.find().fetch().concat(EthAccounts.find().fetch()), function(account){  
                 if(!account.disabled) return account._id; 
@@ -24,7 +23,7 @@ Template['elements_tokenBox'].helpers({
             if (walletsAndAccounts.indexOf(id) >= 0)
                 totalBalance = totalBalance.plus(new BigNumber(balance, 10));
         });
-        console.log("formattedTotalBalance::::::::::::::::::::::::::::totalBalance:",totalBalance);
+
         return Helpers.formatNumberByDecimals(totalBalance, this.decimals);
     },
     /**
