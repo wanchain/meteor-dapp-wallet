@@ -1,9 +1,28 @@
-function waitingMoment() {
+let InterID;
+
+function waitingMoment(X) {
     EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
-    setTimeout(() => {
-        Session.set('clickButton', 1);
-        EthElements.Modal.hide();
-    }, 10000);
+
+    InterID = Meteor.setInterval(function(){
+        _.each(Session.get('oldCrosschainList'), function (value, index) {
+            console.log('oldCrosschainList==>', value);
+            if (value.x === X) {
+                if(value.status === 'sentXPending' || value.status === 'sentRevokePending') {
+                    console.log('oldCrosschainList:::', value);
+                    Meteor.clearInterval(InterID);
+
+                    Session.set('clickButton', 1);
+                    EthElements.Modal.hide();
+                }
+            }
+        });
+
+    }, 5000);
+
+    // setTimeout(() => {
+    //     Session.set('clickButton', 1);
+    //     EthElements.Modal.hide();
+    // }, 10000);
 }
 
 Template['views_modals_sendcrossBtcReleaseX'].onCreated(function(){
@@ -60,7 +79,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         EthElements.Modal.hide();
                     } else {
                         // EthElements.Modal.hide();
-                        waitingMoment();
+                        waitingMoment(params.x);
                     }
                 });
 
@@ -99,6 +118,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
+                        console.log('data:::', data);
                         // EthElements.Modal.hide();
                         waitingMoment();
                     }
