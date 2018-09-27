@@ -188,6 +188,12 @@ Template['views_btcTowbtc'].events({
                 let btcAccounts = result.address;
                 let btcBalance = new BigNumber(result.balance);
 
+                if(amount.lte(new BigNumber(0.02))) {
+                    return GlobalNotification.warning({
+                        content: 'please input amount  greater than 0.02',
+                        duration: 2
+                    });
+                }
 
                 if(btcBalance.eq(new BigNumber(0))) {
                     return GlobalNotification.warning({

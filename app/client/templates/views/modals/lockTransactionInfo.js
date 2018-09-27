@@ -12,6 +12,8 @@ Template['views_modals_unlockTransactionInfo'].events({
         EthElements.Modal.hide();
     },
     'click .ok-cross': function () {
+        EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
+
         // console.log('data trans: ', this.trans);
         let password_input = document.getElementById('crosschain-psd').value;
 

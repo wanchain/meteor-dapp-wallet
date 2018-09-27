@@ -13,6 +13,7 @@ Template['views_modals_lockBtcInfo'].events({
         EthElements.Modal.hide();
     },
     'click .ok-cross': function () {
+        EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
         let password_input_wan = document.getElementById('crosschain-psd-wan').value;
 
@@ -54,7 +55,6 @@ Template['views_modals_lockBtcInfo'].events({
 
             mist.BTC2WBTC().lockBtc('BTC', this.trans, function (err,data) {
                 if (err) {
-                    console.log('err: ', err);
                     Helpers.showError(err);
                     EthElements.Modal.hide();
                 } else {
@@ -67,7 +67,6 @@ Template['views_modals_lockBtcInfo'].events({
 
             mist.BTC2WBTC().lockWbtc('BTC', this.trans, function (err,data) {
                 if (err) {
-                    console.log('err: ', err);
                     Helpers.showError(err);
                     EthElements.Modal.hide();
                 } else {
