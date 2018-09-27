@@ -1,30 +1,27 @@
-Meteor.startup(function() {
+Meteor.startup(function () {
 
-    if(typeof mist !== 'undefined')
-    {
-        mist.addPermanentCallbacks('requestAccount',function(e, accounts) {
-            if(!e) {
+    if (typeof mist !== 'undefined') {
+        mist.addPermanentCallbacks('requestAccount', function (e, accounts) {
+            if (!e) {
                 console.log('PermanentCallbacksrequestAccount :' + JSON.stringify(accounts));
-                if(!_.isArray(accounts)) {
+                if (!_.isArray(accounts)) {
                     accounts = [accounts];
                 }
-                accounts.forEach(function(account){
+                accounts.forEach(function (account) {
                     addr = account.address.toLowerCase();
                     web3.wan.getWanAddress(addr, function (e, wAddress) {
                         if (!e) {
-                            var doc = EthAccounts.findAll({
-                                address: addr,
+                            let doc = EthAccounts.findAll({
+                                address: addr
                             }).fetch()[0];
-                            if(doc)
-                            {
+                            if (doc) {
                                 EthAccounts.updateAll(doc._id, {
                                     $set: {name: account.name, reminder: account.reminder}
                                 });
                                 console.log("modify account name!");
                             }
-                            else
-                            {
-                                var insert = {
+                            else {
+                                let insert = {
                                     type: 'account',
                                     address: addr,
                                     waddress: wAddress,
@@ -45,7 +42,7 @@ Meteor.startup(function() {
                     });
 
                 });
-            } else if(e.message) {
+            } else if (e.message) {
                 GlobalNotification.error({
                     content: e.message,
                     duration: 8
@@ -72,9 +69,9 @@ Meteor.startup(function() {
     TAPi18n.setLanguage('en');
 
     // change moment and numeral language, when language changes
-    Tracker.autorun(function(){
-        if(_.isString(TAPi18n.getLanguage())) {
-            var lang = TAPi18n.getLanguage().substr(0,2);
+    Tracker.autorun(function () {
+        if (_.isString(TAPi18n.getLanguage())) {
+            var lang = TAPi18n.getLanguage().substr(0, 2);
             moment.locale(lang);
             try {
                 numeral.language(lang);
@@ -102,12 +99,11 @@ Meteor.startup(function() {
         //     }, 5000);
         // }
 
-        if(typeof mist !== 'undefined')
-        {
+        if (typeof mist !== 'undefined') {
             mist.ETH2WETH().getWethToken(function (err, unicornToken) {
 
-                if(!err) {
-                    Meteor.setTimeout(function(){
+                if (!err) {
+                    Meteor.setTimeout(function () {
 
                         let tokenId = Helpers.makeId('token', unicornToken.address);
                         let dapp_hasWethToken = Tokens.findOne(tokenId);
@@ -119,14 +115,16 @@ Meteor.startup(function() {
                                 Tokens.remove(dapp_isWeth._id);
                             }
 
-                            Tokens.upsert(tokenId, {$set: {
+                            Tokens.upsert(tokenId, {
+                                $set: {
                                     address: unicornToken.address,
                                     name: unicornToken.name,
                                     symbol: unicornToken.symbol,
                                     balances: {},
                                     decimals: unicornToken.decimals,
                                     isWeth: 1
-                                }});
+                                }
+                            });
                         }
 
                     }, 2000);
@@ -135,29 +133,29 @@ Meteor.startup(function() {
                 }
             });
 
-          // erc20
+            // erc20
             mist.ERC202WERC20().getWerc20TokenAddressList(function (err, result) {
-                if(!err) {
+                if (!err) {
                     Meteor.setTimeout(function () {
 
-                        _.each(result, async function (tokenAddress, index) {
+                        _.each(result, function (tokenAddress, index) {
 
                             const _tokenAddress = tokenAddress;
-                            let unicornToken = {};
+                            let giunicornToken = {};
                             unicornToken.address = _tokenAddress;
 
                             // check if the token has information about itself asynchrounously
-                            var tokenInstance = TokenContract.at(tokenAddress);
+                            let tokenInstance = TokenContract.at(tokenAddress);
 
-                            tokenInstance.symbol(function(e, symbol){
+                            tokenInstance.symbol(function (e, symbol) {
                                 unicornToken.symbol = symbol;
 
-                                tokenInstance.name(function(e, name){
+                                tokenInstance.name(function (e, name) {
                                     unicornToken.name = name;
-                                    tokenInstance.decimals(function(e, decimals){
+                                    tokenInstance.decimals(function (e, decimals) {
                                         unicornToken.decimals = Number(decimals);
 
-                                        console.log("unicornToken:",unicornToken);
+                                        // console.log("unicornToken:", unicornToken);
 
                                         let tokenId = Helpers.makeId('token', unicornToken.address);
                                         let dapp_hasWerc20Token = Tokens.findOne(tokenId);
@@ -185,9 +183,9 @@ Meteor.startup(function() {
                         });
 
                     }, 2000);
-                  } else {
-                      console.log('getWethToken err: ', err);
-                  }
+                } else {
+                    console.log('getWethToken err: ', err);
+                }
             });
 
         }

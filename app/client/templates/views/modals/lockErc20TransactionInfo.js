@@ -12,10 +12,8 @@ Template['views_modals_unlock_erc20TransactionInfo'].events({
         EthElements.Modal.hide();
     },
     'click .ok-cross': function () {
-        // console.log('data trans: ', this.trans);
-        let password_input = document.getElementById('crosschain-psd').value;
 
-        // console.log('password: ', password_input);
+        let password_input = document.getElementById('crosschain-psd').value;
 
         if(!password_input) {
             EthElements.Modal.hide();
@@ -29,7 +27,6 @@ Template['views_modals_unlock_erc20TransactionInfo'].events({
         Session.set('isShowModal', false);
 
         if (this.chain !== 'WAN') {
-            console.log('ETH chain: ', this.chain);
 
             mist.ERC202WERC20(this.chainType).sendLockTrans(this.tokenOrigAddr,this.chainType,this.trans, password_input, function (err,data) {
                 if (err) {
@@ -41,7 +38,6 @@ Template['views_modals_unlock_erc20TransactionInfo'].events({
                 }
             });
         } else {
-            console.log('WAN chain: ', this.chain);
 
             mist.WERC202ERC20(this.chainType).sendLockTrans(this.tokenOrigAddr,this.chainType,this.trans, password_input, function (err,data) {
                 if (err) {
