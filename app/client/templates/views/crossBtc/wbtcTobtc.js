@@ -268,15 +268,35 @@ Template['views_wbtcTobtc'].events({
                 });
             }
 
+            // gas Fee
+            let gasFee = new BigNumber('400000000000000000');
+            let wanAccount = new BigNumber(wanBalance, 10);
+            let wanFee = new BigNumber(EthTools.toWei(valueFee), 10);
+            let totalFee = gasFee.add(wanFee);
 
-            // valueFee > wanBalance
-            if((new BigNumber(EthTools.toWei(valueFee), 10)).gt(new BigNumber(wanBalance, 10)))
+            // gasFee > wanAccount
+            if(gasFee.gt(wanAccount)) {
                 return GlobalNotification.warning({
-                    content: 'Insufficient WAN balance in your FROM account',
+                    content: 'This wan address\'s balance less than gas fee.',
                     duration: 2
                 });
+            }
 
+            // wanFee > wanBalance
+            if(wanFee.gt(wanAccount)) {
+                return GlobalNotification.warning({
+                    content: 'This wan address\'s balance less than storeman fee.',
+                    duration: 2
+                });
+            }
 
+            // totalFee > wanBalance
+            if (totalFee.gt(wanAccount)) {
+                return GlobalNotification.warning({
+                    content: 'Insufficient WAN balance in your FROM account.',
+                    duration: 2
+                });
+            }
 
             let trans = {
                 wanAddress: from, amount: amount.toString(10), storeman: {wanAddress: storeman, txFeeRatio: txFeeRatio},

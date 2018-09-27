@@ -162,11 +162,19 @@ Template['views_btcTowbtc'].events({
             });
         }
 
-        let account = new BigNumber(Helpers.getAccountByAddress(to).balance ? Helpers.getAccountByAddress(to).balance : 0);
+        let account = new BigNumber(web3.fromWei(Helpers.getAccountByAddress(to).balance ? Helpers.getAccountByAddress(to).balance : 0));
 
         if(account.eq(new BigNumber(0))) {
             return GlobalNotification.warning({
                 content: 'This wan address\'s balance is 0.',
+                duration: 2
+            });
+        }
+
+        // gasPrice
+        if(account.lt(new BigNumber(0.4))) {
+            return GlobalNotification.warning({
+                content: 'This wan address\'s balance less than gas fee.',
                 duration: 2
             });
         }
