@@ -308,7 +308,7 @@ Template['elements_cross_transactions_table_btc'].events({
                 show_data.symbol = 'WBTC';
 
                 trans = {
-                    HashX: show_data.HashX, crossAddress: show_data.crossAddress
+                    HashX: show_data.HashX, crossAddress: show_data.crossAddress, X: show_data.x
                 };
 
                 showQuestion(show_data, trans, transType);
@@ -341,7 +341,7 @@ Template['elements_cross_transactions_table_btc'].events({
                 console.log('wbtc chain: ', show_data.chain);
 
                 trans = {
-                    from: show_data.from, HashX: show_data.HashX,
+                    from: show_data.from, HashX: show_data.HashX, X: show_data.x
                 };
 
                 showQuestion(show_data, trans, transType);

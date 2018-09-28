@@ -64,8 +64,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
         TemplateVar.set('isButton', true);
         Session.set('isShowModal', false);
 
-        let params = {};
-        params.x = this.trans.X;
+        let secret = this.trans.X;
 
         // releaseX
         if (this.transType === 'releaseX') {
@@ -75,15 +74,18 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                 // release x in btc
                 console.log('release X Chain 1: ', this.Chain);
 
+                let params = {};
+
                 params.crossAddress = this.trans.cross;
                 params.wanPassword = password_input;
+                params.x = secret;
 
                 mist.BTC2WBTC().redeemBtc('BTC', params, function (err,data) {
                     if (err) {
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        waitingMoment(params.x);
+                        waitingMoment(secret);
                     }
                 });
 
@@ -99,7 +101,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        waitingMoment(params.x);
+                        waitingMoment(secret);
                     }
                 });
             }
@@ -121,7 +123,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        waitingMoment(params.x);
+                        waitingMoment(secret);
                     }
                 });
             } else {
@@ -136,7 +138,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        waitingMoment(params.x);
+                        waitingMoment(secret);
                     }
                 });
 
