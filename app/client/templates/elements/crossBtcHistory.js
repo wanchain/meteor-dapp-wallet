@@ -329,7 +329,7 @@ Template['elements_cross_transactions_table_btc'].events({
                 trans = {
                     from: show_data.from, amount: show_data.value.toString(10),
                     storemanGroup: show_data.storeman, cross: show_data.crossAddress,
-                    HashX: show_data.HashX,
+                    HashX: show_data.HashX, X: show_data.x
                 };
 
                 // release x in wan

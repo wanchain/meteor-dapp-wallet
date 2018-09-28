@@ -1,9 +1,31 @@
-function waitingMoment() {
+let InterID;
+
+function waitingMoment(X) {
     EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
-    setTimeout(() => {
-        Session.set('clickButton', 1);
-        EthElements.Modal.hide();
-    }, 10000);
+
+    if (X) {
+        InterID = Meteor.setInterval(function(){
+            _.each(Session.get('oldCrosschainList'), function (value, index) {
+                if (value.x === X) {
+                    if(value.status === 'sentXPending' || value.status === 'sentRevokePending') {
+                        console.log('eth oldCrosschainList done:::', value.status);
+                        Meteor.clearInterval(InterID);
+
+                        Session.set('clickButton', 1);
+                        EthElements.Modal.hide();
+                    } else {
+                        console.log('eth oldCrosschainList interval:::', value.status);
+                    }
+                }
+            });
+
+        }, 5000);
+    } else {
+        setTimeout(() => {
+            Session.set('clickButton', 1);
+            EthElements.Modal.hide();
+        }, 5000);
+    }
 }
 
 Template['views_modals_sendcrosschainReleaseX'].onCreated(function(){
@@ -43,6 +65,8 @@ Template['views_modals_sendcrosschainReleaseX'].events({
         TemplateVar.set('isButton', true);
         Session.set('isShowModal', false);
 
+        let secret = this.trans.X;
+
         // releaseX
         if (this.transType === 'releaseX') {
 
@@ -57,8 +81,7 @@ Template['views_modals_sendcrosschainReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        // EthElements.Modal.hide();
-                        waitingMoment();
+                        waitingMoment(secret);
                     }
                 });
             } else {
@@ -70,8 +93,7 @@ Template['views_modals_sendcrosschainReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        // EthElements.Modal.hide();
-                        waitingMoment();
+                        waitingMoment(secret);
                     }
                 });
             }
@@ -88,8 +110,7 @@ Template['views_modals_sendcrosschainReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        // EthElements.Modal.hide();
-                        waitingMoment();
+                        waitingMoment(secret);
                     }
                 });
             } else {
@@ -101,8 +122,7 @@ Template['views_modals_sendcrosschainReleaseX'].events({
                         Helpers.showError(err);
                         EthElements.Modal.hide();
                     } else {
-                        // EthElements.Modal.hide();
-                        waitingMoment();
+                        waitingMoment(secret);
                     }
                 });
             }

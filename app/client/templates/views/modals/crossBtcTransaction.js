@@ -3,21 +3,29 @@ let InterID;
 function waitingMoment(X) {
     EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
-    InterID = Meteor.setInterval(function(){
-        _.each(Session.get('oldCrosschainList'), function (value, index) {
-            console.log('oldCrosschainList==>', value);
-            if (value.x === X) {
-                if(value.status === 'sentXPending' || value.status === 'sentRevokePending') {
-                    console.log('oldCrosschainList:::', value);
-                    Meteor.clearInterval(InterID);
+    if (X) {
+        InterID = Meteor.setInterval(function(){
+            _.each(Session.get('oldCrosschainList'), function (value, index) {
+                if (value.x === X) {
+                    if(value.status === 'sentXPending' || value.status === 'sentRevokePending') {
+                        console.log('btc oldCrosschainList done:::', value.status);
+                        Meteor.clearInterval(InterID);
 
-                    Session.set('clickButton', 1);
-                    EthElements.Modal.hide();
+                        Session.set('clickButton', 1);
+                        EthElements.Modal.hide();
+                    } else {
+                        console.log('btc oldCrosschainList interval:::', value.status);
+                    }
                 }
-            }
-        });
+            });
 
-    }, 10000);
+        }, 5000);
+    } else {
+        setTimeout(() => {
+            Session.set('clickButton', 1);
+            EthElements.Modal.hide();
+        }, 5000);
+    }
 }
 
 Template['views_modals_sendcrossBtcReleaseX'].onCreated(function(){
