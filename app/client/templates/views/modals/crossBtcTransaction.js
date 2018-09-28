@@ -11,9 +11,11 @@ function waitingMoment(X) {
                         console.log('btc oldCrosschainList done:::', value.status);
                         Meteor.clearInterval(InterID);
 
+                        Session.set('isShowModal', false);
                         Session.set('clickButton', 1);
                         EthElements.Modal.hide();
                     } else {
+                        Session.set('isShowModal', true);
                         console.log('btc oldCrosschainList interval:::', value.status);
                     }
                 }
@@ -24,7 +26,7 @@ function waitingMoment(X) {
         setTimeout(() => {
             Session.set('clickButton', 1);
             EthElements.Modal.hide();
-        }, 5000);
+        }, 10000);
     }
 }
 
