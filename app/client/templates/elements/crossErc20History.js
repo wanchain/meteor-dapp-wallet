@@ -563,50 +563,46 @@ function resultEach(template, result) {
 
 let InterID;
 
-Template['elements_cross_transactions_table'].onCreated(function () {
+Template['elements_cross_transactions_table_erc20'].onCreated(function () {
     let template = this;
 
     const self = this;
+    let tokenAddrList = [self.data.tokenOrigAddr,self.data.tokenWanAddr];
+    let symbol = self.data.symbol;
+    let chainType = self.data.chainType;
+    mist.ERC202WERC20(chainType).listHistory(self.data.addressList.concat(self.data.wanAddressList),tokenAddrList,symbol, (err, result) => {
+        resultEach(template, result);
 
-    let symbol = 'ETH';
-    mist.ETH2WETH().getWethToken((err, unicornToken) => {
-        let tokenAddrList = ['ETH',unicornToken.address];
-        mist.ETH2WETH().listHistory(self.data.addressList.concat(self.data.wanAddressList),tokenAddrList,symbol, (err, result) => {
-            resultEach(template, result);
-
-            Session.set('oldCrosschainList', result);
-            TemplateVar.set(template, 'crosschainList', result);
-        });
-
-
-        InterID = Meteor.setInterval(function () {
-            mist.ETH2WETH().listHistory(self.data.addressList.concat(self.data.wanAddressList),tokenAddrList,symbol, (err, result) => {
-                resultEach(template, result)
-
-                let oldCrosschainResult = Session.get('oldCrosschainList');
-                let oldResultHex = web3.toHex(oldCrosschainResult);
-                let resultHex = web3.toHex(result);
-
-                if (!oldCrosschainResult || oldResultHex !== resultHex) {
-                    // console.log('update history transaction: ',oldResultHex !== resultHex);
-                    Session.set('oldCrosschainList', result);
-                    TemplateVar.set(template, 'crosschainList', result);
-                }
-            });
-
-        }, 10000);
-
+        Session.set('oldCrosschainList', result);
+        TemplateVar.set(template, 'crosschainList', result);
     });
 
 
+    InterID = Meteor.setInterval(function () {
+        mist.ERC202WERC20(chainType).listHistory(self.data.addressList.concat(self.data.wanAddressList),tokenAddrList,symbol, (err, result) => {
+            resultEach(template, result)
+
+            let oldCrosschainResult = Session.get('oldCrosschainList');
+            let oldResultHex = web3.toHex(oldCrosschainResult);
+            let resultHex = web3.toHex(result);
+
+            if (!oldCrosschainResult || oldResultHex !== resultHex) {
+                // console.log('update history transaction: ',oldResultHex !== resultHex);
+                Session.set('oldCrosschainList', result);
+                TemplateVar.set(template, 'crosschainList', result);
+            }
+        });
+
+    }, 10000);
+
 });
 
-Template['elements_cross_transactions_table'].onDestroyed(function () {
+Template['elements_cross_transactions_table_erc20'].onDestroyed(function () {
     Meteor.clearInterval(InterID);
 });
 
 
-Template['elements_cross_transactions_table'].helpers({
+Template['elements_cross_transactions_table_erc20'].helpers({
     historyList: function () {
 
         let crosschainList = [];
@@ -774,7 +770,7 @@ Template['elements_cross_transactions_table'].helpers({
 });
 
 
-Template['elements_cross_transactions_table'].events({
+Template['elements_cross_transactions_table_erc20'].events({
 
     'click .show-detail': function (e) {
         let id = e.target.id;

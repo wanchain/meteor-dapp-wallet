@@ -14,12 +14,6 @@ Template['views_crosschain_erc20_main'].onCreated(function () {
     let tokenWanAddr = FlowRouter.getParam('tokenWanAddr');
     let chainType = FlowRouter.getParam('chainType');
 
-    console.log("############################################");
-    console.log("tokenOrigAddr:",tokenOrigAddr);
-    console.log("tokenWanAddr:",tokenWanAddr);
-    console.log("chainType:",chainType);
-    console.log("symbol:",symbol);
-    console.log("############################################");
     TemplateVar.set(template,"chainType",chainType);
     TemplateVar.set(template,"symbol",symbol);
     TemplateVar.set(template,"tokenOrigAddr",tokenOrigAddr);

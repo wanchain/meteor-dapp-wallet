@@ -81,7 +81,7 @@
     </nav>
 
     {{#if $eq ($.Session.get "clickButton") 1}}
-        {{> views_crosschain_erc20 chainType=chainType symbol=getSymbol tokenOrigAddr=tokenOrigAddr }}
+        {{> views_crosschain_erc20 chainType=chainType symbol=getSymbol tokenOrigAddr=tokenOrigAddr tokenWanAddr=tokenWanAddr }}
     {{/if}}
 
     {{#if $eq ($.Session.get "clickButton") 2}}

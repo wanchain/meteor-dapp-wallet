@@ -19,7 +19,7 @@
             <h1 class="account-h1" style="margin-top: 0; padding-left: 0;"><div class="viwes-account-line"></div><strong>History for ETH and Crosschain Transaction</strong></h1>
             {{#if addressList }}
                 {{#if wanAddressList}}
-                    {{> elements_cross_transactions_table addressList=addressList wanAddressList=wanAddressList}}
+                    {{> elements_cross_transactions_table_erc20 addressList=addressList wanAddressList=wanAddressList tokenOrigAddr=tokenOrigAddr tokenWanAddr=tokenWanAddr chainType=chainType symbol=symbol}}
                 {{/if}}
             {{else}}
                 <div class="wanchain-notransaction" style="">
