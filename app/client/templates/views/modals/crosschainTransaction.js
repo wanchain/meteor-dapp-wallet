@@ -3,6 +3,8 @@ let InterID;
 function waitingMoment(X) {
 
     if (X) {
+        Session.set('isShowModal', true);
+
         InterID = Meteor.setInterval(function(){
             _.each(Session.get('oldCrosschainList'), function (value, index) {
                 if (value.x === X) {
@@ -10,11 +12,14 @@ function waitingMoment(X) {
                         console.log('eth oldCrosschainList done:::', value.status);
                         Meteor.clearInterval(InterID);
 
+                        Session.set('isShowModal', false);
                         Session.set('clickButton', 1);
                         EthElements.Modal.hide();
                     } else {
                         console.log('eth oldCrosschainList interval:::', value.status);
                     }
+                } else {
+                    Session.set('isShowModal', false);
                 }
             });
 

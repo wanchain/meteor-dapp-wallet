@@ -3,6 +3,8 @@ let InterID;
 function waitingMoment(X) {
 
     if (X) {
+        Session.set('isShowModal', true);
+
         InterID = Meteor.setInterval(function(){
             _.each(Session.get('oldCrosschainList'), function (value, index) {
                 if (value.x === X) {
@@ -10,11 +12,14 @@ function waitingMoment(X) {
                         console.log('btc oldCrosschainList done:::', value.status);
                         Meteor.clearInterval(InterID);
 
+                        Session.set('isShowModal', false);
                         Session.set('clickButton', 1);
                         EthElements.Modal.hide();
                     } else {
                         console.log('btc oldCrosschainList interval:::', value.status);
                     }
+                } else {
+                    Session.set('isShowModal', false);
                 }
             });
 
@@ -65,6 +70,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
 
         let secret = this.trans.X;
 
+        EthElements.Modal.hide();
         EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
         // releaseX
@@ -81,14 +87,16 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                 params.wanPassword = password_input;
                 params.x = secret;
 
-                mist.BTC2WBTC().redeemBtc('BTC', params, function (err,data) {
-                    if (err) {
-                        Helpers.showError(err);
-                        EthElements.Modal.hide();
-                    } else {
-                        waitingMoment(secret);
-                    }
-                });
+                setTimeout(() => {
+                    mist.BTC2WBTC().redeemBtc('BTC', params, function (err,data) {
+                        if (err) {
+                            Helpers.showError(err);
+                            EthElements.Modal.hide();
+                        } else {
+                            waitingMoment(secret);
+                        }
+                    });
+                }, 500);
 
             } else {
                 // release x in wan
@@ -97,14 +105,16 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                 let params = this.trans;
                 params.btcPassword = password_input;
 
-                mist.BTC2WBTC().redeemWbtc('BTC', params, function (err,data) {
-                    if (err) {
-                        Helpers.showError(err);
-                        EthElements.Modal.hide();
-                    } else {
-                        waitingMoment(secret);
-                    }
-                });
+                setTimeout(() => {
+                    mist.BTC2WBTC().redeemWbtc('BTC', params, function (err,data) {
+                        if (err) {
+                            Helpers.showError(err);
+                            EthElements.Modal.hide();
+                        } else {
+                            waitingMoment(secret);
+                        }
+                    });
+                }, 500);
             }
         }
         // revoke
@@ -119,14 +129,17 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                 params.HashX = this.trans.HashX;
                 params.btcPassword = password_input;
 
-                mist.BTC2WBTC().revokeBtc('BTC', params, function (err,data) {
-                    if (err) {
-                        Helpers.showError(err);
-                        EthElements.Modal.hide();
-                    } else {
-                        waitingMoment(secret);
-                    }
-                });
+                setTimeout(() => {
+                    mist.BTC2WBTC().revokeBtc('BTC', params, function (err,data) {
+                        if (err) {
+                            Helpers.showError(err);
+                            EthElements.Modal.hide();
+                        } else {
+                            waitingMoment(secret);
+                        }
+                    });
+                }, 500);
+
             } else {
                 // revoke in wan
                 console.log('revoke Chain 2: ', this.Chain);
@@ -134,14 +147,16 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                 let params = this.trans;
                 params.wanPassword = password_input;
 
-                mist.BTC2WBTC().revokeWbtc('BTC', params, function (err,data) {
-                    if (err) {
-                        Helpers.showError(err);
-                        EthElements.Modal.hide();
-                    } else {
-                        waitingMoment(secret);
-                    }
-                });
+                setTimeout(() => {
+                    mist.BTC2WBTC().revokeWbtc('BTC', params, function (err,data) {
+                        if (err) {
+                            Helpers.showError(err);
+                            EthElements.Modal.hide();
+                        } else {
+                            waitingMoment(secret);
+                        }
+                    });
+                }, 500);
 
             }
         }
