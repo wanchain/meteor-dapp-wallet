@@ -1,25 +1,35 @@
 let InterID;
 
 function waitingMoment(X) {
-
     if (X) {
-        Session.set('isShowModal', true);
+        EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
+
+        _.each(Session.get('oldCrosschainList'), function (value, index) {
+            if (value.x === X) {
+                if(value.status === 'sentXPending' || value.status === 'sentRevokePending') {
+                    console.log('btc oldCrosschainList done:::', value.status);
+                    EthElements.Modal.hide();
+                    Session.set('clickButton', 1);
+                } else {
+                    EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
+                    console.log('eth oldCrosschainList interval:::', value.status);
+                }
+            }
+        });
 
         InterID = Meteor.setInterval(function(){
             _.each(Session.get('oldCrosschainList'), function (value, index) {
                 if (value.x === X) {
                     if(value.status === 'sentXPending' || value.status === 'sentRevokePending') {
                         console.log('btc oldCrosschainList done:::', value.status);
-                        Meteor.clearInterval(InterID);
 
-                        Session.set('isShowModal', false);
-                        Session.set('clickButton', 1);
+                        Meteor.clearInterval(InterID);
                         EthElements.Modal.hide();
+                        Session.set('clickButton', 1);
                     } else {
+                        EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
                         console.log('btc oldCrosschainList interval:::', value.status);
                     }
-                } else {
-                    Session.set('isShowModal', false);
                 }
             });
 
@@ -66,7 +76,6 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
         }
 
         TemplateVar.set('isButton', true);
-        Session.set('isShowModal', false);
 
         let secret = this.trans.X;
 
