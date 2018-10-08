@@ -1,7 +1,6 @@
 let InterID;
 
 function waitingMoment(X) {
-    EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
     if (X) {
         InterID = Meteor.setInterval(function(){
@@ -11,11 +10,9 @@ function waitingMoment(X) {
                         console.log('btc oldCrosschainList done:::', value.status);
                         Meteor.clearInterval(InterID);
 
-                        Session.set('isShowModal', false);
                         Session.set('clickButton', 1);
                         EthElements.Modal.hide();
                     } else {
-                        Session.set('isShowModal', true);
                         console.log('btc oldCrosschainList interval:::', value.status);
                     }
                 }
@@ -67,6 +64,8 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
         Session.set('isShowModal', false);
 
         let secret = this.trans.X;
+
+        EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
         // releaseX
         if (this.transType === 'releaseX') {

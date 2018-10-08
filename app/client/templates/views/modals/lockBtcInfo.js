@@ -13,7 +13,6 @@ Template['views_modals_lockBtcInfo'].events({
         EthElements.Modal.hide();
     },
     'click .ok-cross': function () {
-        EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
         let password_input_wan = document.getElementById('crosschain-psd-wan').value;
 
@@ -53,27 +52,37 @@ Template['views_modals_lockBtcInfo'].events({
 
             this.trans.btcPassword = password_input;
 
-            mist.BTC2WBTC().lockBtc('BTC', this.trans, function (err,data) {
-                if (err) {
-                    Helpers.showError(err);
-                    EthElements.Modal.hide();
-                } else {
-                    EthElements.Modal.hide();
-                    Session.set('clickButton', 1);
-                }
-            });
+            EthElements.Modal.hide();
+            EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
+
+            setTimeout(() => {
+                mist.BTC2WBTC().lockBtc('BTC', this.trans, function (err,data) {
+                    if (err) {
+                        Helpers.showError(err);
+                        EthElements.Modal.hide();
+                    } else {
+                        EthElements.Modal.hide();
+                        Session.set('clickButton', 1);
+                    }
+                });
+            }, 500);
         } else {
             //lockWbtc (wan)
 
-            mist.BTC2WBTC().lockWbtc('BTC', this.trans, function (err,data) {
-                if (err) {
-                    Helpers.showError(err);
-                    EthElements.Modal.hide();
-                } else {
-                    EthElements.Modal.hide();
-                    Session.set('clickButton', 1);
-                }
-            });
+            EthElements.Modal.hide();
+            EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
+
+            setTimeout(() => {
+                mist.BTC2WBTC().lockWbtc('BTC', this.trans, function (err,data) {
+                    if (err) {
+                        Helpers.showError(err);
+                        EthElements.Modal.hide();
+                    } else {
+                        EthElements.Modal.hide();
+                        Session.set('clickButton', 1);
+                    }
+                });
+            }, 500);
         }
 
     }
