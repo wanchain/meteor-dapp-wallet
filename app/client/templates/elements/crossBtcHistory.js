@@ -30,12 +30,9 @@ function resultEach(template, result) {
                 if (stateDict[value.status] === 8 || stateDict[value.status] === 12 || stateDict[value.status] === 13) {
                     value.htlcdate = `<span>${Helpers.timeStamp2String(endTimestamp)}</span>`;
                 } else {
-                    // console.log('endTimestamp,', endTimestamp);
-                    // console.log('nowTimestamp,', nowTimestamp);
                     value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endTimestamp - nowTimestamp)}</span>`;
                 }
             } else {
-
                 if (stateDict[value.status] === 8 || stateDict[value.status] === 12 || stateDict[value.status] === 13) {
                     value.htlcdate = `<span>${Helpers.timeStamp2String(endTimestamp)}</span>`;
                 } else {
@@ -148,66 +145,93 @@ Template['elements_cross_transactions_table_btc'].helpers({
 
                 let style = 'display: block; font-size: 18px; background-color: transparent;';
 
-                // Release
-                if (stateDict[value.status] === 5) {
-                    style += 'color: #920b1c;';
+                switch(stateDict[value.status]) {
 
-                    value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
-                    value.state = 'To be confirmed';
-                }
-                // suspending
-                else if (stateDict[value.status] === 14) {
-                    value.operation = `<h2 style="${style}">Cancel</h2>`;
-                    value.state = 'To be cancelled in ' + value.htlcdate;
-                }
-                // Revoke
-                else if (stateDict[value.status] === 9) {
-                    style += 'color: #920b1c;';
-                    value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
-                    value.state = 'To be cancelled';
-                }
-                // Release or Revoke finished
-                else if (stateDict[value.status] === 8 || stateDict[value.status] === 12) {
-                    if (stateDict[value.status] === 8) {
-                        value.state = 'Success';
-                    } else {
-                        value.state = 'Cancelled';
-                    }
-
-                    value.operation = `<h2 style="${style}"></h2>`;
-                }
-                // locking
-                else if (stateDict[value.status] >= 1 && stateDict[value.status] <= 4) {
-                    if (stateDict[value.status] === 1) {
+                    // locking
+                    case 1:
                         value.state = 'Pending';
-                    } else if (stateDict[value.status] >= 2){
-                        value.state = 'Cross-Tx ' + (stateDict[value.status] - 1).toString() +  '/4';
-                    }
-                    value.operation = `<h2 style="${style}">Confirm</h2>`;
-                }
-                // Releasing
-                else if (stateDict[value.status] >= 6 && stateDict[value.status] <= 7) {
-                    value.state = 'Confirming ' + (stateDict[value.status] - 5).toString() +  '/3';
-                    value.operation = `<h2 style="${style}"></h2>`;
-                }
-                // Revoking
-                else if (stateDict[value.status] >= 10 && stateDict[value.status] <= 11) {
-                    value.state = 'Cancelling ' + (stateDict[value.status] - 9).toString() +  '/3';
-                    value.operation = `<h2 style="${style}"></h2>`;
-                }
-                // Failed
-                else if (stateDict[value.status] === 13) {
-                    value.state = 'Failed';
-                    value.operation = `<h2 style="${style}"></h2>`;
-                }
-                // normal
-                else {
-                    value.state = 'Success';
-                    value.crossAddress = value.to;
-                    value.htlcdate = '--';
-                    value.fromText = `<small style="${smallStyle}">BTC</small>`;
-                    value.toText = `<small style="${smallStyle}">BTC</small>`;
-                    value.operation = `<h2 style="${style}"></h2>`;
+                        value.operation = `<h2 style="${style}">Confirm</h2>`;
+                        break;
+                    case 2:
+                        value.state = 'Cross-Tx 1/4';
+                        value.operation = `<h2 style="${style}">Confirm</h2>`;
+                        break;
+                    case 3:
+                        value.state = 'Cross-Tx 2/4';
+                        value.operation = `<h2 style="${style}">Confirm</h2>`;
+                        break;
+                    case 4:
+                        value.state = 'Cross-Tx 3/4';
+                        value.operation = `<h2 style="${style}">Confirm</h2>`;
+                        break;
+
+                    // Release
+                    case 5:
+                        style += 'color: #920b1c;';
+                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
+                        value.state = 'To be confirmed';
+                        break;
+
+                    // Releasing
+                    case 6:
+                        value.state = 'Confirming 1/3';
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        break;
+                    case 7:
+                        value.state = 'Confirming 2/3';
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        break;
+
+                    // Release finished
+                    case 8:
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        value.state = 'Success';
+                        break;
+
+                    // Revoke
+                    case 9:
+                        style += 'color: #920b1c;';
+                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
+                        value.state = 'To be cancelled';
+                        break;
+
+                    // Revoking
+                    case 10:
+                        value.state = 'Cancelling 1/3';
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        break;
+                    case 11:
+                        value.state = 'Cancelling 2/3';
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        break;
+
+                    // Revoke finished
+                    case 12:
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        value.state = 'Cancelled';
+                        break;
+
+                    // Failed
+                    case 13:
+                        value.state = 'Failed';
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        break;
+
+                    // suspending
+                    case 14:
+                        value.operation = `<h2 style="${style}">Cancel</h2>`;
+                        value.state = 'To be cancelled in ' + value.htlcdate;
+                        break;
+
+                    // normal
+                    default:
+                        value.state = 'Success';
+                        value.crossAddress = value.to;
+                        value.htlcdate = '--';
+                        value.fromText = `<small style="${smallStyle}">BTC</small>`;
+                        value.toText = `<small style="${smallStyle}">BTC</small>`;
+                        value.operation = `<h2 style="${style}"></h2>`;
+
                 }
 
                 crosschainList.push(value);
@@ -272,88 +296,78 @@ Template['elements_cross_transactions_table_btc'].events({
         let id = e.target.id;
         let show_data = TemplateVar.get('crosschainList')[id];
 
-        let getGas;
-        let gasPrice;
-        let transData;
         let trans;
         let transType;
 
-        // suspending
-        if (stateDict[show_data.status] === 14) {
-            return GlobalNotification.warning({
-                content: 'Transaction locked now, please retry cancellation later',
-                duration: 2
-            });
-        }
-        // release X
-        else if (stateDict[show_data.status] === 5) {
-            transType = 'releaseX';
+        switch(stateDict[show_data.status]) {
 
+            // suspending
+            case 14:
+                GlobalNotification.warning({
+                    content: 'Transaction locked now, please retry cancellation later',
+                    duration: 2
+                });
+                break;
 
-            // release X btc => wbtc
-            if (show_data.chain === 'BTC') {
-                show_data.symbol = 'BTC';
+            // release X
+            case 5:
+                transType = 'releaseX';
 
-                trans = {
-                    lockTxHash: show_data.lockTxHash, amount: show_data.value.toString(10),
-                    storemanGroup: show_data.storeman, cross: show_data.crossAddress,
-                    X: show_data.x
-                };
+                // release X btc => wbtc
+                if (show_data.chain === 'BTC') {
+                    show_data.symbol = 'BTC';
+                    trans = {
+                        lockTxHash: show_data.lockTxHash, amount: show_data.value.toString(10),
+                        storemanGroup: show_data.storeman, cross: show_data.crossAddress,
+                        X: show_data.x
+                    };
+                }
+                // release X wbtc => btc
+                else if (show_data.chain === 'WAN') {
+                    show_data.symbol = 'WBTC';
+                    trans = {
+                        HashX: show_data.HashX, crossAddress: show_data.crossAddress, X: show_data.x
+                    };
+                }
+
+                showQuestion(show_data, trans, transType);
+                 break;
+
+            // revoke
+            case 9:
+                transType = 'revoke';
+
+                // revoke btc => wbtc
+                if (show_data.chain === 'BTC') {
+                    show_data.symbol = 'BTC';
+                    trans = {
+                        from: show_data.from, amount: show_data.value.toString(10),
+                        storemanGroup: show_data.storeman, cross: show_data.crossAddress,
+                        HashX: show_data.HashX, X: show_data.x
+                    };
+                }
+                // revoke wbtc => btc
+                else if (show_data.chain === 'WAN') {
+                    show_data.symbol = 'WBTC';
+                    trans = {
+                        from: show_data.from, HashX: show_data.HashX, X: show_data.x
+                    };
+                }
 
                 showQuestion(show_data, trans, transType);
 
-            }
-            // release X wbtc => btc
-            else if (show_data.chain === 'WAN') {
-                show_data.symbol = 'WBTC';
+                break;
 
-                trans = {
-                    HashX: show_data.HashX, crossAddress: show_data.crossAddress, X: show_data.x
-                };
+            // other status
+            default:
+                GlobalNotification.warning({
+                    content: 'Can not operate',
+                    duration: 2
+                });
 
-                showQuestion(show_data, trans, transType);
 
-            }
-        }
 
-        // revoke
-        else if (stateDict[show_data.status] === 9) {
 
-            transType = 'revoke';
-
-            // revoke btc => wbtc
-            if (show_data.chain === 'BTC') {
-                console.log('chain: ', show_data.chain);
-                show_data.symbol = 'BTC';
-
-                trans = {
-                    from: show_data.from, amount: show_data.value.toString(10),
-                    storemanGroup: show_data.storeman, cross: show_data.crossAddress,
-                    HashX: show_data.HashX, X: show_data.x
-                };
-
-                // release x in wan
-                showQuestion(show_data, trans, transType);
-
-            }
-            // revoke wbtc => btc
-            else if (show_data.chain === 'WAN') {
-                console.log('wbtc chain: ', show_data.chain);
-
-                trans = {
-                    from: show_data.from, HashX: show_data.HashX, X: show_data.x
-                };
-
-                showQuestion(show_data, trans, transType);
-            }
-        }
-
-        // other status
-        else {
-            return GlobalNotification.warning({
-                content: 'Can not operate',
-                duration: 2
-            });
         }
 
     },

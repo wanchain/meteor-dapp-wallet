@@ -86,6 +86,7 @@ Template['views_modals_sendcrosschainReleaseX'].events({
                 // release x in eth
                 console.log('release X Chain 1: ', this.Chain);
 
+                EthElements.Modal.show('views_modals_loading', {closeable: true, class: 'crosschain-loading'});
                 mist.ETH2WETH().sendRefundTrans(this.trans, password_input, function (err,data) {
                     if (err) {
                         Helpers.showError(err);
@@ -98,6 +99,7 @@ Template['views_modals_sendcrosschainReleaseX'].events({
                 // release x in wan
                 console.log('release X Chain 2: ', this.Chain);
 
+                EthElements.Modal.show('views_modals_loading', {closeable: true, class: 'crosschain-loading'});
                 mist.WETH2ETH().sendRefundTrans(this.trans, password_input, function (err,data) {
                     if (err) {
                         Helpers.showError(err);
@@ -115,6 +117,7 @@ Template['views_modals_sendcrosschainReleaseX'].events({
                 // revoke in eth
                 console.log('revoke Chain 1: ', this.Chain);
 
+                EthElements.Modal.show('views_modals_loading', {closeable: true, class: 'crosschain-loading'});
                 mist.ETH2WETH().sendRevokeTrans(this.trans, password_input, this.trans.x, function (err,data) {
                     if (err) {
                         Helpers.showError(err);
@@ -127,6 +130,7 @@ Template['views_modals_sendcrosschainReleaseX'].events({
                 // revoke in wan
                 console.log('revoke Chain 2: ', this.Chain);
 
+                EthElements.Modal.show('views_modals_loading', {closeable: true, class: 'crosschain-loading'});
                 mist.WETH2ETH().sendRevokeTrans(this.trans, password_input, this.trans.x, function (err,data) {
                     if (err) {
                         Helpers.showError(err);

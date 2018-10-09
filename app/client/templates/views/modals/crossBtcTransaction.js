@@ -79,25 +79,27 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
         Session.set('isShowModal', false);
 
         let secret = this.trans.X;
+        let params;
+        let transferType = this.Chain + this.transType;
+        // BTCreleaseX, BTCrevoke, WANreleaseX, WANrevoke;
 
         EthElements.Modal.hide();
-        EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
+        EthElements.Modal.show('views_modals_loading', {closeable: true, class: 'crosschain-loading'});
 
-        // releaseX
-        if (this.transType === 'releaseX') {
+        Meteor.setTimeout(() => {
 
-            if (this.Chain === 'BTC') {
+            switch(transferType) {
 
-                // release x in btc
-                console.log('release X Chain 1: ', this.Chain);
+                // BTCreleaseX
+                case 'BTCreleaseX':
+                    console.log('crossBtcTransaction Type: ', 'BTCreleaseX');
 
-                let params = {};
+                    params = {};
+                    params.crossAddress = this.trans.cross;
+                    params.wanPassword = password_input;
+                    params.x = secret;
 
-                params.crossAddress = this.trans.cross;
-                params.wanPassword = password_input;
-                params.x = secret;
-
-                setTimeout(() => {
+                    EthElements.Modal.show('views_modals_loading', {closeable: true, class: 'crosschain-loading'});
                     mist.BTC2WBTC().redeemBtc('BTC', params, function (err,data) {
                         if (err) {
                             Helpers.showError(err);
@@ -106,40 +108,19 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                             waitingMoment(secret);
                         }
                     });
-                }, 500);
 
-            } else {
-                // release x in wan
-                console.log('release X Chain 2: ', this.Chain);
+                    break;
 
-                let params = this.trans;
-                params.btcPassword = password_input;
+                // BTCrevoke
+                case 'BTCrevoke':
+                    console.log('crossBtcTransaction Type: ', 'BTCrevoke');
 
-                setTimeout(() => {
-                    mist.BTC2WBTC().redeemWbtc('BTC', params, function (err,data) {
-                        if (err) {
-                            Helpers.showError(err);
-                            EthElements.Modal.hide();
-                        } else {
-                            waitingMoment(secret);
-                        }
-                    });
-                }, 500);
-            }
-        }
-        // revoke
-        else {
+                    params = {};
+                    params.from = this.trans.from;
+                    params.HashX = this.trans.HashX;
+                    params.btcPassword = password_input;
 
-            if (this.Chain === 'BTC') {
-                // revoke in btc
-                console.log('revoke Chain 1: ', this.Chain);
-
-                let params = {};
-                params.from = this.trans.from;
-                params.HashX = this.trans.HashX;
-                params.btcPassword = password_input;
-
-                setTimeout(() => {
+                    EthElements.Modal.show('views_modals_loading', {closeable: true, class: 'crosschain-loading'});
                     mist.BTC2WBTC().revokeBtc('BTC', params, function (err,data) {
                         if (err) {
                             Helpers.showError(err);
@@ -148,16 +129,36 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                             waitingMoment(secret);
                         }
                     });
-                }, 500);
 
-            } else {
-                // revoke in wan
-                console.log('revoke Chain 2: ', this.Chain);
+                    break;
 
-                let params = this.trans;
-                params.wanPassword = password_input;
+                // WANreleaseX
+                case 'WANreleaseX':
+                    console.log('crossBtcTransaction Type: ', 'WANreleaseX');
 
-                setTimeout(() => {
+                    params = this.trans;
+                    params.btcPassword = password_input;
+
+                    EthElements.Modal.show('views_modals_loading', {closeable: true, class: 'crosschain-loading'});
+                    mist.BTC2WBTC().redeemWbtc('BTC', params, function (err,data) {
+                        if (err) {
+                            Helpers.showError(err);
+                            EthElements.Modal.hide();
+                        } else {
+                            waitingMoment(secret);
+                        }
+                    });
+
+                    break;
+
+                // WANrevoke
+                case 'WANrevoke':
+                    console.log('crossBtcTransaction Type: ', 'WANrevoke');
+
+                    params = this.trans;
+                    params.wanPassword = password_input;
+
+                    EthElements.Modal.show('views_modals_loading', {closeable: true, class: 'crosschain-loading'});
                     mist.BTC2WBTC().revokeWbtc('BTC', params, function (err,data) {
                         if (err) {
                             Helpers.showError(err);
@@ -166,10 +167,16 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
                             waitingMoment(secret);
                         }
                     });
-                }, 500);
+
+                    break;
+
+                default:
+                    Helpers.showError('unknown error.');
+                    EthElements.Modal.hide();
 
             }
-        }
+
+        }, 500);
 
     }
 });
