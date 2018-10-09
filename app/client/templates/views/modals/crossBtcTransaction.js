@@ -76,6 +76,7 @@ Template['views_modals_sendcrossBtcReleaseX'].events({
         }
 
         TemplateVar.set('isButton', true);
+        Session.set('isShowModal', false);
 
         let secret = this.trans.X;
 
