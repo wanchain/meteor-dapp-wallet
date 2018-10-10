@@ -118,7 +118,9 @@ Template['views_werc20Toerc20'].helpers({
     'addressList': function(){
         return TemplateVar.get('addressList');
     },
-
+    'symbol': function () {
+        return TemplateVar.get('symbol');
+    },
     'Deposit': function () {
 
         let result = [];

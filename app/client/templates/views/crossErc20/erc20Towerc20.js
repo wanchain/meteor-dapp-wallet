@@ -104,7 +104,9 @@ Template['views_erc20Towerc20'].helpers({
     'wanAddressList': function(){
         return TemplateVar.get('wanAddressList');
     },
-
+    'symbol': function () {
+        return TemplateVar.get('symbol');
+    },
     'Deposit': function () {
 
         let result = [];
