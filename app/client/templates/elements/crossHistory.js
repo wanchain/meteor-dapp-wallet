@@ -532,7 +532,7 @@ function showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transT
 }
 
 function resultEach(template, result) {
-    _.each(result, function (value, index) {
+    _.each(result.crossCollection, function (value, index) {
 
         if (value.htlcTimeOut) {
             let nowTime = new Date().Format('yyyy-MM-dd hh:mm:ss:S');
@@ -579,6 +579,9 @@ Template['elements_cross_transactions_table'].onCreated(function () {
 
             Session.set('oldCrosschainList', result);
             TemplateVar.set(template, 'crosschainList', result);
+            TemplateVar.set(template, 'crossCollection', result.crossCollection);
+            TemplateVar.set(template, 'normalCollection', result.normalCollection);
+
         });
 
 
@@ -594,6 +597,8 @@ Template['elements_cross_transactions_table'].onCreated(function () {
                     // console.log('update history transaction: ',oldResultHex !== resultHex);
                     Session.set('oldCrosschainList', result);
                     TemplateVar.set(template, 'crosschainList', result);
+                    TemplateVar.set(template, 'crossCollection', result.crossCollection);
+                    TemplateVar.set(template, 'normalCollection', result.normalCollection);
                 }
             });
 
@@ -612,15 +617,15 @@ Template['elements_cross_transactions_table'].onDestroyed(function () {
 Template['elements_cross_transactions_table'].helpers({
     historyList: function () {
 
-        let crosschainList = [];
+        let crossCollection = [];
+        let normalCollection = [];
 
-        if (TemplateVar.get('crosschainList') && TemplateVar.get('crosschainList').length > 0) {
+        if (TemplateVar.get('crossCollection') && TemplateVar.get('crossCollection').length > 0) {
             let smallStyle = 'display: block; color: #4b90f7;';
+            let style = 'display: block; font-size: 18px; background-color: transparent;';
 
-            _.each(TemplateVar.get('crosschainList'), function (value, index) {
+            _.each(TemplateVar.get('crossCollection'), function (value, index) {
                 // console.log("value:", JSON.stringify(value));
-
-                let style = 'display: block; font-size: 18px; background-color: transparent;';
 
                 value.fromText = `<small style="${smallStyle}">${value.srcChainType}</small>`;
                 value.toText = `<small style="${smallStyle}">${value.dstChainType}</small>`;
@@ -767,11 +772,32 @@ Template['elements_cross_transactions_table'].helpers({
                     value.state = 'Cancelled';
                 }
 
-                crosschainList.push(value);
+                crossCollection.push(value);
             });
         }
 
-        return crosschainList;
+        if (TemplateVar.get('normalCollection') && TemplateVar.get('normalCollection').length > 0) {
+            let smallStyle = 'display: block; color: #4b90f7;';
+
+            let style = 'display: block; font-size: 18px; background-color: transparent;';
+            _.each(TemplateVar.get('normalCollection'), function (value, index) {
+
+                value.htlcdate = '--';
+                value.time = '--';
+                value.symbol = value.tokenSymbol;
+
+                value.fromText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
+                value.toText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
+                value.crossAdress = value.to;
+                value.value = web3.fromWei(value.value);
+                value.state = value.status;
+                value.operation = `<h2 style="${style}">${value.status}</h2>`;
+
+                normalCollection.push(value);
+            });
+        }
+
+        return crossCollection.concat(normalCollection);
     },
 
 });
@@ -784,7 +810,7 @@ Template['elements_cross_transactions_table'].events({
 
         Session.set('isShowModal', true);
 
-        let show_data = TemplateVar.get('crosschainList')[id];
+        let show_data = TemplateVar.get('crossCollection')[id];
         // console.log('show_data: ', show_data);
 
         if (show_data) {
@@ -828,7 +854,7 @@ Template['elements_cross_transactions_table'].events({
 
     'click .crosschain-list': function (e) {
         let id = e.target.id;
-        let show_data = TemplateVar.get('crosschainList')[id];
+        let show_data = TemplateVar.get('crossCollection')[id];
 
         let trans;
         let transType;
