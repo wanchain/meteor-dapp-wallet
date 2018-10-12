@@ -43,10 +43,10 @@ class crossChainOperators{
         let operator = new crossOperator('sendRawTrans',{tx:trans},chainType,callback);
         this.invokeOperator(operator);
     }
-    // sendNormalTransaction(trans, passwd, chainType, callback){
-    //     let operator = new crossOperator('sendNormalTransaction',{tx:trans, passwd:passwd},chainType,callback);
-    //     this.invokeOperator(operator);
-    // }
+    sendNormalTransaction(trans,tokenOrigAddr, password, chainType, callback){
+        let operator = new crossOperator('sendNormalTransaction',{tx:trans, tokenOrigAddr:tokenOrigAddr, password:password},chainType,callback);
+        this.invokeOperator(operator);
+    }
     listHistory(addrList,tokenAddrList,symbol, callback){
         this.invokeOperator(new crossOperator('listHistory',{addrList:addrList,tokenAddrList:tokenAddrList,symbol:symbol},this.getOriginChainType(),callback));
     }

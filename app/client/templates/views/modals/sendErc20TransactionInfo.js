@@ -3,7 +3,7 @@ Template['views_modals_sendEthTransactionInfo'].onCreated(function(){
     TemplateVar.set(template, 'isButton', false);
 });
 
-Template['views_modals_sendEthTransactionInfo'].events({
+Template['views_modals_sendErc20TransactionInfo'].events({
     'click .cancel-cross': function () {
         Session.set('isShowModal', false);
 
@@ -33,7 +33,7 @@ Template['views_modals_sendEthTransactionInfo'].events({
         TemplateVar.set('isButton', true);
         Session.set('isShowModal', false);
 
-        mist.ETH2WETH().sendNormalTransaction(txArgs, password_input, 'ETH', function (err,data) {
+        mist.ERC202WERC20(this.chainType).sendNormalTransaction(txArgs, this.tokenOrigAddr,password_input, this.chainType, function (err,data) {
             if (err) {
                 Helpers.showError(err);
                 EthElements.Modal.hide();

@@ -86,12 +86,15 @@ function canRevoke(record) {
 
     if (status !== stateDict.BuddyLocked
         && status !== stateDict.Locked
-        && status !== stateDict.RedeemSent
+        // && status !== stateDict.RedeemSent
         && status !== stateDict.RedeemSending
         && status !== stateDict.RedeemSendFail
-        && status !== stateDict.RedeemSendFailAfterRetries) {
+        && status !== stateDict.RedeemSendFailAfterRetries
+        && status !== stateDict.RevokeSendFail
+        && status !== stateDict.RevokeSendFailAfterRetries
+    ) {
         retResult.code = false;
-        retResult.result = "Can not revoke,staus is not BuddyLocked or Locked";
+        retResult.result = "Can not revoke";
         return retResult;
     }
     let currentTime = Number(Date.now()) / 1000;
@@ -827,9 +830,6 @@ Template['elements_cross_transactions_table'].events({
         let id = e.target.id;
         let show_data = TemplateVar.get('crosschainList')[id];
 
-        let getGas;
-        let gasPrice;
-        let transData;
         let trans;
         let transType;
 

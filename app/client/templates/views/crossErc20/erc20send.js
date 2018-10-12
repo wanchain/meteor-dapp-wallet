@@ -20,13 +20,22 @@ Template['views_erc20send'].onCreated(function(){
 
     EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
-    mist.ETH2WETH().getMultiBalances(Session.get('addressList'), function (err, result) {
+    let chainType = this.data.chainType;
+    let symbol = this.data.symbol;
+    let tokenOrigAddr = this.data.tokenOrigAddr;
+
+    TemplateVar.set(template, 'symbol', symbol);
+    TemplateVar.set(template, 'chainType', chainType);
+    TemplateVar.set(template, 'tokenOrigAddr', tokenOrigAddr);
+
+
+    mist.ERC202WERC20(chainType).getMultiTokenBalance(Session.get('addressList'),tokenOrigAddr, function (err, result) {
         EthElements.Modal.hide();
 
         if (!err) {
             let result_list = [];
 
-            TemplateVar.set(template,'ethBalance',result);
+            TemplateVar.set(template,'erc20Balance',result);
 
             _.each(result, function (value, index) {
                 const balance =  web3.fromWei(value, 'ether');
@@ -45,7 +54,7 @@ Template['views_erc20send'].onCreated(function(){
         }
     });
 
-    mist.ETH2WETH().getGasPrice('ETH', function (err,data) {
+    mist.ERC202WERC20(chainType).getGasPrice(chainType, function (err,data) {
         if (!err) {
             TemplateVar.set(template,'estimatedGas', data.ethNormalGas);
             TemplateVar.set(template,'gasPrice', data.gasPrice);
@@ -54,7 +63,6 @@ Template['views_erc20send'].onCreated(function(){
             let number = new BigNumber(data.ethNormalGas * data.gasPrice);
 
             TemplateVar.set(template, 'fee', EthTools.formatBalance(number, '0,0.00[0000000000000000]', 'ether'));
-            TemplateVar.set(template, 'total', EthTools.formatBalance(number, '0,0.00[0000000000000000]', 'ether'));
         }
     });
 
@@ -77,6 +85,12 @@ Template['views_erc20send'].helpers({
             return (key === 'high') ? '+' : '-';
         }
     },
+    'symbol':function () {
+        return TemplateVar.get('symbol').toLowerCase();
+    },
+    'chainType':function () {
+        return TemplateVar.get('chainType').toLowerCase();
+    }
 });
 
 
@@ -100,7 +114,6 @@ Template['views_erc20send'].events({
         }
 
         TemplateVar.set('amount', amount);
-        TemplateVar.set('total', amount.add(new BigNumber(TemplateVar.get('fee'))));
 
     },
 
@@ -132,15 +145,13 @@ Template['views_erc20send'].events({
         TemplateVar.set('feeMultiplicator', feeRate);
         TemplateVar.set('fee', fee);
 
-        let amount = TemplateVar.get('amount') ? TemplateVar.get('amount') : new BigNumber(0);
-        TemplateVar.set('total', amount.add(new BigNumber(fee)));
     },
 
     /**
      Submit the form and send the transaction!
      @event submit form
      */
-    'submit form': function(e, template){
+    'submit form': function(e, template) {
 
         let from = TemplateVar.get('from'),
             to = TemplateVar.get('to'),
@@ -150,12 +161,12 @@ Template['views_erc20send'].events({
             chooseGasPrice = TemplateVar.get('gasPrice').toString(),
             estimatedGas = TemplateVar.get('estimatedGas').toString();
 
-        if (!from && !TemplateVar.get('total')) {
+        if (!from && !amount) {
             EthElements.Modal.hide();
             Session.set('clickButton', 1);
         }
 
-        if(!to) {
+        if (!to) {
             return GlobalNotification.warning({
                 content: 'i18n:wallet.send.error.noReceiver',
                 duration: 2
@@ -169,20 +180,20 @@ Template['views_erc20send'].events({
             });
         }
 
-        if(!web3.isAddress(to))
+        if (!web3.isAddress(to))
             return GlobalNotification.warning({
                 content: 'i18n:wallet.send.error.noReceiver',
                 duration: 2
             });
 
-        if(!amount) {
+        if (!amount) {
             return GlobalNotification.warning({
                 content: 'Please enter a valid amount',
                 duration: 2
             });
         }
 
-        if(amount.eq(new BigNumber(0))) {
+        if (amount.eq(new BigNumber(0))) {
             return GlobalNotification.warning({
                 content: 'Please enter a valid amount',
                 duration: 2
@@ -190,46 +201,59 @@ Template['views_erc20send'].events({
         }
 
         const amountSymbol = amount.toString().split('.')[1];
-        if (amountSymbol && amountSymbol.length >=19) {
+        if (amountSymbol && amountSymbol.length >= 19) {
             return GlobalNotification.warning({
                 content: 'Amount not valid',
                 duration: 2
             });
         }
 
-        // let ethBalance = EthTools.toWei(TemplateVar.get('ethBalance')[from.toLowerCase()]);
-        let ethBalance = TemplateVar.get('ethBalance')[from.toLowerCase()];
-        let total = EthTools.toWei(TemplateVar.get('total'));
+        let chainType = TemplateVar.get('chainType');
+        let symbol = TemplateVar.get('symbol').toLowerCase();
+        let tokenOrigAddr = TemplateVar.get('tokenOrigAddr');
+        let erc20Balance = TemplateVar.get('erc20Balance')[from.toLowerCase()];
 
-        if(new BigNumber(total).gt(new BigNumber(ethBalance, 10)))
+        if (new BigNumber(amount).gt(new BigNumber(erc20Balance, 10)))
             return GlobalNotification.warning({
-                content: 'Insufficient balance',
+                content: `Insufficient ${symbol} balance in your FROM account`,
                 duration: 2
+            });
+        mist.ERC202WERC20(chainType).getBalance(from.toLowerCase(), function (err,ethBalance) {
+
+            if(new BigNumber(EthTools.toWei(fee), 10).gt(new BigNumber(ethBalance, 10)))
+                return GlobalNotification.warning({
+                    content: `Insufficient ${chainType} balance in your FROM account`,
+                    duration: 2
+                });
+
+            let trans = {
+                from: from, amount: amount.toString(10),
+                to: to, gas: estimatedGas, gasPrice: gasPrice
+            };
+
+            // console.log('trans: ', trans);
+            Session.set('isShowModal', true);
+            EthElements.Modal.question({
+                template: 'views_modals_sendErc20TransactionInfo',
+                data: {
+                    from: from,
+                    to: to,
+                    amount: amount.toString(10),
+                    gasPrice: gasPrice,
+                    chooseGasPrice: chooseGasPrice,
+                    gas: estimatedGas,
+                    fee: fee,
+                    trans: trans,
+                    chainType:chainType,
+                    symbol:symbol,
+                    tokenOrigAddr:tokenOrigAddr
+                },
+            },{
+                class: 'send-transaction-info',
+                closeable: false,
             });
 
 
-        let trans = {
-            from: from, amount: amount.toString(10),
-            to: to, gas: estimatedGas, gasPrice: gasPrice
-        };
-
-        // console.log('trans: ', trans);
-        Session.set('isShowModal', true);
-        EthElements.Modal.question({
-            template: 'views_modals_sendEthTransactionInfo',
-            data: {
-                from: from,
-                to: to,
-                amount: amount.toString(10),
-                gasPrice: gasPrice,
-                chooseGasPrice: chooseGasPrice,
-                gas: estimatedGas,
-                fee: fee,
-                trans: trans,
-            },
-        },{
-            class: 'send-transaction-info',
-            closeable: false,
         });
 
     }

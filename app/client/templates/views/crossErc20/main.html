@@ -60,7 +60,7 @@
                         "></div>
             </li>
 
-            <!--<li>
+            <li>
                 <a class="toNormal" style="
                     {{#if $eq ($.Session.get "clickButton") 4}}
                     color: #737B93;
@@ -75,7 +75,7 @@
                          {{/if}}
                              "
                      ></div>
-            </li>-->
+            </li>
 
         </ul>
     </nav>
@@ -93,7 +93,7 @@
     {{/if}}
 
     {{#if $eq ($.Session.get "clickButton") 4}}
-        {{> views_erc20send}}
+        {{> views_erc20send chainType=chainType symbol=getSymbol tokenOrigAddr=tokenOrigAddr}}
     {{/if}}
 
 </template>

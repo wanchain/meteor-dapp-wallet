@@ -18,7 +18,7 @@
                                 {{#each selectAccount}}
                                     <option value="{{address}}">
                                         {{name}}
-                                        - ({{balance}} eth)
+                                        - ({{balance}} {{symbol}})
                                     </option>
                                 {{/each}}
                             </select>
@@ -51,7 +51,7 @@
                         <strong style="display: block" class="views_send_strong"><div class="triangle"></div>{{i18n 'wallet.send.fee'}}</strong>
 
                         <div class="dapp-select-gas-price">
-                            <span>{{TemplateVar.get 'fee'}} <span>eth</span></span>
+                            <span>{{TemplateVar.get 'fee'}} <span>{{chainType}}</span></span>
                             {{#unless TemplateVar.get "sending"}}
                                 <a class="options" style="cursor: pointer">[Advanced options]</a>
 
@@ -72,7 +72,10 @@
                 <div class="col col-12 mobile-full contBox send-info" style="padding-left: 0;">
                     <strong style="display: block" class="views_send_strong"><div class="triangle"></div>Total</strong>
                     <div class="dapp-select-gas-price">
-                        <span class="amount">{{TemplateVar.get "total"}}<span> eth</span></span>
+                        <!--<span class="amount">{{TemplateVar.get "total"}}<span> {{symbol}}</span></span>-->
+                        <span class="amount">{{TemplateVar.get "amount"}}<span> {{symbol}}</span></span>
+                        <br>
+                        {{i18n "wallet.send.estimatedFee"}}: {{TemplateVar.get "fee"}}<span> {{chainType}}</span>
                     </div>
                 </div>
 

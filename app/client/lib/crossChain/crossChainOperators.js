@@ -46,8 +46,8 @@ class crossChainOperators{
         let operator = new crossOperator('sendRawTrans',{tx:trans},chainType,callback);
         this.invokeOperator(operator);
     }
-    sendNormalTransaction(trans, passwd, chainType, callback){
-        let operator = new crossOperator('sendNormalTransaction',{tx:trans, passwd:passwd},chainType,callback);
+    sendNormalTransaction(trans, password, chainType, callback){
+        let operator = new crossOperator('sendNormalTransaction',{tx:trans, password:password},chainType,callback);
         this.invokeOperator(operator);
     }
 
