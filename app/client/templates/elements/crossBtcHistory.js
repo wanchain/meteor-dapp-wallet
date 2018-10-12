@@ -131,7 +131,7 @@ Template['elements_cross_transactions_table_btc'].helpers({
             let smallStyle = 'display: block; color: #4b90f7;';
 
             _.each(TemplateVar.get('crosschainList'), function (value, index) {
-                value.balance =  web3.toBigNumber(value.value).div(100000000).toString();
+                value.balance =  web3.toBigNumber(value.value).div(100000000).toString(10);
 
                 if (value.chain === 'BTC') {
                     value.fromText = `<small style="${smallStyle}">BTC</small>`;

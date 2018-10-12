@@ -249,15 +249,6 @@ Template['views_wbtcTobtc'].events({
             });
         }
 
-        const amountSymbol = amount.toString().split('.')[1];
-        if (amountSymbol && amountSymbol.length >=9) {
-            return GlobalNotification.warning({
-                content: 'Amount not valid',
-                duration: 2
-            });
-        }
-
-
         mist.WETH2ETH().getBalance(from.toLowerCase(), function (err,wanBalance) {
 
             // error

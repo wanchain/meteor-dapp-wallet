@@ -56,7 +56,7 @@ Template['elements_account_table'].onCreated(function () {
 
                 for (let i in changeResult) {
                     let balance =  web3.fromWei(changeResult[i], 'ether');
-                    let content = 'Balance of ' + i.toString() + ' has changed to ' + balance.toString();
+                    let content = 'Balance of ' + i.toString(10) + ' has changed to ' + balance.toString(10);
 
                     GlobalNotification.info({
                         content: content,

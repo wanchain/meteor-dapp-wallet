@@ -277,14 +277,6 @@ Template['views_wethToeth'].events({
             });
         }
 
-        const amountSymbol = amount.toString().split('.')[1];
-        if (amountSymbol && amountSymbol.length >=19) {
-            return GlobalNotification.warning({
-                content: 'Amount not valid',
-                duration: 2
-            });
-        }
-
         let wethBalance = TemplateVar.get('wethBalance')[from.toLowerCase()];
         // let wanBalance = await Helpers.promisefy(mist.WETH2ETH().getBalance, [from.toLowerCase()], mist.WETH2ETH());
 

@@ -179,14 +179,6 @@ Template['views_btcTowbtc'].events({
             });
         }
 
-        const amountSymbol = amount.toString().split('.')[1];
-        if (amountSymbol && amountSymbol.length >=9) {
-            return GlobalNotification.warning({
-                content: 'Amount not valid',
-                duration: 2
-            });
-        }
-
 
         mist.BTC2WBTC().getBtcMultiBalances('BTC', (err, result) => {
 
