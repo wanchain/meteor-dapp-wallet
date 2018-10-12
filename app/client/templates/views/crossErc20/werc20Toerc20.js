@@ -21,6 +21,7 @@ Template['views_werc20Toerc20'].onCreated(function(){
 
     TemplateVar.set(template, 'amount', 0);
     TemplateVar.set(template, 'feeMultiplicator', 0);
+    TemplateVar.set(template, 'boundQuota', 0);
     TemplateVar.set(template, 'options', false);
     TemplateVar.set(template, 'coverCharge', 0);
 
@@ -132,7 +133,9 @@ Template['views_werc20Toerc20'].helpers({
                 let deposit = web3.fromWei(value.deposit, 'ether');
                 let used = ((outboundQuota/ quota) * 100).toString() + '%';
 
-                result.push({deposit: deposit, outboundQuota: outboundQuota, used: used})
+                result.push({deposit: deposit, outboundQuota: outboundQuota, used: used});
+
+                TemplateVar.set('boundQuota',outboundQuota);
             }
         });
 
@@ -235,6 +238,7 @@ Template['views_werc20Toerc20'].events({
             chooseGasPrice = TemplateVar.get('gasPrice').toString(),
             estimatedGas = TemplateVar.get('estimatedGas').toString();
         let txFeeRatio = TemplateVar.get('txFeeRatio');
+        let boundQuota = TemplateVar.get('boundQuota');
 
         if (parseInt(gasPrice) < defaultGasprice) {
             gasPrice = defaultGasprice.toString();
@@ -289,6 +293,13 @@ Template['views_werc20Toerc20'].events({
         if (amountSymbol && amountSymbol.length >=19) {
             return GlobalNotification.warning({
                 content: 'Amount not valid',
+                duration: 2
+            });
+        }
+
+        if (new BigNumber(amount, 10).gt(new BigNumber(boundQuota, 10))){
+            return GlobalNotification.warning({
+                content: `Insufficient balance in Locked Account balance`,
                 duration: 2
             });
         }

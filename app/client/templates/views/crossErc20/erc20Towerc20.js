@@ -20,6 +20,7 @@ Template['views_erc20Towerc20'].onCreated(function(){
 
     TemplateVar.set(template, 'amount', 0);
     TemplateVar.set(template, 'feeMultiplicator', 0);
+    TemplateVar.set(template, 'boundQuota', 0);
     TemplateVar.set(template, 'options', false);
 
     EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
@@ -120,7 +121,9 @@ Template['views_erc20Towerc20'].helpers({
                     let done = quota - inboundQuota;
                     let used = ((done/ quota) * 100).toString() + '%';
 
-                    result.push({deposit: deposit, inboundQuota: inboundQuota, quota: quota, done: done, used: used})
+                    result.push({deposit: deposit, inboundQuota: inboundQuota, quota: quota, done: done, used: used});
+
+                    TemplateVar.set('boundQuota',inboundQuota);
                 }
             });
         }
@@ -209,6 +212,7 @@ Template['views_erc20Towerc20'].events({
         let gasPrice = TemplateVar.get('gasPrice').toString(),
             chooseGasPrice = TemplateVar.get('gasPrice').toString(),
             estimatedGas = TemplateVar.get('estimatedGas').toString();
+        let boundQuota = TemplateVar.get('boundQuota');
 
         if (!from && !storeman && !fee && !amount) {
             EthElements.Modal.hide();
@@ -261,6 +265,13 @@ Template['views_erc20Towerc20'].events({
             });
         }
 
+        if (new BigNumber(amount, 10).gt(new BigNumber(boundQuota, 10))){
+            return GlobalNotification.warning({
+                content: `Insufficient balance in Locked Account balance`,
+                duration: 2
+            });
+        }
+
         let erc20Balance = TemplateVar.get('erc20Balance')[from.toLowerCase()];;
         let symbol = TemplateVar.get('symbol');
         let chainType = TemplateVar.get('chainType');
@@ -294,9 +305,7 @@ Template['views_erc20Towerc20'].events({
                     to: to, gasLimit: estimatedGas, gasPrice: gasPrice
                 };
 
-                console.log('trans: ', trans);
-
-
+                // console.log('trans: ', trans);
 
                 mist.ERC202WERC20(chainType).getApproveTransData(tokenOrigAddr,chainType, trans, function (err,getApproveTransData) {
                     mist.ERC202WERC20(chainType).getLockTransData(tokenOrigAddr,chainType, trans, function (err,getLockTransData) {

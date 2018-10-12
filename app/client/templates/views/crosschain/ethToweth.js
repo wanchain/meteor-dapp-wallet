@@ -17,6 +17,7 @@ Template['views_ethToweth'].onCreated(function(){
     TemplateVar.set(template, 'amount', 0);
     TemplateVar.set(template, 'feeMultiplicator', 0);
     TemplateVar.set(template, 'options', false);
+    TemplateVar.set(template, 'boundQuota', 0);
 
     EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
@@ -109,7 +110,9 @@ Template['views_ethToweth'].helpers({
                     let done = quota - inboundQuota;
                     let used = ((done/ quota) * 100).toString() + '%';
 
-                    result.push({deposit: deposit, inboundQuota: inboundQuota, quota: quota, done: done, used: used})
+                    result.push({deposit: deposit, inboundQuota: inboundQuota, quota: quota, done: done, used: used});
+
+                    TemplateVar.set('boundQuota',inboundQuota);
                 }
             });
         }
@@ -203,6 +206,8 @@ Template['views_ethToweth'].events({
             chooseGasPrice = TemplateVar.get('gasPrice').toString(),
             estimatedGas = TemplateVar.get('estimatedGas').toString();
 
+        let boundQuota = TemplateVar.get('boundQuota');
+
         if (!from && !storeman && !total) {
             EthElements.Modal.hide();
             Session.set('clickButton', 1);
@@ -250,6 +255,13 @@ Template['views_ethToweth'].events({
         if (amountSymbol && amountSymbol.length >=19) {
             return GlobalNotification.warning({
                 content: 'Amount not valid',
+                duration: 2
+            });
+        }
+
+        if (new BigNumber(amount, 10).gt(new BigNumber(boundQuota, 10))){
+            return GlobalNotification.warning({
+                content: `Insufficient balance in Locked Account balance`,
                 duration: 2
             });
         }
