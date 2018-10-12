@@ -242,6 +242,13 @@ Template['views_wbtcTobtc'].events({
             });
         }
 
+        if(amount.lte(new BigNumber(0.02))) {
+            return GlobalNotification.warning({
+                content: 'please input amount  greater than 0.02',
+                duration: 2
+            });
+        }
+
         if(amount.gt(new BigNumber(wbtcBalance))) {
             return GlobalNotification.warning({
                 content: 'Please enter a valid amount',

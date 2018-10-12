@@ -92,16 +92,11 @@ Template['elements_account'].helpers({
     @method (tokens)
     */
     'tokens': function(){
-        var query = {};
+        let query = {};
         query['balances.'+ this._id] = {$exists: true};
+        let tokens = Tokens.find(query, { sort: {name: 1}}).fetch();
 
-        var tokens = Tokens.find(query, {limit: 5, sort: {name: 1}});
-
-        if (tokens.fetch().length >2 && !TemplateVar.get('hasToken')) {
-            TemplateVar.set('hasToken', true);
-        }
-
-        return tokens;
+        return tokens.length;
     },
 
     /**
@@ -216,6 +211,36 @@ Template['elements_account'].events({
     'click .wallet-box': function(e){
         console.time('renderAccountPage');
     },
+
+    'click .showToken': function(e){
+        let query = {};
+        query['balances.'+ this._id] = {$exists: true};
+
+        let tokens = Tokens.find(query, {sort: {name: 1}}).fetch();
+
+        TemplateVar.set('tokenLength',tokens.length);
+
+        _.each(tokens, (token) => {
+
+            token.name = token.name ? token.name : "UNDEFINED";
+
+            let tokenBalance = 0.00;
+            if (Number(token.balances[this._id]) > 0) {
+                tokenBalance = Helpers.formatNumberByDecimals(token.balances[this._id], token.decimals);
+            }
+
+            token.balance = tokenBalance + '<span>' + token.symbol + '<span/>';
+        });
+
+        EthElements.Modal.show({
+            template: 'token_table_modal',
+            data: tokens
+        }, {
+            closeable: false
+        });
+
+    },
+
     'click #transfer': function (e) {
 
         return GlobalNotification.warning({

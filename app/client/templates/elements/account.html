@@ -66,13 +66,9 @@ f
 
                     </div>
                     <div class="tagRight">
-                        {{#with tokens}}
-                            {{#each this}}
-                                <span class="account-balance">{{this.name}}: <span style="font-weight: normal;">{{{formattedTokenBalance}}}</span></span>
-                            {{/each}}
-                        {{/with}}
-
-                        {{#if TemplateVar.get "hasToken"}}<span class="tagAllBtn" >See All Tokens</span>{{/if}}
+                        {{#if tokens}}
+                            <button class="showToken" ><span style="padding: 3px 18px;background: #1993fd;border-radius: 20px;color: #ffffff;">Show Tokens</span></button>
+                        {{/if}}
 
                     </div>
                 </p>
