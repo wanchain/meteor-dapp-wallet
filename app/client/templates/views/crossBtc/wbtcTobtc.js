@@ -61,7 +61,7 @@ Template['views_wbtcTobtc'].onCreated(function(){
                 Session.set('clickButton', 1);
 
                 return GlobalNotification.warning({
-                    content: 'No Wan account.',
+                    content: 'No WBTC Balance.',
                     duration: 5
                 });
             }
