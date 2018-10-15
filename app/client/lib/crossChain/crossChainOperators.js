@@ -87,8 +87,8 @@ class crossChainOperators{
         let operator = new crossOperator('sendRefundTrans',{tx:trans, password:password},this.getOriginChainType(),callback);
         this.invokeOperator(operator);
     }
-    sendRevokeTrans(trans,password,secretX,callback){
-        let operator = new crossOperator('sendRevokeTrans',{tx:trans,secretX:secretX, password:password},this.getOriginChainType(),callback);
+    sendRevokeTrans(trans,password,callback){
+        let operator = new crossOperator('sendRevokeTrans',{tx:trans, password:password},this.getOriginChainType(),callback);
         this.invokeOperator(operator);
     }
     getCrossEthScAddress(callback){

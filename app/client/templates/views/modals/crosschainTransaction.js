@@ -45,7 +45,7 @@ function revokeEth(self,password_input) {
         // revoke in eth
         console.log('revoke Chain 1: ', self.Chain);
 
-        mist.ETH2WETH().sendRevokeTrans(self.trans, password_input, self.trans.x, function (err, data) {
+        mist.ETH2WETH().sendRevokeTrans(self.trans, password_input, function (err, data) {
             if (err) {
                 Helpers.showError(err);
                 EthElements.Modal.hide();
@@ -58,7 +58,7 @@ function revokeEth(self,password_input) {
         // revoke in wan
         console.log('revoke Chain 2: ', self.Chain);
 
-        mist.WETH2ETH().sendRevokeTrans(self.trans, password_input, self.trans.x, function (err, data) {
+        mist.WETH2ETH().sendRevokeTrans(self.trans, password_input, function (err, data) {
             if (err) {
                 Helpers.showError(err);
                 EthElements.Modal.hide();
@@ -110,7 +110,7 @@ function revokeErc20(self,password_input) {
         // revoke in eth
         console.log('revoke Chain 1: ', self.Chain);
 
-        mist.ERC202WERC20(self.tokenType).sendRevokeTrans(self.tokenAddr,self.tokenType,self.trans, password_input, self.trans.x, function (err, data) {
+        mist.ERC202WERC20(self.tokenType).sendRevokeTrans(self.tokenAddr,self.tokenType,self.trans, password_input, function (err, data) {
             if (err) {
                 Helpers.showError(err);
                 EthElements.Modal.hide();
@@ -123,7 +123,7 @@ function revokeErc20(self,password_input) {
         // revoke in wan
         console.log('revoke Chain 2: ', self.Chain);
 
-        mist.WERC202ERC20(self.tokenType).sendRevokeTrans(self.tokenAddr,self.tokenType,self.trans, password_input, self.trans.x, function (err, data) {
+        mist.WERC202ERC20(self.tokenType).sendRevokeTrans(self.tokenAddr,self.tokenType,self.trans, password_input, function (err, data) {
             if (err) {
                 Helpers.showError(err);
                 EthElements.Modal.hide();
