@@ -19,6 +19,7 @@ const stateDict = {
     "LockSending": "LockSending",
     "LockSendFail": "LockSendFail",
     "LockSendFailAfterRetries": "LockSendFailAfterRetries",
+    "LockFail": "LockFail",
     "LockSent": "LockSent",
     "Locked": "Locked",
 
@@ -27,12 +28,14 @@ const stateDict = {
     "RedeemSending": "RedeemSending",
     "RedeemSendFail": "RedeemSendFail",
     "RedeemSendFailAfterRetries": "RedeemSendFailAfterRetries",
+    "RedeemFail": "RedeemFail",
     "RedeemSent": "RedeemSent",
     "Redeemed": "Redeemed",
 
     "RevokeSending": "RevokeSending",
     "RevokeSendFail": "RevokeSendFail",
     "RevokeSendFailAfterRetries": "RevokeSendFailAfterRetries",
+    "RevokeFail": "RevokeFail",
     "RevokeSent": "RevokeSent",
     "Revoked": "Revoked"
 
@@ -54,7 +57,11 @@ function canRefund(record) {
 
 
     //global.lockedTime
-    if (status !== 'BuddyLocked') {
+    if (status !== stateDict.BuddyLocked
+        && status !== stateDict.RedeemSendFail
+        && status !== stateDict.RedeemSendFailAfterRetries
+        && status !== stateDict.RedeemFail
+    ) {
         retResult.code = false;
         retResult.result = "waiting buddy lock";
         return retResult;
@@ -86,12 +93,17 @@ function canRevoke(record) {
 
     if (status !== stateDict.BuddyLocked
         && status !== stateDict.Locked
-        // && status !== stateDict.RedeemSent
+        && status !== stateDict.RedeemSent
         && status !== stateDict.RedeemSending
         && status !== stateDict.RedeemSendFail
         && status !== stateDict.RedeemSendFailAfterRetries
+        && status !== stateDict.RedeemFail
+
+        && status !== stateDict.RevokeSent
+        && status !== stateDict.RevokeSending
         && status !== stateDict.RevokeSendFail
         && status !== stateDict.RevokeSendFailAfterRetries
+        && status !== stateDict.RevokeFail
     ) {
         retResult.code = false;
         retResult.result = "Can not revoke";
@@ -622,10 +634,10 @@ Template['elements_cross_transactions_table'].helpers({
 
         if (TemplateVar.get('crossCollection') && TemplateVar.get('crossCollection').length > 0) {
             let smallStyle = 'display: block; color: #4b90f7;';
-            let style = 'display: block; font-size: 18px; background-color: transparent;';
 
             _.each(TemplateVar.get('crossCollection'), function (value, index) {
                 // console.log("value:", JSON.stringify(value));
+                let style = 'display: block; font-size: 18px; background-color: transparent;';
 
                 value.fromText = `<small style="${smallStyle}">${value.srcChainType}</small>`;
                 value.toText = `<small style="${smallStyle}">${value.dstChainType}</small>`;
@@ -687,16 +699,19 @@ Template['elements_cross_transactions_table'].helpers({
                     value.operation = `<h2 style="${style}">Lock</h2>`;
                     value.state = 'Cross-Tx 4/7';
                 }
-                else if (value.status === stateDict.LockSendFail) {
-
-                }
-                else if (value.status === stateDict.LockSendFailAfterRetries) {
-
+                else if (value.status === stateDict.LockSendFail
+                    || value.status === stateDict.LockSendFailAfterRetries
+                    || value.status === stateDict.LockFail
+                ) {
+                    value.operation = `<h2 style="${style}">Lock</h2>`;
+                    value.state = 'Lock failed';
                 }
                 else if (value.status === stateDict.LockSent) {
+                    value.operation = `<h2 style="${style}">Lock</h2>`;
                     value.state = 'Cross-Tx 5/7';
                 }
                 else if (value.status === stateDict.Locked) {
+                    value.operation = `<h2 style="${style}">Lock</h2>`;
                     value.state = 'Cross-Tx 6/7';
 
                     let isCanRevoke = canRevoke(value).code;
@@ -713,7 +728,7 @@ Template['elements_cross_transactions_table'].helpers({
 
                 }
                 else if (value.status === stateDict.BuddyLocked) {
-                    value.state = 'Cross-Tx 7/7';
+                    value.state = 'Cross-Tx success';
 
                     let isCanRefund = canRefund(value).code;
                     let isCanRevoke = canRevoke(value).code;
@@ -742,33 +757,80 @@ Template['elements_cross_transactions_table'].helpers({
 
                 }
                 else if (value.status === stateDict.RedeemSending) {
+                    value.operation = `<h2 style="${style}">Confirm</h2>`;
                     value.state = 'Confirming 1/3';
-                }
-                else if (value.status === stateDict.RedeemSendFail) {
 
+                    let isCanRevoke = canRevoke(value).code;
+                    // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
+                    if (isCanRevoke) {
+                        style += 'color: #920b1c;';
+                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
+                        value.state = 'To be cancelled';
+                        value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
+                    }
                 }
-                else if (value.status === stateDict.RedeemSendFailAfterRetries) {
-
+                else if (value.status === stateDict.RedeemSendFail
+                    || value.status === stateDict.RedeemSendFailAfterRetries
+                    || value.status === stateDict.RedeemFail
+                ) {
+                    let isCanRefund = canRefund(value).code;
+                    let isCanRevoke = canRevoke(value).code;
+                    // console.log("BuddyLocked:::::::::::isCanRefund:",isCanRefund);
+                    // console.log("BuddyLocked:::::::::::isCanRevoke:",isCanRevoke);
+                    if (isCanRefund) {
+                        style += 'color: #920b1c;';
+                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm Again</h2>`;
+                        value.state = 'To be confirmed again';
+                        value.htlcdate = value.buddyLockedTimeOut ? Helpers.formatDuring(Number(value.buddyLockedTimeOut) * 1000 - Date.now()) : "--";
+                    } else {
+                        if (!isCanRevoke) {
+                            // style += 'color: #920b1c;';
+                            value.operation = `<h2 id = ${index} style="${style}">Cancel</h2>`;
+                            value.state = 'To be cancelled';
+                            value.htlcdate = value.htlcTimeOut ? Helpers.formatDuring(Number(value.htlcTimeOut) * 1000 - Date.now()) : "--";
+                        } else {
+                            style += 'color: #920b1c;';
+                            value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
+                            value.state = 'To be cancelled';
+                            value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
+                        }
+                    }
                 }
                 else if (value.status === stateDict.RedeemSent) {
+                    value.operation = `<h2 style="${style}">Confirm</h2>`;
                     value.state = 'Confirming 2/3';
+                    let isCanRevoke = canRevoke(value).code;
+                    // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
+                    if (isCanRevoke) {
+                        style += 'color: #920b1c;';
+                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
+                        value.state = 'To be cancelled';
+                        value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
+                    }
                 }
                 else if (value.status === stateDict.Redeemed) {
+                    value.operation = `<h2 style="${style}">Confirm</h2>`;
                     value.state = 'Success';
                 }
                 else if (value.status === stateDict.RevokeSending) {
+                    value.operation = `<h2 style="${style}">Cancel</h2>`;
                     value.state = 'Cancelling 1/3';
                 }
-                else if (value.status === stateDict.RevokeSendFail) {
-
-                }
-                else if (value.status === stateDict.RevokeSendFailAfterRetries) {
-
+                else if (value.status === stateDict.RevokeSendFail
+                    || value.status === stateDict.RevokeSendFailAfterRetries
+                    || value.status === stateDict.RevokeFail
+                ) {
+                    style += 'color: #920b1c;';
+                    value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel Again</h2>`;
+                    value.state = 'To be cancelled again';
+                    value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
                 }
                 else if (value.status === stateDict.RevokeSent) {
+                    value.operation = `<h2 style="${style}">Cancel</h2>`;
                     value.state = 'Cancelling 2/3';
                 }
                 else if (value.status === stateDict.Revoked) {
+                    value.operation = `<h2 style="${style}">Cancel</h2>`;
                     value.state = 'Cancelled';
                 }
 
@@ -779,9 +841,8 @@ Template['elements_cross_transactions_table'].helpers({
         if (TemplateVar.get('normalCollection') && TemplateVar.get('normalCollection').length > 0) {
             let smallStyle = 'display: block; color: #4b90f7;';
 
-            let style = 'display: block; font-size: 18px; background-color: transparent;';
             _.each(TemplateVar.get('normalCollection'), function (value, index) {
-
+                let style = 'display: block; font-size: 18px; background-color: transparent;';
                 value.htlcdate = '--';
                 value.time = '--';
                 value.symbol = value.tokenSymbol;
@@ -832,7 +893,7 @@ Template['elements_cross_transactions_table'].events({
                     crossAdress: show_data.crossAdress,
                     from: show_data.from,
                     lockTxHash: show_data.lockTxHash,
-                    refundTxHash: show_data.refundTxHash,
+                    redeemTxHash: show_data.redeemTxHash,
                     revokeTxHash: show_data.revokeTxHash,
                     storeman: show_data.storeman,
                     time: show_data.time,
