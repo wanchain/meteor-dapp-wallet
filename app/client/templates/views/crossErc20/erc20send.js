@@ -23,11 +23,12 @@ Template['views_erc20send'].onCreated(function(){
     let chainType = this.data.chainType;
     let symbol = this.data.symbol;
     let tokenOrigAddr = this.data.tokenOrigAddr;
+    let decimals = this.data.decimals;
 
     TemplateVar.set(template, 'symbol', symbol);
     TemplateVar.set(template, 'chainType', chainType);
     TemplateVar.set(template, 'tokenOrigAddr', tokenOrigAddr);
-
+    TemplateVar.set(template, 'decimals', decimals);
 
     mist.ERC202WERC20(chainType).getMultiTokenBalance(Session.get('addressList'),tokenOrigAddr, function (err, result) {
         EthElements.Modal.hide();
@@ -38,7 +39,7 @@ Template['views_erc20send'].onCreated(function(){
             TemplateVar.set(template,'erc20Balance',result);
 
             _.each(result, function (value, index) {
-                const balance =  web3.fromWei(value, 'ether');
+                let balance =  Helpers.tokenFromWei(value, decimals);
                 // const name = 'Account_' + index.slice(2, 6);
                 if (new BigNumber(balance).gt(0)) {
                     result_list.push({name: index, address: index, balance: balance})

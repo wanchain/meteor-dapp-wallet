@@ -585,6 +585,10 @@ Template['elements_cross_transactions_table_erc20'].onCreated(function () {
     let tokenAddrList = [self.data.tokenOrigAddr,self.data.tokenWanAddr];
     let symbol = self.data.symbol;
     let chainType = self.data.chainType;
+
+    let decimals = self.data.decimals;
+    TemplateVar.set(template, 'decimals', decimals);
+
     mist.ERC202WERC20(chainType).listHistory(self.data.addressList.concat(self.data.wanAddressList),tokenAddrList,symbol, (err, result) => {
         resultEach(template, result);
 
@@ -627,7 +631,7 @@ Template['elements_cross_transactions_table_erc20'].helpers({
 
         let crossCollection = [];
         let normalCollection = [];
-
+        let decimals = TemplateVar.get('decimals');
         if (TemplateVar.get('crossCollection') && TemplateVar.get('crossCollection').length > 0) {
             let smallStyle = 'display: block; color: #4b90f7;';
 
@@ -667,7 +671,7 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                 } else {
                     value.symbol = value.tokenSymbol;
                 }
-                value.value = web3.fromWei(value.contractValue);
+                value.value = Helpers.tokenFromWei(value.contractValue, decimals);
                 value.state = value.status;
                 value.operation = `<h2 style="${style}">${value.status}</h2>`;
                 // value.state
@@ -846,7 +850,8 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                 value.fromText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
                 value.toText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
                 value.crossAdress = value.to;
-                value.value = web3.fromWei(value.value);
+
+                value.value = Helpers.tokenFromWei(value.value, decimals);
                 value.state = value.status;
                 value.operation = `<h2 style="${style}">${value.status}</h2>`;
 

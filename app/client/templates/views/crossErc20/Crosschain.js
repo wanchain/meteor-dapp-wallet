@@ -47,6 +47,7 @@ Template['views_crosschain_erc20'].onCreated(function () {
     TemplateVar.set(template, 'symbol', this.data.symbol);
     TemplateVar.set(template, 'chainType', this.data.chainType);
     TemplateVar.set(template, 'tokenOrigAddr', this.data.tokenOrigAddr);
+    TemplateVar.set(template, 'decimals', this.data.decimals);
 
     let chainType = this.data.chainType;
     getAddressList(template,chainType);
@@ -83,6 +84,9 @@ Template['views_crosschain_erc20'].helpers({
     },
     'symbol': function(){
         return TemplateVar.get('symbol')
+    },
+    'decimals': function(){
+        return TemplateVar.get('decimals')
     }
 
 });

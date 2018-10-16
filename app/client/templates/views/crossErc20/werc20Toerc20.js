@@ -14,10 +14,18 @@ const defaultGasprice = 180000000000;
 // Set basic variables
 Template['views_werc20Toerc20'].onCreated(function(){
     var template = this;
-    TemplateVar.set(template, 'symbol', this.data.symbol);
-    TemplateVar.set(template, 'chainType', this.data.chainType);
-    TemplateVar.set(template, 'tokenOrigAddr', this.data.tokenOrigAddr);
-    TemplateVar.set(template, 'tokenWanAddr', this.data.tokenWanAddr);
+
+    let chainType = this.data.chainType;
+    let symbol = this.data.symbol;
+    let tokenOrigAddr = this.data.tokenOrigAddr;
+    let tokenWanAddr = this.data.tokenWanAddr;
+    let decimals = this.data.decimals;
+
+    TemplateVar.set(template, 'symbol', symbol);
+    TemplateVar.set(template, 'chainType', chainType);
+    TemplateVar.set(template, 'tokenOrigAddr', tokenOrigAddr);
+    TemplateVar.set(template, 'tokenWanAddr', tokenWanAddr);
+    TemplateVar.set(template, 'decimals', decimals);
 
     TemplateVar.set(template, 'amount', 0);
     TemplateVar.set(template, 'feeMultiplicator', 0);
@@ -40,16 +48,15 @@ Template['views_werc20Toerc20'].onCreated(function(){
 
     // wan accounts token balance
     let wanAddressList = Session.get('wanAddressList');
-    let self = this;
-    let chainType = this.data.chainType;
-    mist.WERC202ERC20(chainType).getMultiTokenBalance(wanAddressList,self.data.tokenWanAddr,(err, result) => {
+
+    mist.WERC202ERC20(chainType).getMultiTokenBalance(wanAddressList,tokenWanAddr,(err, result) => {
         TemplateVar.set(template,'werc20Balance',result);
 
         if (!err) {
             let result_list = [];
 
             _.each(result, function (value, index) {
-                const balance =  web3.fromWei(value, 'ether');
+                const balance =  Helpers.tokenFromWei(value,decimals);
 
                 if (new BigNumber(balance).gt(0)) {
                     // let accounts = EthAccounts.findOne({balance:{$ne:"0"}, address: index});
@@ -68,7 +75,7 @@ Template['views_werc20Toerc20'].onCreated(function(){
     });
 
     // weth => eth storeman
-    mist.WERC202ERC20(chainType).getStoremanGroups(self.data.tokenOrigAddr,function (err,data) {
+    mist.WERC202ERC20(chainType).getStoremanGroups(tokenOrigAddr,function (err,data) {
         EthElements.Modal.hide();
 
         if (!err) {
@@ -125,12 +132,13 @@ Template['views_werc20Toerc20'].helpers({
     'Deposit': function () {
 
         let result = [];
+        let decimals = TemplateVar.get('decimals');
         _.each(TemplateVar.get('storemanGroup'), function (value, index) {
             if (value.smgWanAddr === TemplateVar.get('storeman')) {
 
-                let outboundQuota = web3.fromWei(value.outboundQuota, 'ether');
-                let quota = web3.fromWei(value.quota, 'ether');
-                let deposit = web3.fromWei(value.deposit, 'ether');
+                let outboundQuota = Helpers.tokenFromWei(value.outboundQuota,decimals);
+                let quota = Helpers.tokenFromWei(value.quota,decimals);
+                let deposit = web3.fromWei(value.wanDeposit, 'ether');
                 let used = ((outboundQuota/ quota) * 100).toString() + '%';
 
                 result.push({deposit: deposit, outboundQuota: outboundQuota, used: used});

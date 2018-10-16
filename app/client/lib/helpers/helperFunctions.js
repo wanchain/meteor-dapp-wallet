@@ -129,6 +129,51 @@ Helpers.formatNumberByDecimals = function(number, decimals){
 };
 
 /**
+Token unit conversion
+
+@method tokenToWei
+@param {String} token address
+@param {Number} decimals
+ */
+Helpers.tokenToWei = function(token, decimals=18) {
+    let wei = web3.toBigNumber(token).times('1e' + decimals);
+    return wei.toString(10);
+};
+
+/**
+ Token unit conversion
+
+ @method tokenToWei
+ @param {String} token address
+ @param {Number} decimals
+ */
+Helpers.tokenFromWei = function(token, decimals=18) {
+    let wei = web3.toBigNumber(token).dividedBy('1e' + decimals);
+    return wei.toString(10);
+};
+
+/**
+Token unit conversion
+
+@param {String} token address
+@param {Number} decimals
+ */
+Helpers.tokenToWeiHex = function(token, decimals=18) {
+    let wei = web3.toBigNumber(token).times('1e' + decimals);
+    return '0x'+ wei.toString(16);
+};
+
+/**
+ Token unit conversion
+
+ @param {String} token address
+ @param {Number} decimals
+ */
+Helpers.tokenFromWeiHex = function(token, decimals=18) {
+    let wei = web3.toBigNumber(token).dividedBy('1e' + decimals);
+    return '0x'+ wei.toString(16);
+};
+/**
 Display logs in the console for events.
 
 @method eventLogs

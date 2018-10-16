@@ -37,8 +37,9 @@ const accountClipboardEventHandler = function(e){
 Template['elements_erc20_account_table'].onCreated(function () {
     let template = this;
     // console.log('addressList: ', this.data);
-
+    let decimals = this.data.decimals;
     TemplateVar.set(template,'symbol',this.data.symbol);
+    TemplateVar.set(template,'decimals',decimals);
 
     let chainType = this.data.chainType;
     mist.ERC202WERC20(chainType).getMultiTokenBalance(this.data.addressList,this.data.tokenAddr, (err, result) => {
@@ -58,7 +59,7 @@ Template['elements_erc20_account_table'].onCreated(function () {
                 let changeResult = Helpers.objectCompare(oldAddressList, result);
 
                 for (let i in changeResult) {
-                    let balance =  web3.fromWei(changeResult[i], 'ether');
+                    let balance =  Helpers.tokenFromWei(changeResult[i], decimals);
                     let content = 'Balance of ' + i.toString() + ' has changed to ' + balance.toString();
 
                     GlobalNotification.info({
@@ -91,12 +92,13 @@ Template['elements_erc20_account_table'].helpers({
 
         //eth account list
         const ethAccounts = TemplateVar.get('ethAccounts');
-
+        const decimals = TemplateVar.get('decimals');
 
         let result = [];
         if (ethAccounts) {
             _.each(ethAccounts, function (value, index) {
-                const balance =  web3.fromWei(value, 'ether');
+
+                const balance =  Helpers.tokenFromWei(value, decimals);
                 // const name = 'Account_' + index.slice(2, 6);
                 result.push({address: index, balance: balance})
             });

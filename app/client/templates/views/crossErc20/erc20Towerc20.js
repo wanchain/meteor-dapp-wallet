@@ -13,15 +13,22 @@
 // Set basic variables
 Template['views_erc20Towerc20'].onCreated(function(){
     var template = this;
-    TemplateVar.set(template, 'symbol', this.data.symbol);
-    TemplateVar.set(template, 'chainType', this.data.chainType);
-    TemplateVar.set(template, 'tokenOrigAddr', this.data.tokenOrigAddr);
+
+    let chainType = this.data.chainType;
+    let symbol = this.data.symbol;
+    let tokenOrigAddr = this.data.tokenOrigAddr;
+    let decimals = this.data.decimals;
+
+    TemplateVar.set(template, 'symbol', symbol);
+    TemplateVar.set(template, 'chainType', chainType);
+    TemplateVar.set(template, 'tokenOrigAddr',tokenOrigAddr);
 
 
     TemplateVar.set(template, 'amount', 0);
     TemplateVar.set(template, 'feeMultiplicator', 0);
     TemplateVar.set(template, 'boundQuota', 0);
     TemplateVar.set(template, 'options', false);
+    TemplateVar.set(template, 'decimals', decimals);
 
     EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
@@ -40,16 +47,15 @@ Template['views_erc20Towerc20'].onCreated(function(){
     // eth accounts token balance
     let addressList = Session.get('addressList');
 
-    let self = this;
-    let chainType = this.data.chainType;
-    mist.ERC202WERC20(chainType).getMultiTokenBalance(addressList,self.data.tokenOrigAddr, (err, result) => {
+
+    mist.ERC202WERC20(chainType).getMultiTokenBalance(addressList, tokenOrigAddr, (err, result) => {
         TemplateVar.set(template,'erc20Balance',result);
 
         if (!err) {
             let result_list = [];
 
             _.each(result, function (value, index) {
-                const balance =  web3.fromWei(value, 'ether');
+                const balance =  Helpers.tokenFromWei(value,decimals);
                 // const name = 'Account_' + index.slice(2, 6);
                 if (new BigNumber(balance).gt(0)) {
                     result_list.push({name: index, address: index, balance: balance})
@@ -64,7 +70,7 @@ Template['views_erc20Towerc20'].onCreated(function(){
     });
 
     // eth => weth storeman
-    mist.ERC202WERC20(chainType).getStoremanGroups(self.data.tokenOrigAddr,function (err,data) {
+    mist.ERC202WERC20(chainType).getStoremanGroups(tokenOrigAddr,function (err,data) {
         EthElements.Modal.hide();
 
         if (!err) {
@@ -111,13 +117,14 @@ Template['views_erc20Towerc20'].helpers({
     'Deposit': function () {
 
         let result = [];
-
+        let decimals = TemplateVar.get('decimals');
         if (TemplateVar.get('storemanGroup')) {
             _.each(TemplateVar.get('storemanGroup'), function (value, index) {
                 if (value.smgOrigAddr === TemplateVar.get('storeman')) {
-                    let inboundQuota = web3.fromWei(value.inboundQuota, 'ether');
-                    let quota = web3.fromWei(value.quota, 'ether');
-                    let deposit = web3.fromWei(value.deposit, 'ether');
+
+                    let inboundQuota = Helpers.tokenFromWei(value.inboundQuota,decimals);
+                    let quota = Helpers.tokenFromWei(value.quota,decimals);
+                    let deposit = web3.fromWei(value.wanDeposit, 'ether');
                     let done = quota - inboundQuota;
                     let used = ((done/ quota) * 100).toString() + '%';
 
