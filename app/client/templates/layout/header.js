@@ -22,9 +22,10 @@ Template['layout_header'].onCreated(function(){
 
                 if (!err){
                     for (let tokenAccount of ret){
-                        mist.ERC202WERC20("ETH").getErc20SymbolInfo(tokenAccount.tokenOrigAddr,(error,result) =>{
+                        mist.ERC202WERC20("ETH").getErc20Info(tokenAccount.tokenOrigAddr,(error,result) =>{
                             if (!error){
-                                tokenAccount.symbol = result;
+                                tokenAccount.symbol = result.symbol;
+                                tokenAccount.decimals = result.decimals;
                                 tokenAccount.chainType = 'ETH';
                                 TemplateVar.set(template,'tokenAccounts',ret);
                             }
