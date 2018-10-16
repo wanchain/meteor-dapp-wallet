@@ -133,6 +133,10 @@ class crossChainOperators{
     getErc20SymbolInfo(tokenAddr,callback){
         this.invokeOperator(new crossOperator('getErc20SymbolInfo',{tokenAddr:tokenAddr},this.getOriginChainType(),callback));
     }
+    getErc20Info(tokenAddr,callback){
+        this.invokeOperator(new crossOperator('getErc20Info',{tokenAddr:tokenAddr},this.getOriginChainType(),callback));
+    }
+
     getOriginChainType(){
         return this.direction === directionEnum[0] ? chainType[0] : chainType[1];
     }
