@@ -121,6 +121,17 @@ FlowRouter.route('/crosschain/erc20/:chainType/:tokenOrigAddr/:tokenWanAddr/:sym
     }
 });
 
+FlowRouter.route('/crosschain/btc', {
+    name: 'crosschain_btc',
+    action: function(params, queryParams) {
+        BlazeLayout.render('layout_main', {
+            header: 'layout_header',
+            main: 'views_crosschain_btc_main'
+        });
+    }
+});
+
+
 /**
 The send route.
 

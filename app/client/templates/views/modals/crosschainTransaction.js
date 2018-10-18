@@ -1,9 +1,40 @@
-function waitingMoment() {
-    EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
-    setTimeout(() => {
-        Session.set('clickButton', 1);
-        EthElements.Modal.hide();
-    }, 5000);
+let InterID;
+
+function waitingMoment(X) {
+    if (X) {
+        EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
+
+        _.each(Session.get('oldCrosschainList'), function (value, index) {
+            if (value.x === X) {
+                if(value.status === 'sentXPending' || value.status === 'sentRevokePending') {
+                    console.log('eth oldCrosschainList done:::', value.status);
+                    EthElements.Modal.hide();
+                    Session.set('clickButton', 1);
+                } else {
+                    EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
+                    console.log('eth oldCrosschainList interval:::', value.status);
+                }
+            }
+        });
+
+        InterID = Meteor.setInterval(function(){
+            _.each(Session.get('oldCrosschainList'), function (value, index) {
+                if (value.x === X) {
+                    if(value.status === 'sentXPending' || value.status === 'sentRevokePending') {
+                        console.log('eth oldCrosschainList done:::', value.status);
+
+                        Meteor.clearInterval(InterID);
+                        EthElements.Modal.hide();
+                        Session.set('clickButton', 1);
+                    } else {
+                        EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
+                        console.log('eth oldCrosschainList interval:::', value.status);
+                    }
+                }
+            });
+
+        }, 5000);
+    }
 }
 
 

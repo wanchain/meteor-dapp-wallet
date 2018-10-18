@@ -251,13 +251,13 @@ Template['views_ethToweth'].events({
             });
         }
 
-        const amountSymbol = amount.toString().split('.')[1];
-        if (amountSymbol && amountSymbol.length >=19) {
-            return GlobalNotification.warning({
-                content: 'Amount not valid',
-                duration: 2
-            });
-        }
+        // const amountSymbol = amount.toString(10).split('.')[1];
+        // if (amountSymbol && amountSymbol.length >=19) {
+        //     return GlobalNotification.warning({
+        //         content: 'Amount not valid',
+        //         duration: 2
+        //     });
+        // }
 
         if (new BigNumber(amount, 10).gt(new BigNumber(boundQuota, 10))){
             return GlobalNotification.warning({

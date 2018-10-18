@@ -1,0 +1,23 @@
+<template name="token_table_modal">
+    <table class="dapp-zebra transactions">
+        <thead style="text-align: left;">
+        <tr class="full-width">
+            <th colspan="5">Token</th>
+            <th colspan="5">Balance</th>
+        </tr>
+        </thead>
+        <tbody class="transfer-list-tbody">
+        {{#each tokens}}
+            <tr class="full-width">
+                <td colspan="5">{{name}}</td>
+                <td colspan="5" style="cursor: auto">{{{balance}}}</td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+
+    <div><button class="ok-cross dapp-primary-button">OK</button></div>
+</template>
+
+
+
