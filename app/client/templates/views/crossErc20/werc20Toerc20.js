@@ -180,15 +180,15 @@ Template['views_werc20Toerc20'].events({
 
         let txFeeratio = TemplateVar.get('txFeeRatio');
         let wan2CoinRatio  = TemplateVar.get('wan2CoinRatio');
-        let exp     = new BigNumber(10);
-        let v       = new BigNumber(amount);
-        let wei     = v.mul(exp.pow(18));
 
+        let decimals = TemplateVar.get('decimals');
+
+        let wei = new BigNumber(Helpers.tokenToWei(amount,decimals));
         const DEFAULT_PRECISE = 10000;
         let coverCharge = wei.mul(wan2CoinRatio).mul(txFeeratio).div(DEFAULT_PRECISE).div(DEFAULT_PRECISE);
         // console.log('coverCharge: ', coverCharge);
 
-        TemplateVar.set('coverCharge', web3.fromWei(coverCharge));
+        TemplateVar.set('coverCharge', Helpers.tokenFromWei(coverCharge));
         TemplateVar.set('amount', amount);
     },
 
