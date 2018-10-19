@@ -10,6 +10,8 @@ Template['views_modals_sendErc20TransactionInfo'].events({
         EthElements.Modal.hide();
     },
     'click .ok-cross': function () {
+        EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
+
         let password_input = document.getElementById('ethTransaction-psd').value;
 
         if(!password_input) {
