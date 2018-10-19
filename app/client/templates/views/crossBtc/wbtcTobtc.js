@@ -246,7 +246,7 @@ Template['views_wbtcTobtc'].events({
 
         if(amount.lte(new BigNumber(defaultAmount))) {
             return GlobalNotification.warning({
-                content: 'please input amount  greater than 0.02',
+                content: 'please input amount  greater than ' + defaultAmount,
                 duration: 2
             });
         }

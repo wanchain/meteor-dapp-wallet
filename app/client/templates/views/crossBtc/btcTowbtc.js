@@ -188,9 +188,11 @@ Template['views_btcTowbtc'].events({
                 let btcAccounts = result.address;
                 let btcBalance = new BigNumber(result.balance);
 
-                if(amount.lte(new BigNumber(0.02))) {
+                let defaultAmount = Session.get('network') == 'private' ? 0.002 : 0.002;
+
+                if(amount.lte(new BigNumber(defaultAmount))) {
                     return GlobalNotification.warning({
-                        content: 'please input amount  greater than 0.02',
+                        content: 'please input amount  greater than ' + defaultAmount,
                         duration: 2
                     });
                 }
