@@ -222,7 +222,7 @@ Template['elements_account'].events({
 
         _.each(tokens, (token) => {
 
-            token.name = token.name ? token.name : "UNDEFINED";
+            token.name = token.name ? token.name : "---";
 
             let tokenBalance = 0.00;
             if (Number(token.balances[this._id]) > 0) {
