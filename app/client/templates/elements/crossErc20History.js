@@ -871,45 +871,72 @@ Template['elements_cross_transactions_table_erc20'].events({
         let id = e.target.id;
 
         Session.set('isShowModal', true);
+        let crossCollectionLength = TemplateVar.get('crossCollection').length;
+        if (id<crossCollectionLength){
+            let show_data = TemplateVar.get('crossCollection')[id];
+            // console.log('show_data: ', show_data);
 
-        let show_data = TemplateVar.get('crossCollection')[id];
-        // console.log('show_data: ', show_data);
-
-        if (show_data) {
-            if (!show_data.HashX) {
-                show_data.HashX = show_data.hashX;
-            }
-
-            if (show_data.srcChainType === 'WAN') {
-                show_data.symbol = `W${show_data.tokenSymbol}`;
-            } else {
-                show_data.symbol = show_data.tokenSymbol;
-            }
-
-            EthElements.Modal.show({
-                template: 'views_modals_crosstransactionInfo',
-                data: {
-                    HashX: show_data.HashX,
-                    chain: show_data.srcChainType,
-                    crossAdress: show_data.crossAdress,
-                    from: show_data.from,
-                    lockTxHash: show_data.lockTxHash,
-                    redeemTxHash: show_data.redeemTxHash,
-                    revokeTxHash: show_data.revokeTxHash,
-                    storeman: show_data.storeman,
-                    time: show_data.time,
-                    to: show_data.to,
-                    value: show_data.value,
-                    x: show_data.x,
-                    symbol: show_data.symbol,
-                    status: show_data.state,
-                    fromText: show_data.fromText,
-                    toText: show_data.toText
+            if (show_data) {
+                if (!show_data.HashX) {
+                    show_data.HashX = show_data.hashX;
                 }
-            }, {
-                closeable: false
-            });
 
+                if (show_data.srcChainType === 'WAN') {
+                    show_data.symbol = `W${show_data.tokenSymbol}`;
+                } else {
+                    show_data.symbol = show_data.tokenSymbol;
+                }
+
+                EthElements.Modal.show({
+                    template: 'views_modals_crosstransactionInfo',
+                    data: {
+                        HashX: show_data.HashX,
+                        chain: show_data.srcChainType,
+                        crossAdress: show_data.crossAdress,
+                        from: show_data.from,
+                        lockTxHash: show_data.lockTxHash,
+                        redeemTxHash: show_data.redeemTxHash,
+                        revokeTxHash: show_data.revokeTxHash,
+                        storeman: show_data.storeman,
+                        time: show_data.time,
+                        to: show_data.to,
+                        value: show_data.value,
+                        x: show_data.x,
+                        symbol: show_data.symbol,
+                        status: show_data.state,
+                        fromText: show_data.fromText,
+                        toText: show_data.toText
+                    }
+                }, {
+                    closeable: false
+                });
+
+            }
+        }else{
+            let show_data = TemplateVar.get('normalCollection')[id-crossCollectionLength];
+            // console.log('show_data: ', show_data);
+
+            if (show_data) {
+
+                EthElements.Modal.show({
+                    template: 'views_modals_normaltransactionInfo',
+                    data: {
+                        chainType: show_data.chainType,
+                        tokenSymbol: show_data.tokenSymbol,
+                        txHash: show_data.txHash,
+                        from: show_data.from,
+                        to: show_data.to,
+                        value: show_data.value,
+                        time: show_data.time,
+                        status: show_data.state,
+                        fromText: show_data.fromText,
+                        toText: show_data.toText
+                    }
+                }, {
+                    closeable: false
+                });
+
+            }
         }
 
     },

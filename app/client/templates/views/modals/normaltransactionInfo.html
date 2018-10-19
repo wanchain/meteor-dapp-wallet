@@ -1,0 +1,47 @@
+<template name="views_modals_normaltransactionInfo">
+    {{#with transaction}}
+        <h1 style="font-size: 16px;font-weight: 600;margin-bottom: 10px;">normal transaction info</h1>
+         <!--dapp-zebra-->
+        <table class="dapp-zebraPou">
+            <tbody>
+
+
+                <tr>
+                    <td>Chain</td>
+                    <td>{{chainType}}</td>
+                </tr>
+                <tr>
+                    <td>From</td>
+                    <td>{{from}}{{{fromText}}}</td>
+                </tr>
+                <tr>
+                    <td>To</td>
+                    <td>{{to}}{{{toText}}}</td>
+                </tr>
+
+                <tr>
+                    <td>Value</td>
+                    <td>{{value}} {{tokenSymbol}}</td>
+                </tr>
+
+                {{#if status}}
+                    <tr>
+                        <td>Status</td>
+                        <td>{{{status}}}</td>
+                    </tr>
+                {{/if}}
+
+                {{#if txHash}}
+                    <tr>
+                        <td>txHash</td>
+                        <td>{{txHash}}</td>
+                    </tr>
+                {{/if}}
+
+            </tbody>
+        </table>
+    {{/with}}
+
+    <div><button class="ok-cross dapp-primary-button">OK</button></div>
+
+</template>
