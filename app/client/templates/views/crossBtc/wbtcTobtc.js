@@ -244,7 +244,7 @@ Template['views_wbtcTobtc'].events({
 
         let defaultAmount = Session.get('network') == 'private' ? 0.002 : 0.002;
 
-        if(amount.lte(new BigNumber(defaultAmount))) {
+        if(amount.lt(new BigNumber(defaultAmount))) {
             return GlobalNotification.warning({
                 content: 'please input amount  greater than ' + defaultAmount,
                 duration: 2
