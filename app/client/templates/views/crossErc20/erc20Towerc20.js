@@ -283,18 +283,19 @@ Template['views_erc20Towerc20'].events({
         let symbol = TemplateVar.get('symbol');
         let chainType = TemplateVar.get('chainType');
         let tokenOrigAddr = TemplateVar.get('tokenOrigAddr');
+        let decimals = TemplateVar.get('decimals');
+
+        if(new BigNumber(Helpers.tokenToWei(amount,decimals), 10).gt(new BigNumber(erc20Balance, 10)))
+            return GlobalNotification.warning({
+                content: `Insufficient ${symbol} balance in your FROM account`,
+                duration: 2
+            });
 
         //ETH balance
         mist.ERC202WERC20(chainType).getBalance(from.toLowerCase(), function (err,ethBalance) {
             if (err) {
                 Helpers.showError(err);
             } else {
-
-                if(new BigNumber(EthTools.toWei(amount), 10).gt(new BigNumber(erc20Balance, 10)))
-                    return GlobalNotification.warning({
-                        content: `Insufficient ${symbol} balance in your FROM account`,
-                        duration: 2
-                    });
 
                 let ethValue = new BigNumber(ethBalance, 10);
 

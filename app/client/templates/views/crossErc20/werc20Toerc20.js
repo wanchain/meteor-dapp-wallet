@@ -316,14 +316,16 @@ Template['views_werc20Toerc20'].events({
         let symbol = TemplateVar.get('symbol');
         let chainType = TemplateVar.get('chainType');
         let tokenOrigAddr = TemplateVar.get('tokenOrigAddr');
+        let decimals = TemplateVar.get('decimals');
+
+        if(new BigNumber(Helpers.tokenToWei(amount,decimals), 10).gt(new BigNumber(werc20Balance, 10)))
+            return GlobalNotification.warning({
+                content: `Insufficient W${symbol} balance in your FROM account`,
+                duration: 2
+            });
 
         mist.WERC202ERC20(chainType).getBalance(from.toLowerCase(), function (err,wanBalance) {
             if (!err) {
-                if(new BigNumber(EthTools.toWei(amount), 10).gt(new BigNumber(werc20Balance, 10)))
-                    return GlobalNotification.warning({
-                        content: `Insufficient W${symbol} balance in your FROM account`,
-                        duration: 2
-                    });
 
                 // console.log('fee: ', new BigNumber(EthTools.toWei(fee), 10));
                 // console.log('valueFee: ', new BigNumber(EthTools.toWei(valueFee), 10));

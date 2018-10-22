@@ -213,8 +213,9 @@ Template['views_erc20send'].events({
         let symbol = TemplateVar.get('symbol').toLowerCase();
         let tokenOrigAddr = TemplateVar.get('tokenOrigAddr');
         let erc20Balance = TemplateVar.get('erc20Balance')[from.toLowerCase()];
+        let decimals = TemplateVar.get('decimals');
 
-        if (new BigNumber(amount).gt(new BigNumber(erc20Balance, 10)))
+        if(new BigNumber(Helpers.tokenToWei(amount,decimals), 10).gt(new BigNumber(erc20Balance, 10)))
             return GlobalNotification.warning({
                 content: `Insufficient ${symbol} balance in your FROM account`,
                 duration: 2
