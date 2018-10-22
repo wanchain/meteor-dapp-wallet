@@ -103,8 +103,8 @@ class crossBtcOperators{
         this.invokeOperator(new crossOperator('revokeWbtc',parameters,chainType,callback));
     };
 
-    getBtcFeeRate(chainType,callback) {
-        this.invokeOperator(new crossOperator('getBtcFeeRate',chainType,callback));
+    getBtcFeeRate(chainType, parameters,callback) {
+        this.invokeOperator(new crossOperator('getBtcFeeRate', parameters,chainType,callback));
     };
 
 }

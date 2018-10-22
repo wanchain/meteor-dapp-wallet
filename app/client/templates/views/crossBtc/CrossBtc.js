@@ -43,11 +43,12 @@ Template['views_crosschain_btc'].onCreated(function () {
 
     EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
-    mist.BTC2WBTC().getBtcFeeRate('BTC', (err, result) => {
-        if (!err) {
-            Session.set('btcFee', result);
-        }
-    });
+    // mist.BTC2WBTC().getBtcFeeRate('BTC',null, (err, result) => {
+    //     if (!err) {
+    //         let btcFee = web3.toBigNumber(result).div(100000000).toString(10);
+    //         Session.set('btcFee', btcFee);
+    //     }
+    // });
 
     getAddressList(template);
 

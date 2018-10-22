@@ -282,7 +282,8 @@ Template['elements_cross_transactions_table_btc'].events({
                     symbol: show_data.symbol,
                     status: show_data.state,
                     fromText: show_data.fromText,
-                    toText: show_data.toText
+                    toText: show_data.toText,
+                    btcFee: Session.get('btcFee')
                 }
             }, {
                 closeable: false
