@@ -150,7 +150,7 @@ function releaseEth2Weth(show_data, trans, transType) {
                 } else {
 
                     // wan balance
-                    mist.WETH2ETH().getBalance(show_data.crossAdress.toLowerCase(), function (err, coinBalance) {
+                    mist.WETH2ETH().getBalance(show_data.crossAddress.toLowerCase(), function (err, coinBalance) {
                         if (err) {
                             Helpers.showError(err);
                         } else {
@@ -197,7 +197,7 @@ function releaseWeth2Eth(show_data, trans, transType) {
                 } else {
 
                     //eth balance
-                    mist.ETH2WETH().getBalance(show_data.crossAdress.toLowerCase(), function (err, coinBalance) {
+                    mist.ETH2WETH().getBalance(show_data.crossAddress.toLowerCase(), function (err, coinBalance) {
                         if (err) {
                             Helpers.showError(err);
                         } else {
@@ -342,7 +342,7 @@ function releaseErc202Werc20(show_data, trans, transType) {
                 } else {
 
                     // WAN balance
-                    mist.WERC202ERC20("WAN").getBalance(show_data.crossAdress.toLowerCase(), function (err, coinBalance) {
+                    mist.WERC202ERC20("WAN").getBalance(show_data.crossAddress.toLowerCase(), function (err, coinBalance) {
                         if (err) {
                             Helpers.showError(err);
                         } else {
@@ -390,7 +390,7 @@ function releaseWerc202Erc20(show_data, trans, transType) {
                 } else {
 
                     // eth balance
-                    mist.ERC202WERC20(show_data.tokenType).getBalance(show_data.crossAdress.toLowerCase(), function (err, coinBalance) {
+                    mist.ERC202WERC20(show_data.tokenType).getBalance(show_data.crossAddress.toLowerCase(), function (err, coinBalance) {
                         if (err) {
                             Helpers.showError(err);
                         } else {
@@ -520,7 +520,7 @@ function showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transT
             from: show_data.from,
             to: show_data.to,
             storeman: show_data.storeman,
-            crossAdress: show_data.crossAdress,
+            crossAddress: show_data.crossAddress,
             amount: show_data.value,
             fee: EthTools.formatBalance(fee, '0,0.00[0000000000000000]', 'ether'),
             gasPrice: gasPrice,
@@ -664,7 +664,7 @@ Template['elements_cross_transactions_table'].helpers({
                 value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
                 value.time = value.lockedTime ? Helpers.timeStamp2String(Number(value.lockedTime) * 1000) : "--";
 
-                value.crossAdress = value.to;
+                value.crossAddress = value.to;
 
                 if (value.srcChainType === 'WAN') {
                     value.symbol = `W${value.tokenSymbol}`;
@@ -849,7 +849,7 @@ Template['elements_cross_transactions_table'].helpers({
 
                 value.fromText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
                 value.toText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
-                value.crossAdress = value.to;
+                value.crossAddress = value.to;
                 value.value = web3.fromWei(value.value);
                 value.state = value.status;
                 value.operation = `<h2 style="${style}">${value.status}</h2>`;
@@ -891,7 +891,7 @@ Template['elements_cross_transactions_table'].events({
                     data: {
                         HashX: show_data.HashX,
                         chain: show_data.srcChainType,
-                        crossAdress: show_data.crossAdress,
+                        crossAddress: show_data.crossAddress,
                         from: show_data.from,
                         lockTxHash: show_data.lockTxHash,
                         redeemTxHash: show_data.redeemTxHash,
@@ -972,7 +972,7 @@ Template['elements_cross_transactions_table'].events({
 
             trans = {
                 lockTxHash: show_data.lockTxHash, amount: show_data.contractValue.toString(10),
-                storemanGroup: show_data.storeman, cross: show_data.crossAdress,
+                storemanGroup: show_data.storeman, cross: show_data.crossAddress,
                 x: show_data.x, hashX: show_data.hashX
             };
 
@@ -1012,7 +1012,7 @@ Template['elements_cross_transactions_table'].events({
 
             trans = {
                 lockTxHash: show_data.lockTxHash, amount: show_data.contractValue.toString(10),
-                storemanGroup: show_data.storeman, cross: show_data.crossAdress,
+                storemanGroup: show_data.storeman, cross: show_data.crossAddress,
                 x: show_data.x, hashX: show_data.hashX
             };
 
