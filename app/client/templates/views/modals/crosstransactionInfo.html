@@ -56,6 +56,13 @@
                     <td>{{value}} {{symbol}}</td>
                 </tr>
 
+                {{#if btcFee}}
+                    <tr>
+                        <td>Fee paid</td>
+                        <td>{{btcFee}} {{chain}}</td>
+                    </tr>
+                {{/if}}
+
                 {{#if x}}
                     <tr>
                         <td>Secret</td>

@@ -43,6 +43,12 @@ Template['views_crosschain_btc'].onCreated(function () {
 
     EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
+    mist.BTC2WBTC().getBtcFeeRate('BTC', (err, result) => {
+        if (!err) {
+            Session.set('btcFee', result);
+        }
+    });
+
     getAddressList(template);
 
     InterID = Meteor.setInterval(function(){

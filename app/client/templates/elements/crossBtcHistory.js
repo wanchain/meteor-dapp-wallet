@@ -8,7 +8,7 @@ let InterID;
 
 const stateDict = {
     'sentHashPending': 1, 'sentHashConfirming': 2, 'waitingCross': 3, 'waitingCrossConfirming': 4,
-    'waitingX': 5,'sentXPending': 6, 'sentXConfirming': 7, 'refundFinished': 8,
+    'waitingX': 5,'sentXPending': 6, 'sentXConfirming': 7, 'redeemFinished': 8,
     'waitingRevoke': 9,'sentRevokePending': 10, 'sentRevokeConfirming': 11, 'revokeFinished': 12,
     'sentHashFailed': 13, 'suspending': 14
 };
