@@ -129,6 +129,9 @@ Template['views_werc20Toerc20'].helpers({
     'symbol': function () {
         return TemplateVar.get('symbol');
     },
+    'wsymbol': function () {
+        return `W${TemplateVar.get('symbol')}`;
+    },
     'Deposit': function () {
 
         let result = [];
