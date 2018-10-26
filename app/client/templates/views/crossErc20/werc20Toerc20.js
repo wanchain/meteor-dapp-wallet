@@ -109,7 +109,7 @@ Template['views_werc20Toerc20'].onCreated(function(){
     });
 
     // get wan2coin ratio
-    mist.ERC202WERC20(chainType).getCoin2WanRatio('ETH', function (err,data) {
+    mist.ERC202WERC20(chainType).getCoin2WanRatio(tokenOrigAddr,'ETH', function (err,data) {
         if (!err) {
             data ? TemplateVar.set(template,'wan2CoinRatio',data) : TemplateVar.set(template,'wan2CoinRatio',20);
         }

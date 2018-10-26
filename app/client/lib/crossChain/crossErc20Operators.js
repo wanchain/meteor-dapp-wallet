@@ -119,8 +119,8 @@ class crossChainOperators{
     getAddressList(chainType,callback){
         this.invokeOperator(new crossOperator('getAddressList',{},chainType,callback));
     }
-    getCoin2WanRatio(chainType,callback){
-        this.invokeOperator(new crossOperator('getCoin2WanRatio',{},chainType,callback));
+    getCoin2WanRatio(tokenOrigAddr,chainType,callback){
+        this.invokeOperator(new crossOperator('getCoin2WanRatio',{"tokenOrigAddr":tokenOrigAddr},chainType,callback));
     }
 
     getWerc20TokenAddressList(callback){
