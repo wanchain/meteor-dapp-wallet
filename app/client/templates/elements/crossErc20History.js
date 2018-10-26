@@ -894,6 +894,7 @@ Template['elements_cross_transactions_table_erc20'].events({
                         chain: show_data.srcChainType,
                         crossAddress: show_data.crossAddress,
                         from: show_data.from,
+                        approveTxHash: show_data.approveTxHash,
                         lockTxHash: show_data.lockTxHash,
                         redeemTxHash: show_data.redeemTxHash,
                         revokeTxHash: show_data.revokeTxHash,

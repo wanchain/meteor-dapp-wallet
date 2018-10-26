@@ -24,6 +24,12 @@
                     <td>To</td>
                     <td>{{crossAddress}}{{{toText}}}</td>
                 </tr>
+                {{#if approveTxHash}}
+                    <tr>
+                        <td>approveTxHash</td>
+                        <td>{{approveTxHash}}</td>
+                    </tr>
+                {{/if}}
                 {{#if lockTxHash}}
                     <tr>
                         <td>lockTxHash</td>
