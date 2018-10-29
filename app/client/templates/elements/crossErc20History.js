@@ -844,7 +844,7 @@ Template['elements_cross_transactions_table_erc20'].helpers({
             _.each(TemplateVar.get('normalCollection'), function (value, index) {
                 let style = 'display: block; font-size: 18px; background-color: transparent;';
                 value.htlcdate = '--';
-                value.time = value.time?Helpers.timeStamp2String(Number(value.time) * 1000) : "--";
+                value.time = value.sentTime?Helpers.timeStamp2String(Number(value.sentTime) * 1000) : "--";
                 value.symbol = value.tokenSymbol;
 
                 value.fromText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
