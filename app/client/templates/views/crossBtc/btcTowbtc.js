@@ -45,7 +45,7 @@ Template['views_btcTowbtc'].onCreated(function(){
 
         if (!err) {
             if (data.length > 0) {
-                TemplateVar.set(template, 'storeman', data[0].ethAddress);
+                TemplateVar.set(template, 'storeman', data[0].btcAddress);
                 TemplateVar.set(template, 'storemanWan', data[0].wanAddress);
                 TemplateVar.set(template, 'storemanGroup', data);
             }
@@ -70,7 +70,7 @@ Template['views_btcTowbtc'].helpers({
         // ===== 单位换算问题 =======
         if (TemplateVar.get('storemanGroup')) {
             _.each(TemplateVar.get('storemanGroup'), function (value, index) {
-                if (value.ethAddress === TemplateVar.get('storeman')) {
+                if (value.btcAddress === TemplateVar.get('storeman')) {
                     let deposit = web3.fromWei(value.deposit, 'ether');
 
                     let inboundQuota = web3.toBigNumber(value.inboundQuota).div(100000000);
@@ -110,7 +110,7 @@ Template['views_btcTowbtc'].events({
         event.preventDefault();
 
         _.each(TemplateVar.get('storemanGroup'), function (value, index) {
-            if (value.ethAddress === event.target.value) {
+            if (value.btcAddress === event.target.value) {
                 TemplateVar.set('storemanWan', value.wanAddress);
             }
         });
@@ -212,7 +212,7 @@ Template['views_btcTowbtc'].events({
                 }
 
                 let trans = {
-                    storeman: {wanAddress: storemanWan, ethAddress: storeman},
+                    storeman: {wanAddress: storemanWan, btcAddress: storeman},
                     wanAddress: to,
                     amount: amount.toString(10)
                 };
