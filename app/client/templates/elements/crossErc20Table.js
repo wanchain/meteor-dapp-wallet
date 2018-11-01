@@ -59,6 +59,10 @@ Template['elements_erc20_account_table'].onCreated(function () {
                 let changeResult = Helpers.objectCompare(oldAddressList, result);
 
                 for (let i in changeResult) {
+
+                    if (changeResult[i]==undefined || changeResult[i]== null){
+                        continue;
+                    }
                     let balance =  Helpers.tokenFromWei(changeResult[i], decimals);
                     let content = 'Balance of ' + i.toString() + ' has changed to ' + balance.toString();
 
