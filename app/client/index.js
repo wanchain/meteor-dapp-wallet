@@ -138,6 +138,10 @@ Meteor.startup(function () {
                 if (!err) {
                     Meteor.setTimeout(function () {
 
+                      let dapp_isWethList = Tokens.find({isWerc20: 1}).forEach(function (dapp_isWeth) {
+                        Tokens.remove(dapp_isWeth._id);
+                      });
+
                         _.each(result, function (tokenAddress, index) {
 
                             const _tokenAddress = tokenAddress;
@@ -172,13 +176,16 @@ Meteor.startup(function () {
                                                     isWerc20: 1
                                                 }
                                             });
-                                        }})
+                                        }
                                     });
                                 });
                             });
                         });
-                    }
-                });
+                    });
+                } else {
+                  console.log('getWerc20Token err: ', err);
+                }
+            });
 
             // wbtc
             mist.BTC2WBTC().getWbtcToken(function (err, unicornToken) {
@@ -206,7 +213,7 @@ Meteor.startup(function () {
 
                     }, 2000);
                 } else {
-                    console.log('getWethToken err: ', err);
+                    console.log('getWbtcToken err: ', err);
                 }
             });
 
