@@ -600,19 +600,12 @@ Template['elements_cross_transactions_table'].onCreated(function () {
         InterID = Meteor.setInterval(function () {
             mist.ETH2WETH().listHistory(self.data.addressList.concat(self.data.wanAddressList),tokenAddrList,symbol, (err, result) => {
                 resultEach(template, result)
-              console.log("normalCollection11111: ",result.normalCollection);
                 let oldCrosschainResult = Session.get('oldCrosschainList');
-                console.log("1111111111111");
                 let oldResultHex = web3.toHex(oldCrosschainResult);
-              console.log("222222222222222");
                 let resultHex = web3.toHex(result);
-              console.log("33333333333333333");
-              console.log("oldResultHex !== resultHex :",oldResultHex !== resultHex);
 
                 if (!oldCrosschainResult || oldResultHex !== resultHex) {
                     // console.log('update history transaction: ',oldResultHex !== resultHex);
-                  console.log("##########################");
-                  console.log("normalCollection: ",result.normalCollection);
                     Session.set('oldCrosschainList', result);
                     TemplateVar.set(template, 'crosschainList', result);
                     TemplateVar.set(template, 'crossCollection', result.crossCollection);
@@ -844,10 +837,10 @@ Template['elements_cross_transactions_table'].helpers({
             });
         }
 
-      console.log("####### normal: ",TemplateVar.get('normalCollection'));
+
         if (TemplateVar.get('normalCollection') && TemplateVar.get('normalCollection').length > 0) {
             let smallStyle = 'display: block; color: #4b90f7;';
-          console.log("show normal: ",TemplateVar.get('normalCollection'));
+
             _.each(TemplateVar.get('normalCollection'), function (value, index) {
                 let style = 'display: block; font-size: 18px; background-color: transparent;';
                 value.htlcdate = '--';
