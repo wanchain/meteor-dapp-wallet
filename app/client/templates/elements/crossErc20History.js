@@ -851,7 +851,8 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                 value.toText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
                 value.crossAddress = value.to;
 
-                value.value = Helpers.tokenFromWei(value.value, decimals);
+                value.value = value.amount?value.amount:Helpers.tokenFromWei(value.value, decimals);
+                value.amount = value.amount?value.amount:value.value;
                 value.state = value.status;
                 value.operation = `<h2 style="${style}">${value.status}</h2>`;
 
