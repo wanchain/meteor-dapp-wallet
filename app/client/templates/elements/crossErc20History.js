@@ -555,22 +555,31 @@ function resultEach(template, result) {
             let endTimestamp = Number(value.htlcTimeOut)*1000;
             //let buddyLockedTimeOut = Number(value.buddyLockedTimeOut)*1000;
 
+            if(value.status ===stateDict.Redeemed ||value.status ===stateDict.Revoked
+                || value.status ===stateDict.ApproveSendFail
+                || value.status ===stateDict.ApproveSendFailAfterRetries
+                || value.status ===stateDict.LockFail
+                || value.status ===stateDict.LockSendFail
+                || value.status ===stateDict.LockSendFailAfterRetries
+                || value.status ===stateDict.RedeemFail
+                || value.status ===stateDict.RedeemSendFail
+                || value.status ===stateDict.RedeemSendFailAfterRetries
+                || value.status ===stateDict.RevokeFail
+                || value.status ===stateDict.RevokeSendFail
+                || value.status ===stateDict.RevokeSendFailAfterRetries){
 
-            if (endTimestamp > nowTimestamp) {
-                if(value.status ===stateDict.Locked ||value.status ===stateDict.BuddyLocked || value.status ===stateDict.RedeemSending ){
-                    value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endTimestamp - nowTimestamp)}</span>`;
-                }
-                else{
-                    value.htlcdate = `<span style="color: #1ec89a">${Helpers.timeStamp2String(endTimestamp)}</span>`;
-                }
-
+                value.htlcdate = `<span>${Helpers.timeStamp2String(endTimestamp)}</span>`;
             }else{
-                value.htlcdate = `<span style="color: #1ec89a">${Helpers.timeStamp2String(endTimestamp)}</span>`;
+                if (endTimestamp > nowTimestamp) {
+                    value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endTimestamp - nowTimestamp)}</span>`;
+                }else{
+                    //value.htlcdate = `<span style="color: #1ec89a">${Helpers.timeStamp2String(endTimestamp)}</span>`;
+                    value.htlcdate = "<span style='color: red'>00 h, 00 min</span>";
+                }
             }
 
-
         }else{
-            value.htlcdate = `<span style="color: #1ec89a">--</span>`;
+            value.htlcdate = `<span>--</span>`;
         }
 
     });
@@ -661,7 +670,6 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                 }
 
 
-                value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
                 value.time = value.lockedTime ? Helpers.timeStamp2String(Number(value.lockedTime) * 1000) : "--";
 
                 value.crossAddress = value.to;
@@ -677,52 +685,43 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                 // value.state
 
 
-                if (value.status === stateDict.ApproveSending) {
-                    value.operation = `<h2 style="${style}">Approve</h2>`;
+                if (value.status === stateDict.ApproveSending
+                    || value.status === stateDict.ApproveSent
+                    || value.status === stateDict.Approved) {
+                    value.operation = `<h2 style="${style}"></h2>`;
                     value.state = 'Pending';
                     // value.state = 'Cross-Tx 1/3'
                 }
-                else if (value.status === stateDict.ApproveSendFail) {
-                    value.operation = `<h2 style="${style}">Approve</h2>`;
-                }
-                else if (value.status === stateDict.ApproveSendFailAfterRetries) {
-                    value.operation = `<h2 style="${style}">Approve</h2>`;
-                }
-                else if (value.status === stateDict.ApproveSent) {
-                    value.operation = `<h2 style="${style}">Approve</h2>`;
-                    value.state = 'Cross-Tx 2/7';
-                }
-                else if (value.status === stateDict.Approved) {
-                    value.state = 'Cross-Tx 3/7';
+                else if (value.status === stateDict.ApproveSendFail
+                    || value.status === stateDict.ApproveSendFailAfterRetries) {
+                    value.operation = `<h2 style="${style}"></h2>`;
                 }
                 else if (value.status === stateDict.LockSending) {
-                    value.operation = `<h2 style="${style}">Lock</h2>`;
-                    value.state = 'Cross-Tx 4/7';
+                    value.operation = `<h2 style="${style}">Confirm</h2>`;
+                    value.state = 'Cross-Tx 1/4';
                 }
                 else if (value.status === stateDict.LockSendFail
                     || value.status === stateDict.LockSendFailAfterRetries
                     || value.status === stateDict.LockFail
                 ) {
-                    value.operation = `<h2 style="${style}">Lock</h2>`;
-                    value.state = 'Lock failed';
+                    value.operation = `<h2 style="${style}"></h2>`;
+                    value.state = 'Failed';
                 }
                 else if (value.status === stateDict.LockSent) {
-                    value.operation = `<h2 style="${style}">Lock</h2>`;
-                    value.state = 'Cross-Tx 5/7';
+                    value.operation = `<h2 style="${style}">Confirm</h2>`;
+                    value.state = 'Cross-Tx 2/4';
                 }
                 else if (value.status === stateDict.Locked) {
-                    value.operation = `<h2 style="${style}">Lock</h2>`;
-                    value.state = 'Cross-Tx 6/7';
+                    value.operation = `<h2 style="${style}">Confirm</h2>`;
+                    value.state = 'Cross-Tx 3/4';
 
                     let isCanRevoke = canRevoke(value).code;
-                    value.htlcdate = value.htlcTimeOut ? Helpers.formatDuring(Number(value.htlcTimeOut) * 1000 - Date.now()) : "--";
 
                     // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
                     if (isCanRevoke) {
                         style += 'color: #920b1c;';
                         value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
                         value.state = 'To be cancelled';
-                        value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
 
                     }
 
@@ -739,25 +738,22 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                         style += 'color: #920b1c;';
                         value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
                         value.state = 'To be confirmed';
-                        value.htlcdate = value.buddyLockedTimeOut ? Helpers.formatDuring(Number(value.buddyLockedTimeOut) * 1000 - Date.now()) : "--";
                     } else {
                         if (!isCanRevoke) {
                             // style += 'color: #920b1c;';
                             value.operation = `<h2 id = ${index} style="${style}">Cancel</h2>`;
-                            value.state = 'To be cancelled';
-                            value.htlcdate = value.htlcTimeOut ? Helpers.formatDuring(Number(value.htlcTimeOut) * 1000 - Date.now()) : "--";
+                            value.state = `To be cancelled in ${value.htlcdate}`;
                         } else {
                             style += 'color: #920b1c;';
                             value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
                             value.state = 'To be cancelled';
-                            value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
                         }
 
                     }
 
                 }
                 else if (value.status === stateDict.RedeemSending) {
-                    value.operation = `<h2 style="${style}">Confirm</h2>`;
+                    value.operation = `<h2 style="${style}"></h2>`;
                     value.state = 'Confirming 1/3';
 
                     let isCanRevoke = canRevoke(value).code;
@@ -766,7 +762,6 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                         style += 'color: #920b1c;';
                         value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
                         value.state = 'To be cancelled';
-                        value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
                     }
                 }
                 else if (value.status === stateDict.RedeemSendFail
@@ -781,23 +776,20 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                         style += 'color: #920b1c;';
                         value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm Again</h2>`;
                         value.state = 'To be confirmed again';
-                        value.htlcdate = value.buddyLockedTimeOut ? Helpers.formatDuring(Number(value.buddyLockedTimeOut) * 1000 - Date.now()) : "--";
                     } else {
                         if (!isCanRevoke) {
                             // style += 'color: #920b1c;';
                             value.operation = `<h2 id = ${index} style="${style}">Cancel</h2>`;
-                            value.state = 'To be cancelled';
-                            value.htlcdate = value.htlcTimeOut ? Helpers.formatDuring(Number(value.htlcTimeOut) * 1000 - Date.now()) : "--";
+                            value.state = `To be cancelled in ${value.htlcdate}`;
                         } else {
                             style += 'color: #920b1c;';
                             value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
                             value.state = 'To be cancelled';
-                            value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
                         }
                     }
                 }
                 else if (value.status === stateDict.RedeemSent) {
-                    value.operation = `<h2 style="${style}">Confirm</h2>`;
+                    value.operation = `<h2 style="${style}"></h2>`;
                     value.state = 'Confirming 2/3';
                     let isCanRevoke = canRevoke(value).code;
                     // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
@@ -805,15 +797,14 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                         style += 'color: #920b1c;';
                         value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
                         value.state = 'To be cancelled';
-                        value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
                     }
                 }
                 else if (value.status === stateDict.Redeemed) {
-                    value.operation = `<h2 style="${style}">Confirm</h2>`;
+                    value.operation = `<h2 style="${style}"></h2>`;
                     value.state = 'Success';
                 }
                 else if (value.status === stateDict.RevokeSending) {
-                    value.operation = `<h2 style="${style}">Cancel</h2>`;
+                    value.operation = `<h2 style="${style}"></h2>`;
                     value.state = 'Cancelling 1/3';
                 }
                 else if (value.status === stateDict.RevokeSendFail
@@ -823,14 +814,13 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                     style += 'color: #920b1c;';
                     value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel Again</h2>`;
                     value.state = 'To be cancelled again';
-                    value.htlcdate = value.htlcTimeOut ? Helpers.timeStamp2String(Number(value.htlcTimeOut) * 1000) : "--";
                 }
                 else if (value.status === stateDict.RevokeSent) {
-                    value.operation = `<h2 style="${style}">Cancel</h2>`;
+                    value.operation = `<h2 style="${style}"></h2>`;
                     value.state = 'Cancelling 2/3';
                 }
                 else if (value.status === stateDict.Revoked) {
-                    value.operation = `<h2 style="${style}">Cancel</h2>`;
+                    value.operation = `<h2 style="${style}"></h2>`;
                     value.state = 'Cancelled';
                 }
 
@@ -854,7 +844,7 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                 value.value = value.amount?value.amount:Helpers.tokenFromWei(value.value, decimals);
                 value.amount = value.amount?value.amount:value.value;
                 value.state = value.status;
-                value.operation = `<h2 style="${style}">${value.status}</h2>`;
+                value.operation = `<h2 style="${style}"></h2>`;
 
                 normalCollection.push(value);
             });
