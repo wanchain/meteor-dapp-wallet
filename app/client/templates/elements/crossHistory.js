@@ -600,7 +600,6 @@ Template['elements_cross_transactions_table'].onCreated(function () {
         InterID = Meteor.setInterval(function () {
             mist.ETH2WETH().listHistory(self.data.addressList.concat(self.data.wanAddressList),tokenAddrList,symbol, (err, result) => {
                 resultEach(template, result)
-
                 let oldCrosschainResult = Session.get('oldCrosschainList');
                 let oldResultHex = web3.toHex(oldCrosschainResult);
                 let resultHex = web3.toHex(result);
@@ -838,6 +837,7 @@ Template['elements_cross_transactions_table'].helpers({
             });
         }
 
+
         if (TemplateVar.get('normalCollection') && TemplateVar.get('normalCollection').length > 0) {
             let smallStyle = 'display: block; color: #4b90f7;';
 
@@ -851,7 +851,8 @@ Template['elements_cross_transactions_table'].helpers({
                 value.fromText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
                 value.toText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
                 value.crossAddress = value.to;
-                value.value = web3.fromWei(value.value);
+                value.value = value.amount?value.amount:web3.fromWei(value.value);
+                value.amount = value.amount?value.amount:value.value;
                 value.state = value.status;
                 value.operation = `<h2 style="${style}">${value.status}</h2>`;
 
