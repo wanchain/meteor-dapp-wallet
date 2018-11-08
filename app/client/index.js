@@ -181,7 +181,7 @@ Meteor.startup(function () {
                                 });
                             });
                         });
-                    });
+                    },2000);
                 } else {
                   console.log('getWerc20Token err: ', err);
                 }

@@ -14,22 +14,28 @@ The header template
 Template['layout_header'].onCreated(function(){
     var template = this;
 
-    Meteor.setTimeout(function(){
+    Meteor.setInterval(function(){
 
         if(!Session.get('isShowModal')) {
 
             mist.ERC202WERC20("ETH").getRegErc20Tokens(function(err, ret) {
 
                 if (!err){
-                    for (let tokenAccount of ret){
-                        mist.ERC202WERC20("ETH").getErc20Info(tokenAccount.tokenOrigAddr,(error,result) =>{
-                            if (!error){
-                                tokenAccount.symbol = result.symbol;
-                                tokenAccount.decimals = result.decimals;
-                                tokenAccount.chainType = 'ETH';
-                                TemplateVar.set(template,'tokenAccounts',ret);
-                            }
-                        });
+                  let oldErc20Tokens = Session.get("erc20Tokens");
+                    if (!oldErc20Tokens ||ret === oldErc20Tokens){
+
+                        Session.set("erc20Tokens",ret);
+
+                        for (let tokenAccount of ret){
+                            mist.ERC202WERC20("ETH").getErc20Info(tokenAccount.tokenOrigAddr,(error,result) =>{
+                                if (!error){
+                                    tokenAccount.symbol = result.symbol;
+                                    tokenAccount.decimals = result.decimals;
+                                    tokenAccount.chainType = 'ETH';
+                                    TemplateVar.set(template,'tokenAccounts',ret);
+                                }
+                            });
+                        }
                     }
 
                 }
