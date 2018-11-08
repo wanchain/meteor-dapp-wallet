@@ -166,7 +166,7 @@ Template['views_btcTowbtc'].events({
 
         if(account.eq(new BigNumber(0))) {
             return GlobalNotification.warning({
-                content: 'This wan address\'s balance is 0.',
+                content: 'wan balance must >= 0.4 for gas limit.',
                 duration: 2
             });
         }
@@ -192,7 +192,7 @@ Template['views_btcTowbtc'].events({
 
                 if(amount.lt(new BigNumber(defaultAmount))) {
                     return GlobalNotification.warning({
-                        content: 'please input amount  greater than ' + defaultAmount,
+                        content: 'please input amount equal or greater than ' + defaultAmount,
                         duration: 2
                     });
                 }
