@@ -49,7 +49,20 @@ var accountClipboardEventHandler = function(e){
         selection.removeAllRanges();
     }
 
-    copyAddress();
+    if (Helpers.isOnMainNetwork()) {
+        copyAddress();
+    }
+    else {
+        EthElements.Modal.question({
+            text: new Spacebars.SafeString(TAPi18n.__('wallet.accounts.modal.copyAddressWarning')),
+            ok: function(){
+                copyAddress();
+            },
+            cancel: true,
+            modalQuestionOkButtonText: TAPi18n.__('wallet.accounts.modal.buttonOk'),
+            modalQuestionCancelButtonText: TAPi18n.__('wallet.accounts.modal.buttonCancel')
+        });
+    }
 };
 
 
