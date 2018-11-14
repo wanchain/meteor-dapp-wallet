@@ -78,6 +78,7 @@ Template['views_btcTowbtc'].helpers({
                     let done = quota - inboundQuota;
                     let used = ((done/ quota) * 100).toString() + '%';
 
+                    TemplateVar.set('storemanInboundQuota', inboundQuota);
                     result.push({deposit: deposit, inboundQuota: inboundQuota, quota: quota, used: used})
                 }
             });
@@ -131,7 +132,8 @@ Template['views_btcTowbtc'].events({
         let storeman = TemplateVar.get('storeman'),
             storemanWan = TemplateVar.get('storemanWan'),
             to = TemplateVar.get('to'),
-            amount = TemplateVar.get('amount');
+            amount = TemplateVar.get('amount'),
+            storemanInboundQuota = new BigNumber(TemplateVar.get('storemanInboundQuota'));
 
 
         if(!storeman) {
@@ -188,7 +190,7 @@ Template['views_btcTowbtc'].events({
                 let btcAccounts = result.address;
                 let btcBalance = new BigNumber(result.balance);
 
-                let defaultAmount = Session.get('network') == 'private' ? 0.002 : 0.002;
+                let defaultAmount = Session.get('network') == 'private' ? 0.002 : 0.0002;
 
                 if(amount.lt(new BigNumber(defaultAmount))) {
                     return GlobalNotification.warning({
@@ -207,6 +209,14 @@ Template['views_btcTowbtc'].events({
                 if(btcBalance.lte(new BigNumber(amount))) {
                     return GlobalNotification.warning({
                         content: 'No Enough Balance.',
+                        duration: 2
+                    });
+                }
+
+                // storemanInboundQuota
+                if(storemanInboundQuota.lte(new BigNumber(amount))) {
+                    return GlobalNotification.warning({
+                        content: 'Storeman No Enough Balance.',
                         duration: 2
                     });
                 }

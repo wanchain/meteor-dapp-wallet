@@ -87,9 +87,10 @@ Template['views_wbtcTobtc'].onCreated(function(){
     });
 
     // get wan2coin ratio
-    mist.ETH2WETH().getCoin2WanRatio('ETH', function (err,data) {
+    mist.BTC2WBTC().getCoin2WanRatio('BTC', {crossChain: 'BTC'}, function (err,data) {
+        console.log('data::: ', data);
         if (!err) {
-            data ? TemplateVar.set(template,'wan2CoinRatio',data) : TemplateVar.set(template,'wan2CoinRatio',20);
+            TemplateVar.set(template,'wan2CoinRatio',data.c2wRatio);
         }
     });
 
@@ -118,6 +119,7 @@ Template['views_wbtcTobtc'].helpers({
                 let quota = web3.toBigNumber(value.quota).div(100000000);
                 let used = ((outboundQuota/ quota) * 100).toString() + '%';
 
+                TemplateVar.set('storemanOutboundQuota', outboundQuota);
                 result.push({deposit: deposit, outboundQuota: outboundQuota, used: used})
             }
         });
@@ -199,7 +201,8 @@ Template['views_wbtcTobtc'].events({
             to = TemplateVar.get('to'),
             amount = TemplateVar.get('amount'),
             valueFee = TemplateVar.get('coverCharge'),
-            wbtcBalance = TemplateVar.get('wbtcBalance');
+            wbtcBalance = TemplateVar.get('wbtcBalance'),
+            storemanOutboundQuota = new BigNumber(TemplateVar.get('storemanOutboundQuota'));
 
         if (!from && !storeman && !valueFee) {
             EthElements.Modal.hide();
@@ -242,18 +245,26 @@ Template['views_wbtcTobtc'].events({
             });
         }
 
-        let defaultAmount = Session.get('network') == 'private' ? 0.002 : 0.002;
+        let defaultAmount = Session.get('network') == 'private' ? 0.002 : 0.0002;
 
         if(amount.lt(new BigNumber(defaultAmount))) {
             return GlobalNotification.warning({
-                content: 'please input amount  greater than ' + defaultAmount,
+                content: 'please input amount equal or greater than ' + defaultAmount,
                 duration: 2
             });
         }
 
         if(amount.gt(new BigNumber(wbtcBalance))) {
             return GlobalNotification.warning({
-                content: 'Please enter a valid amount',
+                content: 'No Enough Balance.',
+                duration: 2
+            });
+        }
+
+        // storemanOutboundQuota
+        if(storemanOutboundQuota.lte(new BigNumber(amount))) {
+            return GlobalNotification.warning({
+                content: 'Storeman No Enough Balance.',
                 duration: 2
             });
         }

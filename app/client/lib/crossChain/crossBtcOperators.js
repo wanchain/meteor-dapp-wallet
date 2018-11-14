@@ -107,6 +107,14 @@ class crossBtcOperators{
         this.invokeOperator(new crossOperator('getBtcFeeRate', parameters,chainType,callback));
     };
 
+    checkBtcAddress(chainType, parameters,callback) {
+        this.invokeOperator(new crossOperator('checkBtcAddress', parameters,chainType,callback));
+    };
+
+    getCoin2WanRatio(chainType, parameters,callback) {
+        this.invokeOperator(new crossOperator('getCoin2WanRatio', parameters,chainType,callback));
+    };
+
 }
 
 if(typeof mist !== 'undefined')

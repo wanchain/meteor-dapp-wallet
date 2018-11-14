@@ -128,23 +128,36 @@ Template['views_btcsend'].events({
             });
         }
 
+        let checkBtcAddress = {address: to};
 
-        let trans = {
-            amount: amount.toString(10),
-            to: to
-        };
+        mist.BTC2WBTC().checkBtcAddress('BTC', checkBtcAddress, (err, result) => {
 
-        Session.set('isShowModal', true);
-        EthElements.Modal.question({
-            template: 'views_modals_sendBtcTransactionInfo',
-            data: {
-                to: to,
-                amount: amount.toString(10),
-                trans: trans,
-            },
-        },{
-            class: 'send-transaction-info',
-            closeable: false,
+            if (!err) {
+
+                let trans = {
+                    amount: amount.toString(10),
+                    to: to
+                };
+        
+                Session.set('isShowModal', true);
+                EthElements.Modal.question({
+                    template: 'views_modals_sendBtcTransactionInfo',
+                    data: {
+                        to: to,
+                        amount: amount.toString(10),
+                        trans: trans,
+                    },
+                },{
+                    class: 'send-transaction-info',
+                    closeable: false,
+                });
+    
+            } else {
+                return GlobalNotification.warning({
+                    content: 'btc address invalid',
+                    duration: 2
+                });
+            }
         });
 
     }
