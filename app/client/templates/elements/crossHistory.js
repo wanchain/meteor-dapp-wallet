@@ -545,7 +545,9 @@ function showQuestion(show_data, fee, gasPrice, getGas, transData, trans, transT
 
 function resultEach(template, result) {
     _.each(result.crossCollection, function (value, index) {
-
+        if (value.isNormalTrans){
+            return;
+        }
         if (value.htlcTimeOut) {
             let nowTime = new Date().Format('yyyy-MM-dd hh:mm:ss:S');
             let nowTimestamp =  Math.round(new Date(nowTime).getTime());
@@ -601,7 +603,6 @@ Template['elements_cross_transactions_table'].onCreated(function () {
             Session.set('oldCrosschainList', result);
             TemplateVar.set(template, 'crosschainList', result);
             TemplateVar.set(template, 'crossCollection', result.crossCollection);
-            TemplateVar.set(template, 'normalCollection', result.normalCollection);
 
         });
 
@@ -618,7 +619,6 @@ Template['elements_cross_transactions_table'].onCreated(function () {
                     Session.set('oldCrosschainList', result);
                     TemplateVar.set(template, 'crosschainList', result);
                     TemplateVar.set(template, 'crossCollection', result.crossCollection);
-                    TemplateVar.set(template, 'normalCollection', result.normalCollection);
                 }
             });
 
@@ -638,7 +638,6 @@ Template['elements_cross_transactions_table'].helpers({
     historyList: function () {
 
         let crossCollection = [];
-        let normalCollection = [];
 
         if (TemplateVar.get('crossCollection') && TemplateVar.get('crossCollection').length > 0) {
             let smallStyle = 'display: block; color: #4b90f7;';
@@ -646,211 +645,208 @@ Template['elements_cross_transactions_table'].helpers({
             _.each(TemplateVar.get('crossCollection'), function (value, index) {
                 // console.log("value:", JSON.stringify(value));
                 let style = 'display: block; font-size: 18px; background-color: transparent;';
+                if (value.isNormalTrans){
 
-                value.fromText = `<small style="${smallStyle}">${value.srcChainType}</small>`;
-                value.toText = `<small style="${smallStyle}">${value.dstChainType}</small>`;
-
-                if (value.srcChainType === 'WAN') {
-                    value.tokenAddr = value.dstChainAddr;
-                    value.tokenType = value.dstChainType;
-                    if (value.tokenStand === 'E20') {
-                        value.fromText = `<small style="${smallStyle}">W${value.tokenSymbol}(${value.srcChainType})</small>`;
-                        value.toText = `<small style="${smallStyle}">${value.tokenSymbol}(${value.dstChainType})</small>`;
-                    }
-
-                } else {
-                    value.tokenAddr = value.srcChainAddr;
-                    value.tokenType = value.srcChainType;
-                    if (value.tokenStand === 'E20') {
-                        value.fromText = `<small style="${smallStyle}">${value.tokenSymbol}(${value.srcChainType})</small>`;
-                        value.toText = `<small style="${smallStyle}">W${value.tokenSymbol}(${value.dstChainType})</small>`;
-                    }
-
-                }
-
-
-                value.time = value.lockedTime ? Helpers.timeStamp2String(Number(value.lockedTime) * 1000) : "--";
-
-                value.crossAddress = value.to;
-
-                if (value.srcChainType === 'WAN') {
-                    value.symbol = `W${value.tokenSymbol}`;
-                } else {
+                    value.htlcdate = '--';
+                    value.time = value.sentTime?Helpers.timeStamp2String(Number(value.sentTime) * 1000) : "--";
                     value.symbol = value.tokenSymbol;
-                }
-                value.value = web3.fromWei(value.contractValue);
-                value.state = value.status;
-                value.operation = `<h2 style="${style}">${value.status}</h2>`;
-                // value.state
 
+                    value.fromText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
+                    value.toText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
+                    value.crossAddress = value.to;
 
-                if (value.status === stateDict.ApproveSending
-                    || value.status === stateDict.ApproveSent
-                    || value.status === stateDict.Approved) {
+                    value.value = value.amount?value.amount:web3.fromWei(value.value);
+                    value.amount = value.amount?value.amount:value.value;
+                    value.state = value.status;
                     value.operation = `<h2 style="${style}"></h2>`;
-                    value.state = 'Pending';
-                    // value.state = 'Cross-Tx 1/3'
-                }
-                else if (value.status === stateDict.ApproveSendFail
-                    || value.status === stateDict.ApproveSendFailAfterRetries) {
-                    value.operation = `<h2 style="${style}"></h2>`;
-                }
-                else if (value.status === stateDict.LockSending) {
-                    value.operation = `<h2 style="${style}">Confirm</h2>`;
-                    value.state = 'Cross-Tx 1/4';
-                }
-                else if (value.status === stateDict.LockSendFail
-                    || value.status === stateDict.LockSendFailAfterRetries
-                    || value.status === stateDict.LockFail
-                ) {
-                    value.operation = `<h2 style="${style}"></h2>`;
-                    value.state = 'Failed';
-                }
-                else if (value.status === stateDict.LockSent) {
-                    value.operation = `<h2 style="${style}">Confirm</h2>`;
-                    value.state = 'Cross-Tx 2/4';
-                }
-                else if (value.status === stateDict.Locked) {
-                    value.operation = `<h2 style="${style}">Confirm</h2>`;
-                    value.state = 'Cross-Tx 3/4';
 
-                    let isCanRevoke = canRevoke(value).code;
+                    crossCollection.push(value);
+                }else{
+                    value.fromText = `<small style="${smallStyle}">${value.srcChainType}</small>`;
+                    value.toText = `<small style="${smallStyle}">${value.dstChainType}</small>`;
 
-                    // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
-                    if (isCanRevoke) {
-                        style += 'color: #920b1c;';
-                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
-                        value.state = 'To be cancelled';
+                    if (value.srcChainType === 'WAN') {
+                        value.tokenAddr = value.dstChainAddr;
+                        value.tokenType = value.dstChainType;
+                        if (value.tokenStand === 'E20') {
+                            value.fromText = `<small style="${smallStyle}">W${value.tokenSymbol}(${value.srcChainType})</small>`;
+                            value.toText = `<small style="${smallStyle}">${value.tokenSymbol}(${value.dstChainType})</small>`;
+                        }
 
-                    }
-
-                }
-                else if (value.status === stateDict.BuddyLocked) {
-                    value.state = 'Cross-Tx success';
-
-                    let isCanRefund = canRefund(value).code;
-                    let isCanRevoke = canRevoke(value).code;
-                    // console.log("BuddyLocked:::::::::::isCanRefund:",isCanRefund);
-                    // console.log("BuddyLocked:::::::::::isCanRevoke:",isCanRevoke);
-
-                    if (isCanRefund) {
-                        style += 'color: #920b1c;';
-                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
-                        value.state = 'To be confirmed';
                     } else {
-                        if (!isCanRevoke) {
-                            // style += 'color: #920b1c;';
-                            value.operation = `<h2 id = ${index} style="${style}">Cancel</h2>`;
-                            value.state = `To be cancelled in ${value.htlcdate}`;
-                        } else {
-                            style += 'color: #920b1c;';
-                            value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
-                            value.state = 'To be cancelled';
+                        value.tokenAddr = value.srcChainAddr;
+                        value.tokenType = value.srcChainType;
+                        if (value.tokenStand === 'E20') {
+                            value.fromText = `<small style="${smallStyle}">${value.tokenSymbol}(${value.srcChainType})</small>`;
+                            value.toText = `<small style="${smallStyle}">W${value.tokenSymbol}(${value.dstChainType})</small>`;
                         }
 
                     }
 
-                }
-                else if (value.status === stateDict.RedeemSending) {
-                    value.operation = `<h2 style="${style}"></h2>`;
-                    value.state = 'Confirming 1/3';
 
-                    let isCanRevoke = canRevoke(value).code;
-                    // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
-                    if (isCanRevoke) {
-                        style += 'color: #920b1c;';
-                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
-                        value.state = 'To be cancelled';
-                    }
-                }
-                else if (value.status === stateDict.RedeemSendFail
-                    || value.status === stateDict.RedeemSendFailAfterRetries
-                    || value.status === stateDict.RedeemFail
-                ) {
-                    let isCanRefund = canRefund(value).code;
-                    let isCanRevoke = canRevoke(value).code;
-                    // console.log("BuddyLocked:::::::::::isCanRefund:",isCanRefund);
-                    // console.log("BuddyLocked:::::::::::isCanRevoke:",isCanRevoke);
-                    if (isCanRefund) {
-                        style += 'color: #920b1c;';
-                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm Again</h2>`;
-                        value.state = 'To be confirmed again';
+                    value.time = value.lockedTime ? Helpers.timeStamp2String(Number(value.lockedTime) * 1000) : "--";
+
+                    value.crossAddress = value.to;
+
+                    if (value.srcChainType === 'WAN') {
+                        value.symbol = `W${value.tokenSymbol}`;
                     } else {
-                        if (!isCanRevoke) {
-                            // style += 'color: #920b1c;';
-                            value.operation = `<h2 id = ${index} style="${style}">Cancel</h2>`;
-                            value.state = `To be cancelled in ${value.htlcdate}`;
+                        value.symbol = value.tokenSymbol;
+                    }
+                    value.value = web3.fromWei(value.contractValue);
+                    value.state = value.status;
+                    value.operation = `<h2 style="${style}">${value.status}</h2>`;
+                    // value.state
+
+
+                    if (value.status === stateDict.ApproveSending
+                        || value.status === stateDict.ApproveSent
+                        || value.status === stateDict.Approved) {
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        value.state = 'Pending';
+                        // value.state = 'Cross-Tx 1/3'
+                    }
+                    else if (value.status === stateDict.ApproveSendFail
+                        || value.status === stateDict.ApproveSendFailAfterRetries) {
+                        value.operation = `<h2 style="${style}"></h2>`;
+                    }
+                    else if (value.status === stateDict.LockSending) {
+                        value.operation = `<h2 style="${style}">Confirm</h2>`;
+                        value.state = 'Cross-Tx 1/4';
+                    }
+                    else if (value.status === stateDict.LockSendFail
+                        || value.status === stateDict.LockSendFailAfterRetries
+                        || value.status === stateDict.LockFail
+                    ) {
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        value.state = 'Failed';
+                    }
+                    else if (value.status === stateDict.LockSent) {
+                        value.operation = `<h2 style="${style}">Confirm</h2>`;
+                        value.state = 'Cross-Tx 2/4';
+                    }
+                    else if (value.status === stateDict.Locked) {
+                        value.operation = `<h2 style="${style}">Confirm</h2>`;
+                        value.state = 'Cross-Tx 3/4';
+
+                        let isCanRevoke = canRevoke(value).code;
+
+                        // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
+                        if (isCanRevoke) {
+                            style += 'color: #920b1c;';
+                            value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
+                            value.state = 'To be cancelled';
+
+                        }
+
+                    }
+                    else if (value.status === stateDict.BuddyLocked) {
+                        value.state = 'Cross-Tx success';
+
+                        let isCanRefund = canRefund(value).code;
+                        let isCanRevoke = canRevoke(value).code;
+                        // console.log("BuddyLocked:::::::::::isCanRefund:",isCanRefund);
+                        // console.log("BuddyLocked:::::::::::isCanRevoke:",isCanRevoke);
+
+                        if (isCanRefund) {
+                            style += 'color: #920b1c;';
+                            value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
+                            value.state = 'To be confirmed';
                         } else {
+                            if (!isCanRevoke) {
+                                // style += 'color: #920b1c;';
+                                value.operation = `<h2 id = ${index} style="${style}">Cancel</h2>`;
+                                value.state = `To be cancelled in ${value.htlcdate}`;
+                            } else {
+                                style += 'color: #920b1c;';
+                                value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
+                                value.state = 'To be cancelled';
+                            }
+
+                        }
+
+                    }
+                    else if (value.status === stateDict.RedeemSending) {
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        value.state = 'Confirming 1/3';
+
+                        let isCanRevoke = canRevoke(value).code;
+                        // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
+                        if (isCanRevoke) {
                             style += 'color: #920b1c;';
                             value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
                             value.state = 'To be cancelled';
                         }
                     }
-                }
-                else if (value.status === stateDict.RedeemSent) {
-                    value.operation = `<h2 style="${style}"></h2>`;
-                    value.state = 'Confirming 2/3';
-                    let isCanRevoke = canRevoke(value).code;
-                    // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
-                    if (isCanRevoke) {
-                        style += 'color: #920b1c;';
-                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
-                        value.state = 'To be cancelled';
+                    else if (value.status === stateDict.RedeemSendFail
+                        || value.status === stateDict.RedeemSendFailAfterRetries
+                        || value.status === stateDict.RedeemFail
+                    ) {
+                        let isCanRefund = canRefund(value).code;
+                        let isCanRevoke = canRevoke(value).code;
+                        // console.log("BuddyLocked:::::::::::isCanRefund:",isCanRefund);
+                        // console.log("BuddyLocked:::::::::::isCanRevoke:",isCanRevoke);
+                        if (isCanRefund) {
+                            style += 'color: #920b1c;';
+                            value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm Again</h2>`;
+                            value.state = 'To be confirmed again';
+                        } else {
+                            if (!isCanRevoke) {
+                                // style += 'color: #920b1c;';
+                                value.operation = `<h2 id = ${index} style="${style}">Cancel</h2>`;
+                                value.state = `To be cancelled in ${value.htlcdate}`;
+                            } else {
+                                style += 'color: #920b1c;';
+                                value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
+                                value.state = 'To be cancelled';
+                            }
+                        }
                     }
-                }
-                else if (value.status === stateDict.Redeemed) {
-                    value.operation = `<h2 style="${style}"></h2>`;
-                    value.state = 'Success';
-                }
-                else if (value.status === stateDict.RevokeSending) {
-                    value.operation = `<h2 style="${style}"></h2>`;
-                    value.state = 'Cancelling 1/3';
-                }
-                else if (value.status === stateDict.RevokeSendFail
-                    || value.status === stateDict.RevokeSendFailAfterRetries
-                    || value.status === stateDict.RevokeFail
-                ) {
-                    style += 'color: #920b1c;';
-                    value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel Again</h2>`;
-                    value.state = 'To be cancelled again';
-                }
-                else if (value.status === stateDict.RevokeSent) {
-                    value.operation = `<h2 style="${style}"></h2>`;
-                    value.state = 'Cancelling 2/3';
-                }
-                else if (value.status === stateDict.Revoked) {
-                    value.operation = `<h2 style="${style}"></h2>`;
-                    value.state = 'Cancelled';
+                    else if (value.status === stateDict.RedeemSent) {
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        value.state = 'Confirming 2/3';
+                        let isCanRevoke = canRevoke(value).code;
+                        // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
+                        if (isCanRevoke) {
+                            style += 'color: #920b1c;';
+                            value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
+                            value.state = 'To be cancelled';
+                        }
+                    }
+                    else if (value.status === stateDict.Redeemed) {
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        value.state = 'Success';
+                    }
+                    else if (value.status === stateDict.RevokeSending) {
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        value.state = 'Cancelling 1/3';
+                    }
+                    else if (value.status === stateDict.RevokeSendFail
+                        || value.status === stateDict.RevokeSendFailAfterRetries
+                        || value.status === stateDict.RevokeFail
+                    ) {
+                        style += 'color: #920b1c;';
+                        value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel Again</h2>`;
+                        value.state = 'To be cancelled again';
+                    }
+                    else if (value.status === stateDict.RevokeSent) {
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        value.state = 'Cancelling 2/3';
+                    }
+                    else if (value.status === stateDict.Revoked) {
+                        value.operation = `<h2 style="${style}"></h2>`;
+                        value.state = 'Cancelled';
+                    }
+
+                    crossCollection.push(value);
                 }
 
-                crossCollection.push(value);
             });
         }
 
 
-        if (TemplateVar.get('normalCollection') && TemplateVar.get('normalCollection').length > 0) {
-            let smallStyle = 'display: block; color: #4b90f7;';
 
-            _.each(TemplateVar.get('normalCollection'), function (value, index) {
-                let style = 'display: block; font-size: 18px; background-color: transparent;';
-                value.htlcdate = '--';
-                value.time = value.sentTime?Helpers.timeStamp2String(Number(value.sentTime) * 1000) : "--";
-
-                value.symbol = value.tokenSymbol;
-
-                value.fromText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
-                value.toText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
-                value.crossAddress = value.to;
-                value.value = value.amount?value.amount:web3.fromWei(value.value);
-                value.amount = value.amount?value.amount:value.value;
-                value.state = value.status;
-                value.operation = `<h2 style="${style}"></h2>`;
-
-                normalCollection.push(value);
-            });
-        }
-
-        return crossCollection.concat(normalCollection);
+        return crossCollection;
     },
 
 });
@@ -862,72 +858,62 @@ Template['elements_cross_transactions_table'].events({
         let id = e.target.id;
 
         Session.set('isShowModal', true);
-        let crossCollectionLength = TemplateVar.get('crossCollection').length;
-        if (id<crossCollectionLength){
-            let show_data = TemplateVar.get('crossCollection')[id];
-            // console.log('show_data: ', show_data);
+        let show_data = TemplateVar.get('crossCollection')[id];
+        if (!show_data.isNormalTrans){
 
-            if (show_data) {
-                if (!show_data.HashX) {
-                    show_data.HashX = show_data.hashX;
-                }
-
-                if (show_data.srcChainType === 'WAN') {
-                    show_data.symbol = `W${show_data.tokenSymbol}`;
-                } else {
-                    show_data.symbol = show_data.tokenSymbol;
-                }
-
-                EthElements.Modal.show({
-                    template: 'views_modals_crosstransactionInfo',
-                    data: {
-                        HashX: show_data.HashX,
-                        chain: show_data.srcChainType,
-                        crossAddress: show_data.crossAddress,
-                        from: show_data.from,
-                        lockTxHash: show_data.lockTxHash,
-                        redeemTxHash: show_data.redeemTxHash,
-                        revokeTxHash: show_data.revokeTxHash,
-                        storeman: show_data.storeman,
-                        time: show_data.time,
-                        to: show_data.to,
-                        value: show_data.value,
-                        x: show_data.x,
-                        symbol: show_data.symbol,
-                        status: show_data.state,
-                        fromText: show_data.fromText,
-                        toText: show_data.toText
-                    }
-                }, {
-                    closeable: false
-                });
-
+            if (!show_data.HashX) {
+                show_data.HashX = show_data.hashX;
             }
+
+            if (show_data.srcChainType === 'WAN') {
+                show_data.symbol = `W${show_data.tokenSymbol}`;
+            } else {
+                show_data.symbol = show_data.tokenSymbol;
+            }
+
+            EthElements.Modal.show({
+                template: 'views_modals_crosstransactionInfo',
+                data: {
+                    HashX: show_data.HashX,
+                    chain: show_data.srcChainType,
+                    crossAddress: show_data.crossAddress,
+                    from: show_data.from,
+                    lockTxHash: show_data.lockTxHash,
+                    redeemTxHash: show_data.redeemTxHash,
+                    revokeTxHash: show_data.revokeTxHash,
+                    storeman: show_data.storeman,
+                    time: show_data.time,
+                    to: show_data.to,
+                    value: show_data.value,
+                    x: show_data.x,
+                    symbol: show_data.symbol,
+                    status: show_data.state,
+                    fromText: show_data.fromText,
+                    toText: show_data.toText
+                }
+            }, {
+                closeable: false
+            });
+
         }else{
-            let show_data = TemplateVar.get('normalCollection')[id-crossCollectionLength];
-            // console.log('show_data: ', show_data);
+            EthElements.Modal.show({
+                template: 'views_modals_normaltransactionInfo',
+                data: {
+                    chainType: show_data.chainType,
+                    tokenSymbol: show_data.tokenSymbol,
+                    txHash: show_data.txHash,
+                    from: show_data.from,
+                    to: show_data.to,
+                    value: show_data.value,
+                    time: show_data.time,
+                    status: show_data.state,
+                    fromText: show_data.fromText,
+                    toText: show_data.toText
+                }
+            }, {
+                closeable: false
+            });
 
-            if (show_data) {
-
-                EthElements.Modal.show({
-                    template: 'views_modals_normaltransactionInfo',
-                    data: {
-                        chainType: show_data.chainType,
-                        tokenSymbol: show_data.tokenSymbol,
-                        txHash: show_data.txHash,
-                        from: show_data.from,
-                        to: show_data.to,
-                        value: show_data.value,
-                        time: show_data.time,
-                        status: show_data.state,
-                        fromText: show_data.fromText,
-                        toText: show_data.toText
-                    }
-                }, {
-                    closeable: false
-                });
-
-            }
         }
 
     },
