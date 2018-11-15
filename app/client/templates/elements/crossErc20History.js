@@ -555,7 +555,7 @@ function resultEach(template, result) {
 
             // HTLCtime
             let endTimestamp = Number(value.htlcTimeOut)*1000;
-            //let buddyLockedTimeOut = Number(value.buddyLockedTimeOut)*1000;
+            let buddyLockedTimeOut = Number(value.buddyLockedTimeOut)*1000;
 
             if(value.status ===stateDict.Redeemed ||value.status ===stateDict.Revoked
                 || value.status ===stateDict.ApproveSendFail
@@ -572,7 +572,9 @@ function resultEach(template, result) {
 
                 value.htlcdate = `<span>${Helpers.timeStamp2String(endTimestamp)}</span>`;
             }else{
-                if (endTimestamp > nowTimestamp) {
+                if (value.buddyLockedTimeOut && buddyLockedTimeOut > nowTimestamp){
+                    value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(buddyLockedTimeOut - nowTimestamp)}</span>`;
+                } else if (endTimestamp > nowTimestamp) {
                     value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endTimestamp - nowTimestamp)}</span>`;
                 }else{
                     //value.htlcdate = `<span style="color: #1ec89a">${Helpers.timeStamp2String(endTimestamp)}</span>`;
@@ -648,7 +650,7 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                 if (value.isNormalTrans){
 
                     value.htlcdate = '--';
-                    value.time = value.sentTime?Helpers.timeStamp2String(Number(value.sentTime) * 1000) : "--";
+                    value.time = value.sendTime?Helpers.timeStamp2String(Number(value.sendTime) * 1000) : "--";
                     value.symbol = value.tokenSymbol;
 
                     value.fromText = `<small style="${smallStyle}">${value.tokenSymbol}</small>`;
@@ -685,7 +687,7 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                     }
 
 
-                    value.time = value.lockedTime ? Helpers.timeStamp2String(Number(value.lockedTime) * 1000) : "--";
+                    value.time = value.sendTime ? Helpers.timeStamp2String(Number(value.sendTime) * 1000) : "--";
 
                     value.crossAddress = value.to;
 
@@ -757,7 +759,7 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                             if (!isCanRevoke) {
                                 // style += 'color: #920b1c;';
                                 value.operation = `<h2 id = ${index} style="${style}">Cancel</h2>`;
-                                value.state = `To be cancelled in ${value.htlcdate}`;
+                                value.state = 'To be cancelled';
                             } else {
                                 style += 'color: #920b1c;';
                                 value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
@@ -795,7 +797,7 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                             if (!isCanRevoke) {
                                 // style += 'color: #920b1c;';
                                 value.operation = `<h2 id = ${index} style="${style}">Cancel</h2>`;
-                                value.state = `To be cancelled in ${value.htlcdate}`;
+                                value.state = 'To be cancelled';
                             } else {
                                 style += 'color: #920b1c;';
                                 value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
