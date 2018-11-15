@@ -14,8 +14,6 @@ The header template
 Template['layout_header'].onCreated(function(){
     var template = this;
 
-    Meteor.setInterval(function(){
-
         if(!Session.get('isShowModal')) {
 
             mist.ERC202WERC20("ETH").getRegErc20Tokens(function(err, ret) {
@@ -44,7 +42,7 @@ Template['layout_header'].onCreated(function(){
         } else {
             console.log('isShowModal: ', Session.get('isShowModal'));
         }
-    }, 1000);
+
 });
 
 
@@ -181,6 +179,36 @@ Template['layout_header'].events({
             } else {
                 alert("create account in mist");
             }
+        }
+    },
+    'mouseenter .crosschainBtn': function (e) {
+
+        if(!Session.get('isShowModal')) {
+            let template = this;
+            mist.ERC202WERC20("ETH").getRegErc20Tokens(function(err, ret) {
+                if (!err){
+                    let oldErc20Tokens = Session.get("erc20Tokens");
+                    if (!oldErc20Tokens ||ret === oldErc20Tokens){
+
+                        Session.set("erc20Tokens",ret);
+
+                        for (let tokenAccount of ret){
+                            mist.ERC202WERC20("ETH").getErc20Info(tokenAccount.tokenOrigAddr,(error,result) =>{
+                                if (!error){
+                                    tokenAccount.symbol = result.symbol;
+                                    tokenAccount.decimals = result.decimals;
+                                    tokenAccount.chainType = 'ETH';
+                                    TemplateVar.set(template,'tokenAccounts',ret);
+                                }
+                            });
+                        }
+                    }
+
+                }
+
+            });
+        } else {
+            console.log('isShowModal: ', Session.get('isShowModal'));
         }
     },
     'click .Cross': function (e) {
