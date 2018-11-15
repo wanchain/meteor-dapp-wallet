@@ -21,48 +21,8 @@ var blocksForConfirmation = 12;
 
 var accountClipboardEventHandler = function(e){
     e.preventDefault();
-
-    function copyAddress(){
-
-        var copyTextarea = document.querySelector('.copyable-address' + e.target.name);
-
-        var selection = window.getSelection();
-        var range = document.createRange();
-        range.selectNodeContents(copyTextarea);
-        selection.removeAllRanges();
-        selection.addRange(range);
-
-        try {
-            document.execCommand('copy');
-
-            GlobalNotification.info({
-                content: 'i18n:wallet.accounts.addressCopiedToClipboard',
-                duration: 3
-            });
-        } catch (err) {
-            GlobalNotification.error({
-                content: 'i18n:wallet.accounts.addressNotCopiedToClipboard',
-                closeable: false,
-                duration: 3
-            });
-        }
-        selection.removeAllRanges();
-    }
-
-    if (Helpers.isOnMainNetwork()) {
-        copyAddress();
-    }
-    else {
-        EthElements.Modal.question({
-            text: new Spacebars.SafeString(TAPi18n.__('wallet.accounts.modal.copyAddressWarning')),
-            ok: function(){
-                copyAddress();
-            },
-            cancel: true,
-            modalQuestionOkButtonText: TAPi18n.__('wallet.accounts.modal.buttonOk'),
-            modalQuestionCancelButtonText: TAPi18n.__('wallet.accounts.modal.buttonCancel')
-        });
-    }
+    var copyTextarea = document.querySelector('.copyable-address' + e.target.name);
+    Helpers.copyAddressOfPrompt(copyTextarea);
 };
 
 

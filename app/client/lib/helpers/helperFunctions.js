@@ -732,3 +732,44 @@ Helpers.objectCompare = function (array1, array2) {
     return result;
 };
 
+Helpers.copyAddress = function(copyTextarea){
+
+    let selection = window.getSelection();
+    let range = document.createRange();
+    range.selectNodeContents(copyTextarea);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    try {
+        document.execCommand('copy');
+
+        GlobalNotification.info({
+            content: 'i18n:wallet.accounts.addressCopiedToClipboard',
+            duration: 3
+        });
+    } catch (err) {
+        GlobalNotification.error({
+            content: 'i18n:wallet.accounts.addressNotCopiedToClipboard',
+            closeable: false,
+            duration: 3
+        });
+    }
+    selection.removeAllRanges();
+}
+
+Helpers.copyAddressOfPrompt = function (dom) {
+    if (Helpers.isOnMainNetwork()) {
+        Helpers.copyAddress(dom);
+    }
+    else {
+        EthElements.Modal.question({
+            text: new Spacebars.SafeString(TAPi18n.__('wallet.accounts.modal.copyAddressWarning')),
+            ok: function(){
+                Helpers.copyAddress(dom);
+            },
+            cancel: true,
+            modalQuestionOkButtonText: TAPi18n.__('wallet.accounts.modal.buttonOk'),
+            modalQuestionCancelButtonText: TAPi18n.__('wallet.accounts.modal.buttonCancel')
+        });
+    }
+}

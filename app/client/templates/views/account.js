@@ -158,64 +158,19 @@ var accountStartScanEventHandler = function(e, template){
     }
 };
 var accountClipboardEventHandler = function(e){
-    if (Session.get('tmpAllowCopy') === true) {
-        Session.set('tmpAllowCopy', false);
-        return true;
+
+    e.preventDefault();
+
+    var type = e.target.name;
+    var typeId = e.target.id;
+
+    var copyTextarea;
+    if (type === 'address' || typeId === 'address') {
+        copyTextarea = document.querySelector('.copyable-address');
+    } else {
+        copyTextarea = document.querySelector('.copyable-waddress');
     }
-    else {
-        e.preventDefault();
-    }
-
-    function copyAddress(){
-        var type = e.target.name;
-        var typeId = e.target.id;
-
-        var copyTextarea;
-        if (type === 'address' || typeId === 'address') {
-            copyTextarea = document.querySelector('.copyable-address');
-        } else {
-            copyTextarea = document.querySelector('.copyable-waddress');
-        }
-
-        var selection = window.getSelection();
-        var range = document.createRange();
-        range.selectNodeContents(copyTextarea);
-        selection.removeAllRanges();
-        selection.addRange(range);
-
-        try {
-            document.execCommand('copy');
-
-            GlobalNotification.info({
-                content: 'i18n:wallet.accounts.addressCopiedToClipboard',
-                duration: 3
-            });
-        } catch (err) {
-            GlobalNotification.error({
-                content: 'i18n:wallet.accounts.addressNotCopiedToClipboard',
-                closeable: false,
-                duration: 3
-            });
-        }
-        selection.removeAllRanges();
-    }
-
-    if (Helpers.isOnMainNetwork()) {
-        Session.set('tmpAllowCopy', true);
-        copyAddress();
-    }
-    else {
-        EthElements.Modal.question({
-            text: new Spacebars.SafeString(TAPi18n.__('wallet.accounts.modal.copyAddressWarning')),
-            ok: function(){
-                Session.set('tmpAllowCopy', true);
-                copyAddress();
-            },
-            cancel: true,
-            modalQuestionOkButtonText: TAPi18n.__('wallet.accounts.modal.buttonOk'),
-            modalQuestionCancelButtonText: TAPi18n.__('wallet.accounts.modal.buttonCancel')
-        });
-    }
+    Helpers.copyAddressOfPrompt(copyTextarea);
 };
 
 Template['views_account'].events({
