@@ -182,7 +182,7 @@ Template['layout_header'].events({
         }
     },
     'mouseenter .crosschainBtn': function (e) {
-
+        $(".crosschainShow").show();
         if(!Session.get('isShowModal')) {
             let template = this;
             mist.ERC202WERC20("ETH").getRegErc20Tokens(function(err, ret) {
@@ -210,6 +210,12 @@ Template['layout_header'].events({
         } else {
             console.log('isShowModal: ', Session.get('isShowModal'));
         }
+    },
+    'mouseleave .crosschainBtn': function () {
+        $(".crosschainShow").hide();
+    },
+    'click .crosschainShow>ul>a': function (e) {
+        $(".crosschainShow").hide();
     },
     'click .Cross': function (e) {
         Session.set('clickButton', 1);
