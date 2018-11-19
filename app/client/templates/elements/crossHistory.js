@@ -599,7 +599,7 @@ Template['elements_cross_transactions_table'].onCreated(function () {
     let symbol = 'ETH';
     mist.ETH2WETH().getWethToken((err, unicornToken) => {
         let tokenAddrList = ['ETH',unicornToken.address];
-        mist.ETH2WETH().listHistory(self.data.addressList.concat(self.data.wanAddressList),tokenAddrList,symbol, (err, result) => {
+        mist.ETH2WETH().listHistory(tokenAddrList,symbol, (err, result) => {
             resultEach(template, result);
 
             Session.set('oldCrosschainList', result);
@@ -610,7 +610,7 @@ Template['elements_cross_transactions_table'].onCreated(function () {
 
 
         InterID = Meteor.setInterval(function () {
-            mist.ETH2WETH().listHistory(self.data.addressList.concat(self.data.wanAddressList),tokenAddrList,symbol, (err, result) => {
+            mist.ETH2WETH().listHistory(tokenAddrList,symbol, (err, result) => {
                 resultEach(template, result)
                 let oldCrosschainResult = Session.get('oldCrosschainList');
                 let oldResultHex = web3.toHex(oldCrosschainResult);

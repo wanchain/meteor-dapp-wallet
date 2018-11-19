@@ -47,8 +47,8 @@ class crossChainOperators{
         let operator = new crossOperator('sendNormalTransaction',{tx:trans, tokenOrigAddr:tokenOrigAddr, password:password},chainType,callback);
         this.invokeOperator(operator);
     }
-    listHistory(addrList,tokenAddrList,symbol, callback){
-        this.invokeOperator(new crossOperator('listHistory',{addrList:addrList,tokenAddrList:tokenAddrList,symbol:symbol},this.getOriginChainType(),callback));
+    listHistory(tokenAddrList,symbol, callback){
+        this.invokeOperator(new crossOperator('listHistory',{tokenAddrList:tokenAddrList,symbol:symbol},this.getOriginChainType(),callback));
     }
 
     getApproveTransData(tokenOrigAddr,tokenChainType,trans,callback){

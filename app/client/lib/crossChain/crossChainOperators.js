@@ -37,8 +37,8 @@ class crossChainOperators{
         }
         return false;
     }
-    listHistory(addrList,tokenAddrList,symbol, callback){
-        this.invokeOperator(new crossOperator('listHistory',{addrList:addrList,tokenAddrList:tokenAddrList,symbol:symbol},this.getOriginChainType(),callback));
+    listHistory(tokenAddrList,symbol, callback){
+        this.invokeOperator(new crossOperator('listHistory',{tokenAddrList:tokenAddrList,symbol:symbol},this.getOriginChainType(),callback));
     }
 
     // signed

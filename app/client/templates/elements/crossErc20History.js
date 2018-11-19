@@ -602,7 +602,7 @@ Template['elements_cross_transactions_table_erc20'].onCreated(function () {
     let decimals = self.data.decimals;
     TemplateVar.set(template, 'decimals', decimals);
 
-    mist.ERC202WERC20(chainType).listHistory(self.data.addressList.concat(self.data.wanAddressList),tokenAddrList,symbol, (err, result) => {
+    mist.ERC202WERC20(chainType).listHistory(tokenAddrList,symbol, (err, result) => {
         resultEach(template, result);
 
         Session.set('oldCrosschainList', result);
@@ -613,7 +613,7 @@ Template['elements_cross_transactions_table_erc20'].onCreated(function () {
 
 
     InterID = Meteor.setInterval(function () {
-        mist.ERC202WERC20(chainType).listHistory(self.data.addressList.concat(self.data.wanAddressList),tokenAddrList,symbol, (err, result) => {
+        mist.ERC202WERC20(chainType).listHistory(tokenAddrList,symbol, (err, result) => {
             resultEach(template, result)
 
             let oldCrosschainResult = Session.get('oldCrosschainList');
