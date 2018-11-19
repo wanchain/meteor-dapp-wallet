@@ -300,13 +300,6 @@ Template['views_werc20Toerc20'].events({
             });
         }
 
-        if (new BigNumber(amount, 10).gt(new BigNumber(boundQuota, 10))){
-            return GlobalNotification.warning({
-                content: `Insufficient balance in Locked Account balance`,
-                duration: 2
-            });
-        }
-
         let werc20Balance = TemplateVar.get('werc20Balance')[from.toLowerCase()];
         let symbol = TemplateVar.get('symbol');
         let chainType = TemplateVar.get('chainType');
@@ -318,6 +311,13 @@ Template['views_werc20Toerc20'].events({
                 content: `Insufficient W${symbol} balance in your FROM account`,
                 duration: 2
             });
+
+        if (new BigNumber(amount, 10).gt(new BigNumber(boundQuota, 10))){
+            return GlobalNotification.warning({
+                content: `Insufficient balance in Locked Account balance`,
+                duration: 2
+            });
+        }
 
         mist.WERC202ERC20(chainType).getBalance(from.toLowerCase(), function (err,wanBalance) {
             if (!err) {

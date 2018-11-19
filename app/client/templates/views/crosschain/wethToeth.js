@@ -282,13 +282,6 @@ Template['views_wethToeth'].events({
             });
         }
 
-        if (new BigNumber(amount, 10).gt(new BigNumber(boundQuota, 10))){
-            return GlobalNotification.warning({
-                content: `Insufficient balance in Locked Account balance`,
-                duration: 2
-            });
-        }
-
         let wethBalance = TemplateVar.get('wethBalance')[from.toLowerCase()];
         // let wanBalance = await Helpers.promisefy(mist.WETH2ETH().getBalance, [from.toLowerCase()], mist.WETH2ETH());
 
@@ -299,6 +292,13 @@ Template['views_wethToeth'].events({
                         content: 'Insufficient WETH balance in your FROM account',
                         duration: 2
                     });
+
+                if (new BigNumber(amount, 10).gt(new BigNumber(boundQuota, 10))){
+                    return GlobalNotification.warning({
+                        content: `Insufficient balance in Locked Account balance`,
+                        duration: 2
+                    });
+                }
 
                 // console.log('fee: ', new BigNumber(EthTools.toWei(fee), 10));
                 // console.log('valueFee: ', new BigNumber(EthTools.toWei(valueFee), 10));

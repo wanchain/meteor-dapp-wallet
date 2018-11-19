@@ -251,21 +251,6 @@ Template['views_ethToweth'].events({
             });
         }
 
-        // const amountSymbol = amount.toString(10).split('.')[1];
-        // if (amountSymbol && amountSymbol.length >=19) {
-        //     return GlobalNotification.warning({
-        //         content: 'Amount not valid',
-        //         duration: 2
-        //     });
-        // }
-
-        if (new BigNumber(amount, 10).gt(new BigNumber(boundQuota, 10))){
-            return GlobalNotification.warning({
-                content: `Insufficient balance in Locked Account balance`,
-                duration: 2
-            });
-        }
-
         mist.ETH2WETH().getBalance(from.toLowerCase(), function (err,ethBalance) {
             if (err) {
                 Helpers.showError(err);
@@ -281,6 +266,12 @@ Template['views_ethToweth'].events({
                         duration: 2
                     });
 
+                if (new BigNumber(amount, 10).gt(new BigNumber(boundQuota, 10))){
+                    return GlobalNotification.warning({
+                        content: `Insufficient balance in Locked Account balance`,
+                        duration: 2
+                    });
+                }
 
                 let trans = {
                     from: from, amount: amount.toString(10), storeman: storeman,
