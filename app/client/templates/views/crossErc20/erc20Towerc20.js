@@ -264,14 +264,6 @@ Template['views_erc20Towerc20'].events({
             });
         }
 
-        const amountSymbol = amount.toString().split('.')[1];
-        if (amountSymbol && amountSymbol.length >=19) {
-            return GlobalNotification.warning({
-                content: 'Amount not valid',
-                duration: 2
-            });
-        }
-
         if (new BigNumber(amount, 10).gt(new BigNumber(boundQuota, 10))){
             return GlobalNotification.warning({
                 content: `Insufficient balance in Locked Account balance`,

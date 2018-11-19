@@ -201,14 +201,6 @@ Template['views_erc20send'].events({
             });
         }
 
-        const amountSymbol = amount.toString().split('.')[1];
-        if (amountSymbol && amountSymbol.length >= 19) {
-            return GlobalNotification.warning({
-                content: 'Amount not valid',
-                duration: 2
-            });
-        }
-
         let chainType = TemplateVar.get('chainType');
         let symbol = TemplateVar.get('symbol').toLowerCase();
         let tokenOrigAddr = TemplateVar.get('tokenOrigAddr');
