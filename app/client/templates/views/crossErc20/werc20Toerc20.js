@@ -340,6 +340,9 @@ Template['views_werc20Toerc20'].events({
                 // console.log('trans: ', trans);
 
                 mist.WERC202ERC20(chainType).getApproveTransData(tokenOrigAddr,chainType, trans, function (err,getApproveTransData) {
+                    trans.x =  getApproveTransData.x;
+                    trans.hashX = getApproveTransData.hashX;
+                    trans.approveNonce = getApproveTransData.approveNonce;
                     mist.WERC202ERC20(chainType).getLockTransData(tokenOrigAddr,chainType, trans, function (err,getLockTransData) {
                         // console.log('getLockTransData: ', getLockTransData);
                         if (!err) {

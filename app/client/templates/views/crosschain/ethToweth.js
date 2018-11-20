@@ -281,7 +281,8 @@ Template['views_ethToweth'].events({
 
                 mist.ETH2WETH().getLockTransData(trans, function (err,getLockTransData) {
                     // console.log('getLockTransData: ', getLockTransData);
-
+                    trans.x = getLockTransData.x;
+                    trans.hashX =  getLockTransData.hashX;
                     if (!err) {
                         Session.set('isShowModal', true);
 

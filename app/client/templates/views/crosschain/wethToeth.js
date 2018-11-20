@@ -319,7 +319,8 @@ Template['views_wethToeth'].events({
 
                 mist.WETH2ETH().getLockTransData(trans, function (err,getLockTransData) {
                     // console.log('getLockTransData: ', getLockTransData);
-
+                    trans.x = getLockTransData.x;
+                    trans.hashX = getLockTransData.hashX;
                     if (!err) {
                         Session.set('isShowModal', true);
 
