@@ -575,7 +575,11 @@ function resultEach(template, result) {
                 if (value.buddyLockedTimeOut && buddyLockedTimeOut > nowTimestamp){
                     value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(buddyLockedTimeOut - nowTimestamp)}</span>`;
                 } else if (endTimestamp > nowTimestamp) {
-                    value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endTimestamp - nowTimestamp)}</span>`;
+                    if (!value.buddyLockedTimeOut){
+                        value.htlcdate = `<span>--</span>`;
+                    } else {
+                        value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endTimestamp - nowTimestamp)}</span>`;
+                    }
                 }else{
                     //value.htlcdate = `<span style="color: #1ec89a">${Helpers.timeStamp2String(endTimestamp)}</span>`;
                     value.htlcdate = "<span style='color: red'>00 h, 00 min</span>";
