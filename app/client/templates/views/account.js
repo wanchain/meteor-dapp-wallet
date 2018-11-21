@@ -247,8 +247,8 @@ Template['views_account'].events({
 
      @event copy .copyable-address span
      */
-    'copy .copyable-address': accountClipboardEventHandler,
-    'copy .copyable-waddress': accountClipboardEventHandler,
+    // 'copy .copyable-address': accountClipboardEventHandler,
+    // 'copy .copyable-waddress': accountClipboardEventHandler,
 
 
 
