@@ -42,6 +42,10 @@ function waitingMoment(X) {
     }
 }
 
+Template['views_modals_sendcrossBtcReleaseX'].onDestroyed(function () {
+    Meteor.clearInterval(InterID);
+});
+
 Template['views_modals_sendcrossBtcReleaseX'].onCreated(function(){
     let template = this;
     TemplateVar.set(template, 'isButton', false);

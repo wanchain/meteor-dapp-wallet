@@ -82,7 +82,20 @@ Template['elements_transactions_table'].helpers({
 
         } else {
             template._properties.cursor = collection.find(selector, {sort: {timestamp: -1, blockNumber: -1}, limit: limit});
-            return template._properties.cursor.fetch();
+
+            let transactionList = template._properties.cursor.fetch();
+            transactionList.forEach(function (account) {
+                if (account.tokenId) {
+                    var token = Tokens.findOne(account.tokenId);
+                    if (token) {
+                        items.push(account);
+                    }
+                } else {
+                    items.push(account);
+                }
+            })
+
+            return items;
         }
     },
     /**
@@ -277,7 +290,7 @@ Template['elements_transactions_row'].helpers({
         var token = Tokens.findOne(this.tokenId);
 
         return (token) ? Helpers.formatNumberByDecimals(this.value, token.decimals) +' '+ token.symbol : this.value;
-    }
+    },
 });
 
 

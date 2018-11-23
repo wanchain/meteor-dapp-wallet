@@ -167,6 +167,10 @@ function revokeErc20(self,password_input) {
 }
 
 
+Template['views_modals_sendcrosschainReleaseX'].onDestroyed(function () {
+    Meteor.clearInterval(InterID);
+});
+
 Template['views_modals_sendcrosschainReleaseX'].onCreated(function () {
     let template = this;
     TemplateVar.set(template, 'isButton', false);

@@ -176,7 +176,7 @@ Template['views_btcTowbtc'].events({
         // gasPrice
         if(account.lt(new BigNumber(0.4))) {
             return GlobalNotification.warning({
-                content: 'This wan address\'s balance less than gas fee.',
+                content: 'Not enough WAN balance for gas fee of transaction (0.4 WAN)',
                 duration: 2
             });
         }

@@ -88,7 +88,6 @@ Template['views_wbtcTobtc'].onCreated(function(){
 
     // get wan2coin ratio
     mist.BTC2WBTC().getCoin2WanRatio('BTC', {crossChain: 'BTC'}, function (err,data) {
-        console.log('data::: ', data);
         if (!err) {
             TemplateVar.set(template,'wan2CoinRatio',data.c2wRatio);
         }
@@ -141,17 +140,16 @@ Template['views_wbtcTobtc'].events({
         let regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
 
         if (event.target.value && (regPos.test(event.target.value) || regNeg.test(event.target.value)) ) {
-            amount = new BigNumber(event.target.value)
+            amount = new BigNumber(event.target.value);
         }
 
         let txFeeratio = TemplateVar.get('txFeeRatio');
         let wan2CoinRatio  = TemplateVar.get('wan2CoinRatio');
         let exp     = new BigNumber(10);
-        let v       = new BigNumber(amount);
-        let wei     = v.mul(exp.pow(18));
+        let cong     = amount.mul(exp.pow(8));
 
         const DEFAULT_PRECISE = 10000;
-        let coverCharge = wei.mul(wan2CoinRatio).mul(txFeeratio).div(DEFAULT_PRECISE).div(DEFAULT_PRECISE);
+        let coverCharge = cong.mul(wan2CoinRatio).mul(txFeeratio).div(DEFAULT_PRECISE).div(DEFAULT_PRECISE);
         // console.log('coverCharge: ', coverCharge);
 
         TemplateVar.set('coverCharge', web3.fromWei(coverCharge));
@@ -288,7 +286,7 @@ Template['views_wbtcTobtc'].events({
             // gasFee > wanAccount
             if(gasFee.gt(wanAccount)) {
                 return GlobalNotification.warning({
-                    content: 'This wan address\'s balance less than gas fee.',
+                    content: 'Not enough WAN balance for gas fee of transaction (0.4 WAN).',
                     duration: 2
                 });
             }

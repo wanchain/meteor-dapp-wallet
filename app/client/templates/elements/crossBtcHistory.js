@@ -28,18 +28,22 @@ function resultEach(template, result) {
         if (stateDict[value.status] === 8 || stateDict[value.status] === 12 || stateDict[value.status] === 13) {
             value.htlcdate = `<span>${Helpers.timeStamp2String(endTimestamp)}</span>`;
         } else {
-            if (nowTimestamp <=endSpendingTimestamp) {
-                // confirm
-                value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endSpendingTimestamp - nowTimestamp)}</span>`;
-                
-            } else if (nowTimestamp >endSpendingTimestamp && nowTimestamp <=endTimestamp) {
-                // lock
-                value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endTimestamp - nowTimestamp)}</span>`;
-
+            if (stateDict[value.status] === 1 || stateDict[value.status] === 2 || stateDict[value.status] === 3 || stateDict[value.status] === 4) {
+                value.htlcdate = `<span style="color: #1ec89a">--</span>`;
             } else {
-                // cancel
-                value.htlcdate = "<span style='color: red'>00 h, 00 min</span>";
-
+                if (nowTimestamp <=endSpendingTimestamp) {
+                    // confirm
+                    value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endSpendingTimestamp - nowTimestamp)}</span>`;
+                    
+                } else if (nowTimestamp >endSpendingTimestamp && nowTimestamp <=endTimestamp) {
+                    // lock
+                    value.htlcdate = `<span style="color: #1ec89a">${Helpers.formatDuring(endTimestamp - nowTimestamp)}</span>`;
+    
+                } else {
+                    // cancel
+                    value.htlcdate = "<span style='color: red'>00 h, 00 min</span>";
+    
+                }
             }
         }
 
@@ -259,39 +263,65 @@ Template['elements_cross_transactions_table_btc'].events({
                 show_data.HashX = show_data.txhash;
             }
 
+            let HashX = show_data.HashX;
+            let lockTxHash = show_data.lockTxHash ? show_data.lockTxHash : show_data.btcLockTxHash;
+            let refundTxHash = show_data.refundTxHash ? show_data.refundTxHash : show_data.btcRefundTxHash;
+            let revokeTxHash = show_data.revokeTxHash ? show_data.revokeTxHash : show_data.btcRevokeTxHash;
+            let btcNoticeTxhash = show_data.btcNoticeTxhash;
+
+            let from = show_data.from;
+            let crossAddress = show_data.crossAddress;
+
+            console.log("show_data: ", show_data);
+
             if (show_data.chain === 'BTC') {
                 show_data.symbol = 'BTC';
+
+                if (show_data.from != 'local btc account' && crossAddress && crossAddress.substr(0, 2) !== '0x') {
+                    crossAddress = '0x' + crossAddress;
+                }
+
             } else if (show_data.chain === 'WAN') {
                 show_data.symbol = 'WBTC';
+
+                if (from && from.substr(0, 2) !== '0x') {
+                    from = '0x' + from;
+                }
+
+                if (HashX && HashX.substr(0, 2) !== '0x') {
+                    HashX = '0x' + HashX;
+                }
+
+                if (lockTxHash && lockTxHash.substr(0, 2) !== '0x') {
+                    lockTxHash = '0x' + lockTxHash;
+                }
+                
+                if (refundTxHash && refundTxHash.substr(0, 2) !== '0x') {
+                    refundTxHash = '0x' + refundTxHash;
+                }
+    
+                
+                if (revokeTxHash && revokeTxHash.substr(0, 2) !== '0x') {
+                    revokeTxHash = '0x' + revokeTxHash;
+                }
+    
+                
+                if (btcNoticeTxhash && btcNoticeTxhash.substr(0, 2) !== '0x') {
+                    btcNoticeTxhash = '0x' + btcNoticeTxhash;
+                }
             }
-
-            let lockTxHash = show_data.lockTxHash ? show_data.lockTxHash : show_data.btcLockTxHash;
-            // console.log('lockTxHash: ', lockTxHash)
-            // if (lockTxHash && lockTxHash.substr(0, 2) !== '0x') {
-            //     lockTxHash = '0x' + lockTxHash;
-            // }
-            
-            let refundTxHash = show_data.refundTxHash ? show_data.refundTxHash : show_data.btcRefundTxHash;
-            // console.log('refundTxHash: ', refundTxHash)
-            // if (refundTxHash && refundTxHash.substr(0, 2) !== '0x') {
-            //     refundTxHash = '0x' + refundTxHash;
-            // }
-
-            let revokeTxHash = show_data.revokeTxHash ? show_data.revokeTxHash : show_data.btcRevokeTxHash;
-            // if (revokeTxHash && revokeTxHash.substr(0, 2) !== '0x') {
-            //     revokeTxHash = '0x' + revokeTxHash;
-            // }
 
             EthElements.Modal.show({
                 template: 'views_modals_crosstransactionInfo',
                 data: {
-                    HashX: show_data.HashX,
+                    HashX: HashX,
                     chain: show_data.chain,
-                    crossAddress: show_data.crossAddress,
-                    from: show_data.from,
+                    crossAddress: crossAddress,
+                    from: from,
                     lockTxHash: lockTxHash,
                     redeemTxHash: refundTxHash,
                     revokeTxHash: revokeTxHash,
+                    btcNoticeTxhash: btcNoticeTxhash,
                     storeman: show_data.storeman,
                     time: show_data.time,
                     to: show_data.to,
