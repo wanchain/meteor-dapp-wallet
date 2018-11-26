@@ -557,19 +557,7 @@ function resultEach(template, result) {
             let endTimestamp = Number(value.htlcTimeOut)*1000;
             let buddyLockedTimeOut = Number(value.buddyLockedTimeOut)*1000;
 
-            if(value.status ===stateDict.Redeemed ||value.status ===stateDict.Revoked
-                || value.status ===stateDict.ApproveSendFail
-                || value.status ===stateDict.ApproveSendFailAfterRetries
-                || value.status ===stateDict.LockFail
-                || value.status ===stateDict.LockSendFail
-                || value.status ===stateDict.LockSendFailAfterRetries
-                || value.status ===stateDict.RedeemFail
-                || value.status ===stateDict.RedeemSendFail
-                || value.status ===stateDict.RedeemSendFailAfterRetries
-                || value.status ===stateDict.RevokeFail
-                || value.status ===stateDict.RevokeSendFail
-                || value.status ===stateDict.RevokeSendFailAfterRetries){
-
+            if(value.status ===stateDict.Redeemed ||value.status ===stateDict.Revoked){
                 value.htlcdate = `<span>${Helpers.timeStamp2String(endTimestamp)}</span>`;
             }else{
                 if (value.buddyLockedTimeOut && buddyLockedTimeOut > nowTimestamp){
