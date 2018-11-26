@@ -22,6 +22,8 @@ Template['views_werc20Toerc20'].onCreated(function(){
     let decimals = this.data.decimals;
 
     TemplateVar.set(template, 'symbol', symbol);
+    TemplateVar.set(template, 'wsymbol', `W${symbol}`);
+
     TemplateVar.set(template, 'chainType', chainType);
     TemplateVar.set(template, 'tokenOrigAddr', tokenOrigAddr);
     TemplateVar.set(template, 'tokenWanAddr', tokenWanAddr);
@@ -130,7 +132,7 @@ Template['views_werc20Toerc20'].helpers({
         return TemplateVar.get('symbol');
     },
     'wsymbol': function () {
-        return `W${TemplateVar.get('symbol')}`;
+        return TemplateVar.get('wsymbol');
     },
     'Deposit': function () {
 
@@ -301,14 +303,14 @@ Template['views_werc20Toerc20'].events({
         }
 
         let werc20Balance = TemplateVar.get('werc20Balance')[from.toLowerCase()];
-        let symbol = TemplateVar.get('symbol');
+        let wsymbol = TemplateVar.get('wsymbol');
         let chainType = TemplateVar.get('chainType');
         let tokenOrigAddr = TemplateVar.get('tokenOrigAddr');
         let decimals = TemplateVar.get('decimals');
 
         if(new BigNumber(Helpers.tokenToWei(amount,decimals), 10).gt(new BigNumber(werc20Balance, 10)))
             return GlobalNotification.warning({
-                content: `Insufficient W${symbol} balance in your FROM account`,
+                content: `Insufficient ${wsymbol} balance in your FROM account`,
                 duration: 2
             });
 
@@ -365,7 +367,7 @@ Template['views_werc20Toerc20'].events({
                                     trans: trans,
                                     chain: 'WAN',
                                     chainType:chainType,
-                                    symbol: symbol
+                                    symbol: wsymbol
                                 },
                             },{
                                 class: 'send-transaction-info',
