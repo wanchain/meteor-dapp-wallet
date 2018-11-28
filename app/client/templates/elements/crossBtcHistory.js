@@ -10,7 +10,7 @@ const stateDict = {
     'sentHashPending': 1, 'sentHashConfirming': 2, 'waitingCross': 3, 'waitingCrossConfirming': 4,
     'waitingX': 5,'sentXPending': 6, 'sentXConfirming': 7, 'redeemFinished': 8,
     'waitingRevoke': 9,'sentRevokePending': 10, 'sentRevokeConfirming': 11, 'revokeFinished': 12,
-    'sentHashFailed': 13, 'suspending': 14
+    'sentHashFailed': 13, 'suspending': 14, "sentRedeemFailed": 15, "sentRevokeFailed": 16
 };
 
 function resultEach(template, result) {
@@ -56,13 +56,20 @@ function showQuestion(show_data, trans, transType) {
 
     Session.set('isShowModal', true);
 
+    let crossAddress = show_data.crossAddress;
+    let storeman = show_data.storeman;
+    if ( show_data.chain === 'BTC' && crossAddress && crossAddress.substr(0, 2) !== '0x') {
+        // crossAddress = '0x' + crossAddress;
+        storeman = '0x' + storeman;
+    }
+
     EthElements.Modal.question({
         template: 'views_modals_sendcrossBtcReleaseX',
         data: {
             from: show_data.from,
             to: show_data.to,
-            storeman: show_data.storeman,
-            crossAddress: show_data.crossAddress,
+            storeman: storeman,
+            crossAddress: crossAddress,
             amount: show_data.balance,
             trans: trans,
             transType: transType,
@@ -142,6 +149,10 @@ Template['elements_cross_transactions_table_btc'].helpers({
                     value.fromText = `<small style="${smallStyle}">BTC</small>`;
                     value.toText = `<small style="${smallStyle}">WAN</small>`;
                     value.symbol = 'BTC';
+                    
+                    if (value.crossAddress && value.crossAddress.substr(0, 2) !== '0x') {
+                        value.crossAddress = '0x' + value.crossAddress;
+                    }
                 } else if (value.chain === 'WAN') {
                     value.fromText = `<small style="${smallStyle}">WAN</small>`;
                     value.toText = `<small style="${smallStyle}">BTC</small>`;
@@ -172,6 +183,7 @@ Template['elements_cross_transactions_table_btc'].helpers({
 
                     // Release
                     case 5:
+                    case 15:
                         style += 'color: #920b1c;';
                         value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
                         value.state = 'To be confirmed';
@@ -195,6 +207,7 @@ Template['elements_cross_transactions_table_btc'].helpers({
 
                     // Revoke
                     case 9:
+                    case 16:
                         style += 'color: #920b1c;';
                         value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
                         value.state = 'To be cancelled';
@@ -272,13 +285,17 @@ Template['elements_cross_transactions_table_btc'].events({
             let from = show_data.from;
             let crossAddress = show_data.crossAddress;
 
-            console.log("show_data: ", show_data);
+            // console.log("show_data: ", show_data);
 
             if (show_data.chain === 'BTC') {
                 show_data.symbol = 'BTC';
 
-                if (show_data.from != 'local btc account' && crossAddress && crossAddress.substr(0, 2) !== '0x') {
-                    crossAddress = '0x' + crossAddress;
+                // if (show_data.from != 'local btc account' && crossAddress && crossAddress.substr(0, 2) !== '0x') {
+                //     crossAddress = '0x' + crossAddress;
+                // }
+
+                if (btcNoticeTxhash && btcNoticeTxhash.substr(0, 2) !== '0x') {
+                    btcNoticeTxhash = '0x' + btcNoticeTxhash;
                 }
 
             } else if (show_data.chain === 'WAN') {
@@ -296,9 +313,9 @@ Template['elements_cross_transactions_table_btc'].events({
                     lockTxHash = '0x' + lockTxHash;
                 }
                 
-                if (refundTxHash && refundTxHash.substr(0, 2) !== '0x') {
-                    refundTxHash = '0x' + refundTxHash;
-                }
+                // if (refundTxHash && refundTxHash.substr(0, 2) !== '0x') {
+                //     refundTxHash = '0x' + refundTxHash;
+                // }
     
                 
                 if (revokeTxHash && revokeTxHash.substr(0, 2) !== '0x') {
@@ -360,6 +377,7 @@ Template['elements_cross_transactions_table_btc'].events({
 
             // release X
             case 5:
+            case 15:
                 transType = 'releaseX';
 
                 // release X btc => wbtc
@@ -384,6 +402,7 @@ Template['elements_cross_transactions_table_btc'].events({
 
             // revoke
             case 9:
+            case 16:
                 transType = 'revoke';
 
                 // revoke btc => wbtc
