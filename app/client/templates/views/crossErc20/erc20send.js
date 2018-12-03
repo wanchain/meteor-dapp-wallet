@@ -61,7 +61,7 @@ Template['views_erc20send'].onCreated(function(){
             TemplateVar.set(template,'gasPrice', data.gasPrice);
             TemplateVar.set(template,'defaultGasPrice', data.gasPrice);
 
-            let number = new BigNumber(data.ethNormalGas * data.gasPrice);
+            let number = new BigNumber(data.ethNormalGas).mul(new BigNumber(data.gasPrice));
 
             TemplateVar.set(template, 'fee', EthTools.formatBalance(number, '0,0.00[0000000000000000]', 'ether'));
         }
@@ -139,7 +139,7 @@ Template['views_erc20send'].events({
         let newGasPrice = new BigNumber(TemplateVar.get('defaultGasPrice')).mul(newFeeRate);
 
         // return the fee
-        let number = TemplateVar.get('estimatedGas') * newGasPrice;
+        let number = new BigNumber(TemplateVar.get('estimatedGas')).mul(new BigNumber(newGasPrice));
         let fee = EthTools.formatBalance(number, '0,0.00[0000000000000000]', 'ether');
 
         TemplateVar.set('gasPrice', newGasPrice);

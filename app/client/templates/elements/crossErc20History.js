@@ -210,7 +210,7 @@ function releaseWerc202Erc20(show_data, trans, transType) {
                             Helpers.showError(err);
                         } else {
                             transData = getRefundTransData.refundTransData;
-                            let fee = new BigNumber(getGas * gasPrice);
+                            let fee = new BigNumber(getGas).mul(new BigNumber(gasPrice));
 
                             if (fee.gt(new BigNumber(coinBalance, 10)))
                                 return GlobalNotification.warning({
@@ -257,7 +257,7 @@ function revokeErc202Werc20(show_data, trans, transType) {
                             Helpers.showError(err);
                         } else {
                             transData = getRevokeTransData.revokeTransData;
-                            let fee = new BigNumber(getGas * gasPrice);
+                            let fee = new BigNumber(getGas).mul(new BigNumber(gasPrice));
 
                             if (fee.gt(new BigNumber(coinBalance, 10)))
                                 return GlobalNotification.warning({
@@ -308,7 +308,7 @@ function revokeWerc202Erc20(show_data, trans, transType) {
                             Helpers.showError(err);
                         } else {
                             transData = getRevokeTransData.revokeTransData;
-                            let fee = new BigNumber(getGas * gasPrice);
+                            let fee = new BigNumber(getGas).mul(new BigNumber(gasPrice));
 
                             if (fee.gt(new BigNumber(coinBalance, 10)))
                                 return GlobalNotification.warning({
