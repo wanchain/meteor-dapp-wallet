@@ -9,10 +9,17 @@ const defaultGasprice = 180000000000;
 
 const stateDict = {
 
+    "ApproveZeroSending":"ApproveZeroSending",
+    "ApproveZeroSendFail":"ApproveZeroSendFail",
+    "ApproveZeroSendFailAfterRetries":"ApproveZeroSendFailAfterRetries",
+    "ApproveZeroFail":"ApproveZeroFail",
+    "ApproveZeroSent":"ApproveZeroSent",
+    "ApprovedZero":"ApprovedZero",
 
     "ApproveSending": "ApproveSending",
     "ApproveSendFail": "ApproveSendFail",
     "ApproveSendFailAfterRetries": "ApproveSendFailAfterRetries",
+    "ApproveFail":"ApproveFail",
     "ApproveSent": "ApproveSent",
     "Approved": "Approved",
 
@@ -504,13 +511,22 @@ Template['elements_cross_transactions_table_erc20'].helpers({
 
                     if (value.status === stateDict.ApproveSending
                         || value.status === stateDict.ApproveSent
-                        || value.status === stateDict.Approved) {
+                        || value.status === stateDict.Approved
+                        || value.status === stateDict.ApproveZeroSending
+                        || value.status === stateDict.ApproveZeroSent
+                        || value.status === stateDict.ApprovedZero
+                    ) {
                         value.operation = `<h2 style="${style}"></h2>`;
                         value.state = 'Pending';
                         // value.state = 'Cross-Tx 1/3'
                     }
-                    else if (value.status === stateDict.ApproveSendFail
-                        || value.status === stateDict.ApproveSendFailAfterRetries) {
+                    else if (value.status === stateDict.ApproveFail
+                        || value.status === stateDict.ApproveSendFail
+                        || value.status === stateDict.ApproveSendFailAfterRetries
+                        || value.status === stateDict.ApproveZeroFail
+                        || value.status === stateDict.ApproveZeroSendFail
+                        || value.status === stateDict.ApproveZeroSendFailAfterRetries
+                    ) {
                         value.operation = `<h2 style="${style}"></h2>`;
                     }
                     else if (value.status === stateDict.LockSending) {

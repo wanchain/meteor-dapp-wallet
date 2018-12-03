@@ -13,6 +13,7 @@ const stateDict = {
     "ApproveSending": "ApproveSending",
     "ApproveSendFail": "ApproveSendFail",
     "ApproveSendFailAfterRetries": "ApproveSendFailAfterRetries",
+    "ApproveFail":"ApproveFail",
     "ApproveSent": "ApproveSent",
     "Approved": "Approved",
 
@@ -503,7 +504,8 @@ Template['elements_cross_transactions_table'].helpers({
                         value.state = 'Pending';
                         // value.state = 'Cross-Tx 1/3'
                     }
-                    else if (value.status === stateDict.ApproveSendFail
+                    else if (value.status === stateDict.ApproveFail
+                        || value.status === stateDict.ApproveSendFail
                         || value.status === stateDict.ApproveSendFailAfterRetries) {
                         value.operation = `<h2 style="${style}"></h2>`;
                     }

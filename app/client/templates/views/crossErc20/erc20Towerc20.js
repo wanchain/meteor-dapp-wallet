@@ -308,10 +308,9 @@ Template['views_erc20Towerc20'].events({
                 // console.log('trans: ', trans);
 
                 mist.ERC202WERC20(chainType).getApproveTransData(tokenOrigAddr,chainType, trans, function (err,getApproveTransData) {
-                    trans.x = getApproveTransData.x;
-                    trans.hashX = getApproveTransData.hashX;
-                    trans.approveNonce = getApproveTransData.approveNonce;
                     mist.ERC202WERC20(chainType).getLockTransData(tokenOrigAddr,chainType, trans, function (err,getLockTransData) {
+                        trans.x = getLockTransData.x;
+                        trans.hashX = getLockTransData.hashX;
                         // console.log('getLockTransData: ', getLockTransData);
                         if (!err) {
                             Session.set('isShowModal', true);
