@@ -298,6 +298,10 @@ Template['elements_cross_transactions_table_btc'].events({
                     btcNoticeTxhash = '0x' + btcNoticeTxhash;
                 }
 
+                if (refundTxHash && refundTxHash.substr(0, 2) !== '0x') {
+                    refundTxHash = '0x' + refundTxHash;
+                }
+
             } else if (show_data.chain === 'WAN') {
                 show_data.symbol = 'WBTC';
 

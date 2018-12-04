@@ -1,12 +1,18 @@
 let InterID;
 
+const stateDone = [
+    'sentXPending', 'sentXConfirming', 'redeemFinished',
+    'sentRevokePending', 'sentRevokeConfirming', 'revokeFinished',
+    'sentHashFailed', 'suspending', "sentRedeemFailed", "sentRevokeFailed"
+]
+
 function waitingMoment(X) {
     if (X) {
         EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
         _.each(Session.get('oldCrosschainList'), function (value, index) {
             if (value.x === X) {
-                if(value.status === 'sentXPending' || value.status === 'sentRevokePending') {
+                if(stateDone.indexOf(value.status) >= 0) {
                     console.log('btc oldCrosschainList done:::', value.status);
                     EthElements.Modal.hide();
                     Session.set('clickButton', 1);
