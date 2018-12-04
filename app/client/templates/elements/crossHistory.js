@@ -42,87 +42,6 @@ const stateDict = {
 
 };
 
-
-function canRefund(record) {
-    let retResult = {};
-    if (!record.lockedTime) {
-        retResult.code = false;
-        retResult.result = "need waiting bolck number.";
-        return retResult;
-    }
-
-    let lockedTime = Number(record.lockedTime);
-    let buddyLockedTime = Number(record.buddyLockedTime);
-    let status = record.status;
-    let buddyLockedTimeOut = Number(record.buddyLockedTimeOut);
-
-
-    //global.lockedTime
-    if (status !== stateDict.BuddyLocked
-        && status !== stateDict.RedeemSendFail
-        && status !== stateDict.RedeemSendFailAfterRetries
-        && status !== stateDict.RedeemFail
-    ) {
-        retResult.code = false;
-        retResult.result = "waiting buddy lock";
-        return retResult;
-    }
-    let currentTime = Number(Date.now()) / 1000; //unit s
-
-    if (currentTime > buddyLockedTime && currentTime < buddyLockedTimeOut) {
-        retResult.code = true;
-        return retResult;
-    } else {
-        retResult.code = false;
-        retResult.result = "Hash lock time is not meet.";
-        return retResult;
-    }
-}
-
-function canRevoke(record) {
-    let retResult = {};
-    if (!record.lockedTime) {
-        retResult.code = false;
-        retResult.result = "need waiting bolck number.";
-        return retResult;
-    }
-
-    let lockedTime = Number(record.lockedTime);
-    let buddyLockedTime = Number(record.buddyLockedTime);
-    let status = record.status;
-    let htlcTimeOut = Number(record.htlcTimeOut);
-
-    if (status !== stateDict.BuddyLocked
-        && status !== stateDict.Locked
-        && status !== stateDict.RedeemSent
-        && status !== stateDict.RedeemSending
-        && status !== stateDict.RedeemSendFail
-        && status !== stateDict.RedeemSendFailAfterRetries
-        && status !== stateDict.RedeemFail
-
-        && status !== stateDict.RevokeSent
-        && status !== stateDict.RevokeSending
-        && status !== stateDict.RevokeSendFail
-        && status !== stateDict.RevokeSendFailAfterRetries
-        && status !== stateDict.RevokeFail
-    ) {
-        retResult.code = false;
-        retResult.result = "Can not revoke";
-        return retResult;
-    }
-    let currentTime = Number(Date.now()) / 1000;
-
-    if (currentTime > htlcTimeOut) {
-        retResult.code = true;
-        return retResult;
-    } else {
-        retResult.code = false;
-        retResult.result = "Hash lock time is not meet.";
-        return retResult;
-    }
-}
-
-
 function releaseEth2Weth(show_data, trans, transType) {
     let getGas;
     let gasPrice;
@@ -460,6 +379,9 @@ Template['elements_cross_transactions_table'].helpers({
 
                     crossCollection.push(value);
                 }else{
+                    let isCanRevoke = value.isCanRevoke;
+                    let isCanRedeem = value.isCanRedeem;
+
                     value.fromText = `<small style="${smallStyle}">${value.srcChainType}</small>`;
                     value.toText = `<small style="${smallStyle}">${value.dstChainType}</small>`;
 
@@ -508,6 +430,7 @@ Template['elements_cross_transactions_table'].helpers({
                         || value.status === stateDict.ApproveSendFail
                         || value.status === stateDict.ApproveSendFailAfterRetries) {
                         value.operation = `<h2 style="${style}"></h2>`;
+                        value.state = 'Failed';
                     }
                     else if (value.status === stateDict.LockSending) {
                         value.operation = `<h2 style="${style}">Confirm</h2>`;
@@ -528,9 +451,6 @@ Template['elements_cross_transactions_table'].helpers({
                         value.operation = `<h2 style="${style}">Confirm</h2>`;
                         value.state = 'Cross-Tx 3/4';
 
-                        let isCanRevoke = canRevoke(value).code;
-
-                        // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
                         if (isCanRevoke) {
                             style += 'color: #920b1c;';
                             value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
@@ -542,12 +462,7 @@ Template['elements_cross_transactions_table'].helpers({
                     else if (value.status === stateDict.BuddyLocked) {
                         value.state = 'Cross-Tx success';
 
-                        let isCanRefund = canRefund(value).code;
-                        let isCanRevoke = canRevoke(value).code;
-                        // console.log("BuddyLocked:::::::::::isCanRefund:",isCanRefund);
-                        // console.log("BuddyLocked:::::::::::isCanRevoke:",isCanRevoke);
-
-                        if (isCanRefund) {
+                        if (isCanRedeem) {
                             style += 'color: #920b1c;';
                             value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm</h2>`;
                             value.state = 'To be confirmed';
@@ -569,8 +484,6 @@ Template['elements_cross_transactions_table'].helpers({
                         value.operation = `<h2 style="${style}"></h2>`;
                         value.state = 'Confirming 1/3';
 
-                        let isCanRevoke = canRevoke(value).code;
-                        // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
                         if (isCanRevoke) {
                             style += 'color: #920b1c;';
                             value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
@@ -581,10 +494,7 @@ Template['elements_cross_transactions_table'].helpers({
                         || value.status === stateDict.RedeemSendFailAfterRetries
                         || value.status === stateDict.RedeemFail
                     ) {
-                        let isCanRefund = canRefund(value).code;
-                        let isCanRevoke = canRevoke(value).code;
-                        // console.log("BuddyLocked:::::::::::isCanRefund:",isCanRefund);
-                        // console.log("BuddyLocked:::::::::::isCanRevoke:",isCanRevoke);
+
                         if (isCanRefund) {
                             style += 'color: #920b1c;';
                             value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm Again</h2>`;
@@ -604,8 +514,7 @@ Template['elements_cross_transactions_table'].helpers({
                     else if (value.status === stateDict.RedeemSent) {
                         value.operation = `<h2 style="${style}"></h2>`;
                         value.state = 'Confirming 2/3';
-                        let isCanRevoke = canRevoke(value).code;
-                        // console.log("Locked:::::::::::isCanRevoke:",isCanRevoke);
+
                         if (isCanRevoke) {
                             style += 'color: #920b1c;';
                             value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Cancel</h2>`;
@@ -742,16 +651,13 @@ Template['elements_cross_transactions_table'].events({
 
          if (show_data.tokenStand === 'ETH') {
 
-            let isCanRefund = canRefund(show_data).code;
-            let isCanRevoke = canRevoke(show_data).code;
-
             trans = {
                 lockTxHash: show_data.lockTxHash, amount: show_data.contractValue.toString(10),
                 storemanGroup: show_data.storeman, cross: show_data.crossAddress,
                 x: show_data.x, hashX: show_data.hashX
             };
 
-            if (isCanRefund) {
+            if (show_data.isCanRedeem) {
                 transType = 'releaseX';
                 // release X eth => weth
                 if (show_data.srcChainType !== 'WAN') {
@@ -761,7 +667,7 @@ Template['elements_cross_transactions_table'].events({
                 else {
                     releaseWeth2Eth(show_data, trans, transType);
                 }
-            } else if (isCanRevoke) {
+            } else if (show_data.isCanRevoke) {
                 transType = 'revoke';
 
                 // revoke X eth => weth
