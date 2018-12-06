@@ -136,7 +136,7 @@ Template['views_erc20send'].events({
     'change input[name="fee"], input input[name="fee"]': function(e){
         let feeRate = Number(e.currentTarget.value);
         let newFeeRate = new BigNumber(feeRate).div(10).add(1);
-        let newGasPrice = new BigNumber(TemplateVar.get('defaultGasPrice')).mul(newFeeRate);
+        let newGasPrice = new BigNumber(TemplateVar.get('defaultGasPrice')).mul(newFeeRate).toFixed();
 
         // return the fee
         let number = new BigNumber(TemplateVar.get('estimatedGas')).mul(new BigNumber(newGasPrice));

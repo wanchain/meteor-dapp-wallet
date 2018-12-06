@@ -30,7 +30,7 @@ Template['views_erc20Towerc20'].onCreated(function(){
     TemplateVar.set(template, 'options', false);
     TemplateVar.set(template, 'decimals', decimals);
 
-    EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
+    EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'}).toFixed();
 
     let wanaddress = [];
     let wanAddressList = Session.get('wanAddressList') ? Session.get('wanAddressList') : [];
