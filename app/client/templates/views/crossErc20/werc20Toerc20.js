@@ -324,10 +324,8 @@ Template['views_werc20Toerc20'].events({
         mist.WERC202ERC20(chainType).getBalance(from.toLowerCase(), function (err,wanBalance) {
             if (!err) {
 
-                // console.log('fee: ', new BigNumber(EthTools.toWei(fee), 10));
-                // console.log('valueFee: ', new BigNumber(EthTools.toWei(valueFee), 10));
-                // console.log('valueFee: ', new BigNumber(EthTools.toWei(fee), 10).add(new BigNumber(EthTools.toWei(valueFee), 10)));
-                if((new BigNumber(EthTools.toWei(fee), 10).add(new BigNumber(EthTools.toWei(valueFee), 10))).gt(new BigNumber(wanBalance, 10)))
+                // approve fee , lock fee, transaction fee
+                if((new BigNumber(EthTools.toWei(fee), 10).mul(2).add(new BigNumber(EthTools.toWei(valueFee), 10))).gt(new BigNumber(wanBalance, 10)))
                     return GlobalNotification.warning({
                         content: 'Insufficient WAN balance in your FROM account',
                         duration: 2

@@ -30,7 +30,7 @@ Template['views_erc20Towerc20'].onCreated(function(){
     TemplateVar.set(template, 'options', false);
     TemplateVar.set(template, 'decimals', decimals);
 
-    EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'}).toFixed();
+    EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
     let wanaddress = [];
     let wanAddressList = Session.get('wanAddressList') ? Session.get('wanAddressList') : [];
@@ -192,7 +192,7 @@ Template['views_erc20Towerc20'].events({
     'change input[name="fee"], input input[name="fee"]': function(e){
         let feeRate = Number(e.currentTarget.value);
         let newFeeRate = new BigNumber(feeRate).div(10).add(1);
-        let newGasPrice = new BigNumber(TemplateVar.get('defaultGasPrice')).mul(newFeeRate);
+        let newGasPrice = new BigNumber(TemplateVar.get('defaultGasPrice')).mul(newFeeRate).toFixed();
 
         // return the fee
         let number = new BigNumber(TemplateVar.get('estimatedGas')).mul(new BigNumber(newGasPrice));
@@ -291,9 +291,8 @@ Template['views_erc20Towerc20'].events({
 
                 let ethValue = new BigNumber(ethBalance, 10);
 
-                // console.log('totalValue: ', totalValue);
-                // console.log('ethValue: ', ethValue);
-                if(new BigNumber(EthTools.toWei(fee), 10).gt(ethValue))
+                // approve fee, lock fee
+                if(new BigNumber(EthTools.toWei(fee), 10).mul(2).gt(ethValue))
                     return GlobalNotification.warning({
                         content: `Insufficient ${chainType} balance in your FROM Account`,
                         duration: 2
