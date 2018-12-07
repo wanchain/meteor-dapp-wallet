@@ -86,7 +86,7 @@
                         <strong style="display: block" class="views_send_strong"><div class=""></div>{{i18n 'wallet.send.fee'}}</strong>
 
                         <div class="dapp-select-gas-price">
-                            <span>{{TemplateVar.get 'fee'}} <span>wan</span></span>
+                            <span>{{TemplateVar.get 'totalFee'}} <span>wan</span></span>
                             {{#unless TemplateVar.get "sending"}}
                                 <a class="options" style="cursor: pointer">[Advanced options]</a>
 
@@ -108,7 +108,7 @@
                     <div class="dapp-select-gas-price">
                         <span class="amount">{{TemplateVar.get "amount"}}<span> {{wsymbol}}</span></span>
                         <br>
-                        {{i18n "wallet.send.estimatedFee"}}: {{TemplateVar.get "fee"}}<span> wan</span>
+                        {{i18n "wallet.send.estimatedFee"}}: {{TemplateVar.get "totalFee"}}<span> wan</span>
                     </div>
                 </div>
 

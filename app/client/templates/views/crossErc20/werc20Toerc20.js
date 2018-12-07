@@ -104,9 +104,10 @@ Template['views_werc20Toerc20'].onCreated(function(){
 
             // console.log('fee', data.LockGas * web3.fromWei(data.gasPrice, 'ether'));
             let number = new BigNumber(data.LockGas).mul(new BigNumber(data.gasPrice));
-            // console.log('formatBalance', EthTools.formatBalance(number, '0,0.00[0000000000000000]', 'ether'));
+            let totalFee = number.mul(2);//approve fee,lock fee
 
             TemplateVar.set(template, 'fee', EthTools.formatBalance(number, '0,0.00[0000000000000000]', 'ether'));
+            TemplateVar.set(template, 'totalFee', EthTools.formatBalance(totalFee, '0,0.00[0000000000000000]', 'ether'));
         }
     });
 
@@ -229,10 +230,12 @@ Template['views_werc20Toerc20'].events({
         // return the fee
         let number = new BigNumber(TemplateVar.get('estimatedGas')).mul(new BigNumber(newGasPrice));
         let fee = EthTools.formatBalance(number, '0,0.00[0000000000000000]', 'ether');
+        let totalFee = number.mul(2);//approve fee,lock fee
 
         TemplateVar.set('gasPrice', newGasPrice);
         TemplateVar.set('feeMultiplicator', feeRate);
         TemplateVar.set('fee', fee);
+        TemplateVar.set('totalFee', totalFee);
     },
 
     /**
