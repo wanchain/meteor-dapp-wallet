@@ -199,7 +199,7 @@ Template['views_erc20Towerc20'].events({
         let number = new BigNumber(TemplateVar.get('estimatedGas')).mul(new BigNumber(newGasPrice));
         var fee = EthTools.formatBalance(number, '0,0.00[0000000000000000]', 'ether');
 
-        let totalFee = number.mul(2);//approve fee,lock fee
+        let totalFee = EthTools.formatBalance(number.mul(2), '0,0.00[0000000000000000]', 'ether');//approve fee,lock fee
         TemplateVar.set('gasPrice', newGasPrice);
         TemplateVar.set('feeMultiplicator', feeRate);
         TemplateVar.set('fee', fee);
