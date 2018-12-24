@@ -214,7 +214,7 @@ Template['views_erc20Towerc20'].events({
         let from = TemplateVar.get('from'),
             storeman = TemplateVar.get('storeman'),
             to = TemplateVar.get('to'),
-            fee = TemplateVar.get('fee'),
+            fee = TemplateVar.get('totalFee'),
             amount = TemplateVar.get('amount');
 
         let gasPrice = TemplateVar.get('gasPrice').toString(),

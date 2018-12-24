@@ -246,7 +246,7 @@ Template['views_werc20Toerc20'].events({
         let from = TemplateVar.get('from'),
             storeman = TemplateVar.get('storeman'),
             to = TemplateVar.get('to'),
-            fee = TemplateVar.get('fee'),
+            fee = TemplateVar.get('totalFee'),
             amount = TemplateVar.get('amount'),
             valueFee = TemplateVar.get('coverCharge');
 
