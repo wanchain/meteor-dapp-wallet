@@ -16,7 +16,8 @@
  when the user actually wants to send the dummy data.
  @property defaultEstimateGas
  */
-var defaultEstimateGas = 50000000;
+// var defaultEstimateGas = 50000000;
+var defaultEstimateGas = 4700000;
 
 var checkWaddress = function (waddress) {
     var value = waddress.replace(/[\s\*\(\)\!\?\#\$\%]+/g, '');
@@ -595,24 +596,43 @@ Template['views_send'].events({
      */
     'keyup input[name="amount"], change input[name="amount"], input input[name="amount"]': function(e, template){
         // ether
-        if(TemplateVar.get('selectedToken') === 'ether') {
-            var wei = EthTools.toWei(e.currentTarget.value.replace(',','.'));
 
-            TemplateVar.set('amount', wei || '0');
+        let balance = 0;
+        let amount = 0;
 
-            checkOverDailyLimit(template.find('select[name="dapp-select-account"].send-from').value, wei, template);
+        var reg =new RegExp("^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$")
+        if (reg.test(e.currentTarget.value)) {
 
-        // token
-        } else {
-
-            var token = Tokens.findOne({address: TemplateVar.get('selectedToken')}),
+            if(TemplateVar.get('selectedToken') === 'ether') {
+                amount = EthTools.toWei(e.currentTarget.value.replace(',','.'));
+                balance = Helpers.getAccountByAddress(TemplateVar.get('fromAddress'))['balance'];
+    
+                TemplateVar.set('amount', amount || '0');
+    
+                checkOverDailyLimit(template.find('select[name="dapp-select-account"].send-from').value, amount, template);
+    
+            // token
+            } else {
+    
+                var token = Tokens.findOne({address: TemplateVar.get('selectedToken')});
                 amount = e.currentTarget.value || '0';
+    
+                TemplateVar.set('tokenId', token._id);
+    
+                balance = token.balances[Helpers.getAccountByAddress(TemplateVar.get('fromAddress'))._id] || '0';
+    
+                amount = new BigNumber(amount, 10).times(Math.pow(10, token.decimals || 0)).floor().toString(10);
+    
+                TemplateVar.set('amount', amount);
+            }
 
-            TemplateVar.set('tokenId', token._id);
+        }
 
-            amount = new BigNumber(amount, 10).times(Math.pow(10, token.decimals || 0)).floor().toString(10);
-
-            TemplateVar.set('amount', amount);
+        if(new BigNumber(amount, 10).gt(new BigNumber(balance, 10))) {
+            TemplateVar.set('amountInvalid', true);
+            TemplateVar.set('amount', 0);
+        } else {
+            TemplateVar.set('amountInvalid', false);
         }
     },
     /**
@@ -700,7 +720,6 @@ Template['views_send'].events({
 
                 var token = Tokens.findOne({address: tokenAddress}),
                     tokenBalance = token.balances[selectedAccount._id] || '0';
-
 
                 if(new BigNumber(tokenAmount, 10).gt(new BigNumber(tokenBalance, 10)))
                     return GlobalNotification.warning({
