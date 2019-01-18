@@ -50,7 +50,6 @@ class crossChainOperators{
     listHistory(tokenAddrList,symbol, callback){
         this.invokeOperator(new crossOperator('listHistory',{tokenAddrList:tokenAddrList,symbol:symbol},this.getOriginChainType(),callback));
     }
-
     getApproveTransData(tokenOrigAddr,tokenChainType,trans,callback){
         let operator = new crossOperator('getApproveTransData',{tx:trans,tokenOrigAddr:tokenOrigAddr,tokenChainType:tokenChainType},this.getOriginChainType() ,callback);
         this.invokeOperator(operator);
@@ -125,6 +124,9 @@ class crossChainOperators{
 
     getWerc20TokenAddressList(callback){
         this.invokeOperator(new crossOperator('getWerc20TokenAddressList',[],this.getOriginChainType(),callback));
+    }
+    listAllCrossTrans(callback){
+        this.invokeOperator(new crossOperator('listAllCrossTrans',[],this.getOriginChainType(),callback));
     }
     getRegErc20Tokens(callback){
         this.invokeOperator(new crossOperator('getRegErc20Tokens',{},this.getOriginChainType(),callback));
