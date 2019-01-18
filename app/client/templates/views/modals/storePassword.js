@@ -7,7 +7,6 @@ Template['views_modals_storepassword'].onDestroyed(function () {
 
 Template['views_modals_storepassword'].onCreated(function () {
     let self = this;
-    console.log(self.data.needPwd)
     TemplateVar.set(self, 'needRedeem', self.data.needPwd['redeem']);
     TemplateVar.set(self, 'needRevoke', self.data.needPwd['revoke']);
     TemplateVar.set(self, 'redeemText', 'Transactions pending confirmation');
@@ -23,10 +22,10 @@ Template['views_modals_storepassword'].helpers({
                 time: value.sendTime?Helpers.timeStamp2String(Number(value.sendTime) * 1000) : "--",
                 amount: Helpers.tokenFromWei(value.contractValue, value.decimals),
                 from: value.srcChainAddr !== 'WAN' ? `${value.from} (${value.srcChainType})` : `${value.from} (WAN)`,
-                to: value.srcChainAddr !== 'WAN' ? `${value.to} (WAN)` : `${value.to} (${value.srcChainType})`,
+                to: value.srcChainAddr !== 'WAN' ? `${value.to} (WAN)` : `${value.to} (${value.dstChainType})`,
                 symbol: value.tokenSymbol,
                 id: `redeem${index}`,
-                inputText: value.srcChainAddr !== 'WAN' ? 'Enter TO account\'s password' : 'Enter FROM account\'s password'
+                inputText: 'Enter TO account\'s password'
             })
         })
         return pwdCollection;
@@ -40,10 +39,10 @@ Template['views_modals_storepassword'].helpers({
                 time: value.sendTime?Helpers.timeStamp2String(Number(value.sendTime) * 1000) : "--",
                 amount: Helpers.tokenFromWei(value.contractValue, value.decimals),
                 from: value.srcChainAddr !== 'WAN' ? `${value.from} (${value.srcChainType})` : `${value.from} (WAN)`,
-                to: value.srcChainAddr !== 'WAN' ? `${value.to} (WAN)` : `${value.to} (${value.srcChainType})`,
+                to: value.srcChainAddr !== 'WAN' ? `${value.to} (WAN)` : `${value.to} (${value.dstChainType})`,
                 symbol: value.tokenSymbol,
                 id: `revoke${index}`,
-                inputText: value.srcChainAddr !== 'WAN' ? 'Enter FROM account\'s password' : 'Enter TO account\'s password'
+                inputText: 'Enter FROM account\'s password'
             })
         })
         return pwdCollection;
@@ -92,10 +91,10 @@ Template['views_modals_storepassword'].events({
 
         if(right === length) {
             TemplateVar.get('needRedeem').forEach(value => {
-                value.srcChainAddr !== 'WAN' ? Session.set(`${value.to}`, value.pwd) : Session.set(`${value.from}`, value.pwd);
+                Session.set(`${value.to}`, value.pwd);
             });
             TemplateVar.get('needRevoke').forEach(value => {
-                value.srcChainAddr !== 'WAN' ? Session.set(`${value.from}`, value.pwd) : Session.set(`${value.to}`, value.pwd);
+                Session.set(`${value.from}`, value.pwd);
             });
             let bool = TemplateVar.get('needRedeem').concat(TemplateVar.get('needRevoke')).every(val => {
                 return Session.get(val.hashX) === Session.get('NUM');

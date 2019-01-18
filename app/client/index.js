@@ -249,36 +249,20 @@ Meteor.startup(function () {
                         result['canRedeem'].forEach(item => {
                             !Session.get(item.hashX) ? Session.set(item.hashX, 1) : '';
                             if(Session.get(item.hashX) <= Session.get('NUM')) {
-                                if(item.srcChainType !== 'WAN') {
-                                    if(!Session.get(item.to)) {
-                                        needPwd['redeem'].push(item);
-                                    } else {
-                                        pending['redeem'].push(item);
-                                    }
+                                if(!Session.get(item.to)) {
+                                    needPwd['redeem'].push(item);
                                 } else {
-                                    if(!Session.get(item.form)) {
-                                        needPwd['redeem'].push(item);
-                                    } else {
-                                        pending['redeem'].push(item);
-                                    }
+                                    pending['redeem'].push(item);
                                 }
                             }
                         });
                         result['canRevoke'].forEach(item => {
                             !Session.get(item.hashX) ? Session.set(item.hashX, 1) : '';
                             if(Session.get(item.hashX) <= Session.get('NUM')) {
-                                if(item.srcChainType !== 'WAN') {
-                                    if(!Session.get(item.from)) {
-                                        needPwd['revoke'].push(item);
-                                    } else {
-                                        pending['revoke'].push(item);
-                                    }
+                                if(!Session.get(item.from)) {
+                                    needPwd['revoke'].push(item);
                                 } else {
-                                    if(!Session.get(item.to)) {
-                                        needPwd['revoke'].push(item);
-                                    } else {
-                                        pending['revoke'].push(item);
-                                    }
+                                    pending['revoke'].push(item);
                                 }
                             } 
                         });
@@ -340,7 +324,7 @@ Meteor.startup(function () {
 
                                     }
                                 });
-                            } else if (trans_data.srcChainType === 'WAN' && Session.get(trans_data.from)) {
+                            } else if (trans_data.srcChainType === 'WAN' && Session.get(trans_data.to)) {
                                 trans_data.tokenAddr = trans_data.dstChainAddr;
                                 trans_data.tokenType = trans_data.dstChainType;
                                 mist.WERC202ERC20(trans_data.tokenType).getGasPrice(trans_data.dstChainType, function (err, getGasPrice) {
@@ -355,7 +339,7 @@ Meteor.startup(function () {
                                             if (err) {
                                                 Helpers.showError(err);
                                                 sending.delete(trans_data.hashX);
-                                                Session.set(trans_data.from, null);
+                                                Session.set(trans_data.to, null);
                                                 Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
                                             }
                                         });
@@ -416,7 +400,7 @@ Meteor.startup(function () {
                                             if (err) {
                                                 Helpers.showError(err);
                                                 sending.delete(trans_data.hashX);
-                                                Session.set(trans_data.to, null);
+                                                Session.set(trans_data.from, null);
                                                 Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
                                             }
                                         });                    
