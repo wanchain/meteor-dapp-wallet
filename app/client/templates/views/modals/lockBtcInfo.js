@@ -15,6 +15,7 @@ Template['views_modals_lockBtcInfo'].events({
     'click .ok-cross': function () {
 
         let password_input_wan = document.getElementById('crosschain-psd-wan').value;
+        Session.set(this.trans.wanAddress, password_input_wan);
 
         if(!password_input_wan) {
             EthElements.Modal.hide();

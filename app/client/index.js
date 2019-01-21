@@ -246,176 +246,393 @@ Meteor.startup(function () {
                 };
                 mist.ERC202WERC20().listAllCrossTrans(function(err, result) {
                     if (!err) {
-                        result['canRedeem'].forEach(item => {
-                            !Session.get(item.hashX) ? Session.set(item.hashX, 1) : '';
-                            if(Session.get(item.hashX) <= Session.get('NUM')) {
-                                if(!Session.get(item.to)) {
-                                    needPwd['redeem'].push(item);
-                                } else {
-                                    pending['redeem'].push(item);
-                                }
-                            }
-                        });
-                        result['canRevoke'].forEach(item => {
-                            !Session.get(item.hashX) ? Session.set(item.hashX, 1) : '';
-                            if(Session.get(item.hashX) <= Session.get('NUM')) {
-                                if(!Session.get(item.from)) {
-                                    needPwd['revoke'].push(item);
-                                } else {
-                                    pending['revoke'].push(item);
-                                }
-                            } 
-                        });
+                        mist.BTC2WBTC().listHistory('BTC', (errBtc, resultBtc) => {
+                            if(!errBtc) {
 
-                        if (Session.get('display') !== 'none' && !Session.get('popStorePwd') && (needPwd['redeem'].length !== 0 || needPwd['revoke'].length !== 0)) {
-                            const tasks = needPwd['redeem'].concat(needPwd['revoke']);
-                            let completed = 0;
-                            tasks.forEach(item => {
-                                let tokenOrigAddr;
-                                if (item.tokenStand === 'E20') {
-                                    tokenOrigAddr = item.srcChainAddr === 'WAN' ? item.dstChainAddr : item.srcChainAddr;
-                                }
-                                mist.ERC202WERC20('ETH').getErc20Info(tokenOrigAddr, (error, result) => {
-                                    if (!error) {
-                                        item.decimals = result.decimals;
-                                        if (++completed === tasks.length) {
-                                            finish();
+                                resultBtc.forEach(item => {
+                                    item.hashX = item.HashX;
+                                    if(item.hashX) {
+                                        if(['sentRedeemFailed', 'waitingX'].includes(item.status)) {
+                                            result['canRedeem'].push(item);
+                                        }
+                                        if(['waitingRevoke', 'sentRevokeFailed'].includes(item.status)) {
+                                            result['canRevoke'].push(item);
                                         }
                                     }
-                                });
-                            });
-                        }
-                        
-                        pending['redeem'].filter(item => !sending.has(item.hashX)).forEach((trans_data) => {
-                            sending.add(trans_data.hashX)
-                            let getGas, gasPrice;
-                            let trans = {
-                                lockTxHash: trans_data.lockTxHash, 
-                                amount: trans_data.contractValue.toString(10),
-                                storemanGroup: trans_data.storeman, 
-                                cross: trans_data.crossAddress,
-                                x: trans_data.x, 
-                                hashX: trans_data.hashX
-                            };
-                            if (trans_data.srcChainType !== 'WAN' && Session.get(trans_data.to)) {
-                                trans_data.tokenAddr = trans_data.srcChainAddr;
-                                trans_data.tokenType = trans_data.srcChainType;
-                                mist.ERC202WERC20(trans_data.tokenType).getGasPrice(trans_data.dstChainType, function (err, getGasPrice) {
-                                    if (err) {
-                                        Helpers.showError(err);
-                                        sending.delete(trans_data.hashX)
-                                    } else {
-                                        getGas = getGasPrice.RefundGas;
-                                        gasPrice = getGasPrice.gasPrice;
-                                        if (gasPrice < defaultGasprice) {
-                                            gasPrice = defaultGasprice
-                                        }
-                                        trans.gasLimit = getGas;
-                                        trans.gasPrice = gasPrice;
-                                        let pwd = Session.get(trans_data.to);
-                                        mist.ERC202WERC20(trans_data.tokenType).sendRefundTrans(trans_data.tokenAddr, trans_data.tokenType, trans, pwd, function (err) {
-                                            if (err) {
-                                                Helpers.showError(err);
-                                                sending.delete(trans_data.hashX);
-                                                Session.set(trans_data.to, null);
-                                                Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                })
+                                result['canRedeem'].forEach(item => {
+                                    !Session.get(item.hashX) ? Session.set(item.hashX, 1) : '';
+                                    if(Session.get(item.hashX) <= Session.get('NUM')) {
+                                        if(['WAN', 'BTC'].includes(item.chain)) {
+                                            if(item.chain === 'BTC') {
+                                                !Session.get(`0x${item.crossAddress}`) ? needPwd['redeem'].push(item) : pending['redeem'].push(item)
+                                            } else {
+                                                !Session.get(item.crossAddress) ? needPwd['redeem'].push(item) : pending['redeem'].push(item)
                                             }
-                                        });
+                                        } else {
+                                            !Session.get(item.to) ? needPwd['redeem'].push(item) : pending['redeem'].push(item);
+                                        }
 
                                     }
                                 });
-                            } else if (trans_data.srcChainType === 'WAN' && Session.get(trans_data.to)) {
-                                trans_data.tokenAddr = trans_data.dstChainAddr;
-                                trans_data.tokenType = trans_data.dstChainType;
-                                mist.WERC202ERC20(trans_data.tokenType).getGasPrice(trans_data.dstChainType, function (err, getGasPrice) {
-                                    if (err) {
-                                        Helpers.showError(err);
-                                        sending.delete(trans_data.hashX);
-                                    } else {
-                                        trans.gasLimit = getGasPrice.RefundGas;
-                                        trans.gasPrice = getGasPrice.gasPrice;
-                                        let pwd = Session.get(trans_data.to);
-                                        mist.WERC202ERC20(trans_data.tokenType).sendRefundTrans(trans_data.tokenAddr, trans_data.tokenType, trans, pwd, function (err) {
-                                            if (err) {
-                                                Helpers.showError(err);
-                                                sending.delete(trans_data.hashX);
-                                                Session.set(trans_data.to, null);
-                                                Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
-                                            }
-                                        });
+
+                                result['canRevoke'].forEach(item => {
+                                    !Session.get(item.hashX) ? Session.set(item.hashX, 1) : '';
+                                    if(Session.get(item.hashX) <= Session.get('NUM')) {
+                                        !Session.get(item.from) ? needPwd['revoke'].push(item) : pending['revoke'].push(item);
                                     }
                                 });
-                            }
-
-                        });
-                        pending['revoke'].filter(item => !sending.has(item.hashX)).forEach((trans_data) =>{
-                            sending.add(trans_data.hashX)
-                            let trans = {
-                                lockTxHash: trans_data.lockTxHash, 
-                                amount: trans_data.contractValue.toString(10),
-                                storemanGroup: trans_data.storeman, 
-                                cross: trans_data.crossAddress,
-                                x: trans_data.x, 
-                                hashX: trans_data.hashX
-                            };
-                            if (trans_data.srcChainType === 'WAN') {
-                                trans_data.tokenAddr = trans_data.dstChainAddr;
-                                trans_data.tokenType = trans_data.dstChainType;
-                                mist.WERC202ERC20(trans_data.tokenType).getGasPrice(trans_data.dstChainType, function (err, getGasPrice) {
-                                    if (err) {
-                                        Helpers.showError(err);
-                                        sending.delete(trans_data.hashX)
-                                    } else {
-                                        getGas = getGasPrice.RevokeGas;
-                                        gasPrice = getGasPrice.gasPrice;
-                                        if (gasPrice < defaultGasprice) {
-                                            gasPrice = defaultGasprice
+                                if (Session.get('display') !== 'none' && !Session.get('popStorePwd') && (needPwd['redeem'].length !== 0 || needPwd['revoke'].length !== 0)) {
+                                    const tasks = needPwd['redeem'].concat(needPwd['revoke']);
+                                    let completed = 0;
+                                    tasks.forEach(item => {
+                                        let tokenOrigAddr;
+                                        if (item.tokenStand === 'E20') {
+                                            tokenOrigAddr = item.srcChainAddr === 'WAN' ? item.dstChainAddr : item.srcChainAddr;
+                                            mist.ERC202WERC20('ETH').getErc20Info(tokenOrigAddr, (error, result) => {
+                                                if (!error) {
+                                                    item.decimals = result.decimals;
+                                                    if (++completed === tasks.length) {
+                                                        finish();
+                                                    }
+                                                }
+                                            });
                                         }
-                                        trans.gasLimit = getGas;
-                                        trans.gasPrice = gasPrice;
-                                        let pwd = Session.get(trans_data.from);
-                                        mist.WERC202ERC20(trans_data.tokenType).sendRevokeTrans(trans_data.tokenAddr,trans_data.tokenType,trans,pwd, function (err) {
-                                            if (err) {
-                                                Helpers.showError(err);
-                                                sending.delete(trans_data.hashX);
-                                                Session.set(trans_data.from, null);
-                                                Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                        if (item.tokenStand === 'ETH') {
+                                            item.decimals = 18;
+                                            if (++completed === tasks.length) {
+                                                finish();
                                             }
-                                        });                    
-                            
+                                        }
+                                        if(['WAN', 'BTC'].includes(item.chain)) {
+                                            item.decimals = 8;
+                                            if (++completed === tasks.length) {
+                                                finish();
+                                            }
+                                        }
+                                    });
+                                }
+                                
+                                pending['redeem'].filter(item => !sending.has(item.hashX)).forEach((trans_data) => {
+                                    sending.add(trans_data.hashX);
+                                    if(trans_data.tokenStand === 'E20' && Session.get(trans_data.to)) {
+                                        let getGas, gasPrice;
+                                        let trans = {
+                                            lockTxHash: trans_data.lockTxHash, 
+                                            amount: trans_data.contractValue.toString(10),
+                                            storemanGroup: trans_data.storeman, 
+                                            cross: trans_data.crossAddress,
+                                            x: trans_data.x, 
+                                            hashX: trans_data.hashX
+                                        };
+                                        if (trans_data.srcChainType !== 'WAN') {
+                                            trans_data.tokenAddr = trans_data.srcChainAddr;
+                                            trans_data.tokenType = trans_data.srcChainType;
+                                            mist.ERC202WERC20(trans_data.tokenType).getGasPrice(trans_data.dstChainType, function (err, getGasPrice) {
+                                                if (err) {
+                                                    Helpers.showError(err);
+                                                    sending.delete(trans_data.hashX)
+                                                } else {
+                                                    getGas = getGasPrice.RefundGas;
+                                                    gasPrice = getGasPrice.gasPrice;
+                                                    if (gasPrice < defaultGasprice) {
+                                                        gasPrice = defaultGasprice
+                                                    }
+                                                    trans.gasLimit = getGas;
+                                                    trans.gasPrice = gasPrice;
+                                                    let pwd = Session.get(trans_data.to);
+                                                    mist.ERC202WERC20(trans_data.tokenType).sendRefundTrans(trans_data.tokenAddr, trans_data.tokenType, trans, pwd, function (err) {
+                                                        if (err) {
+                                                            Helpers.showError(err);
+                                                            sending.delete(trans_data.hashX);
+                                                            Session.set(trans_data.to, null);
+                                                            Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                        }
+                                                    });
+            
+                                                }
+                                            });
+                                        } else {
+                                            trans_data.tokenAddr = trans_data.dstChainAddr;
+                                            trans_data.tokenType = trans_data.dstChainType;
+                                            mist.WERC202ERC20(trans_data.tokenType).getGasPrice(trans_data.dstChainType, function (err, getGasPrice) {
+                                                if (err) {
+                                                    Helpers.showError(err);
+                                                    sending.delete(trans_data.hashX);
+                                                } else {
+                                                    trans.gasLimit = getGasPrice.RefundGas;
+                                                    trans.gasPrice = getGasPrice.gasPrice;
+                                                    let pwd = Session.get(trans_data.to);
+                                                    mist.WERC202ERC20(trans_data.tokenType).sendRefundTrans(trans_data.tokenAddr, trans_data.tokenType, trans, pwd, function (err) {
+                                                        if (err) {
+                                                            Helpers.showError(err);
+                                                            sending.delete(trans_data.hashX);
+                                                            Session.set(trans_data.to, null);
+                                                            Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    }
+                                    if(trans_data.tokenStand === 'ETH' && Session.get(trans_data.to)) {
+                                        let getGas, gasPrice;
+                                        let trans = {
+                                            lockTxHash: trans_data.lockTxHash, 
+                                            amount: trans_data.contractValue.toString(10),
+                                            storemanGroup: trans_data.storeman, 
+                                            cross: trans_data.crossAddress,
+                                            x: trans_data.x, 
+                                            hashX: trans_data.hashX
+                                        };
+                                        if (trans_data.srcChainType !== 'WAN') {
+                                            trans_data.tokenAddr = trans_data.srcChainAddr;
+                                            trans_data.tokenType = trans_data.srcChainType;
+                                            mist.ETH2WETH().getGasPrice('WAN', function (err, getGasPrice) {
+                                                if (err) {
+                                                    Helpers.showError(err);
+                                                    sending.delete(trans_data.hashX)
+                                                } else {
+                                                    getGas = getGasPrice.RefundGas;
+                                                    gasPrice = getGasPrice.gasPrice;
+                                                    if (gasPrice < defaultGasprice) {
+                                                        gasPrice = defaultGasprice
+                                                    }
+                                                    trans.gasLimit = getGas;
+                                                    trans.gasPrice = gasPrice;
+                                                    let pwd = Session.get(trans_data.to);
+                                                    mist.ETH2WETH().sendRefundTrans(trans, pwd, function (err) {
+                                                        if (err) {
+                                                            Helpers.showError(err);
+                                                            sending.delete(trans_data.hashX);
+                                                            Session.set(trans_data.to, null);
+                                                            Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                        }
+                                                    });
+            
+                                                }
+                                            });
+                                        } else {
+                                            trans_data.tokenAddr = trans_data.dstChainAddr;
+                                            trans_data.tokenType = trans_data.dstChainType;
+                                            mist.WETH2ETH().getGasPrice('ETH', function (err, getGasPrice) {
+                                                if (err) {
+                                                    Helpers.showError(err);
+                                                    sending.delete(trans_data.hashX);
+                                                } else {
+                                                    trans.gasLimit = getGasPrice.RefundGas;
+                                                    trans.gasPrice = getGasPrice.gasPrice;
+                                                    let pwd = Session.get(trans_data.to);
+                                                    mist.WETH2ETH().sendRefundTrans(trans, pwd, function (err) {
+                                                        if (err) {
+                                                            Helpers.showError(err);
+                                                            sending.delete(trans_data.hashX);
+                                                            Session.set(trans_data.to, null);
+                                                            Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    }
+                                    if(['WAN', 'BTC'].includes(trans_data.chain)) {
+                                        if(trans_data.chain === 'BTC' && Session.get(`0x${trans_data.crossAddress}`)) {
+                                            let params = {
+                                                crossAddress: trans_data.crossAddress,
+                                                wanPassword: Session.get(`0x${trans_data.crossAddress}`),
+                                                x: trans_data.x
+                                            };
+                                            mist.BTC2WBTC().redeemBtc('BTC', params, function (err,data) {
+                                                if (err) {
+                                                    Helpers.showError(err);
+                                                    sending.delete(trans_data.hashX);
+                                                    Session.set(`0x${trans_data.crossAddress}`, null);
+                                                    Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                }
+                                            });
+                                        } else if(trans_data.chain === 'WAN' && Session.get(trans_data.crossAddress)) {
+                                            let params = {
+                                                HashX: trans_data.HashX, 
+                                                crossAddress: trans_data.crossAddress, 
+                                                X: trans_data.x,
+                                                btcPassword: Session.get(trans_data.crossAddress)
+                                            }
+                                            mist.BTC2WBTC().redeemWbtc('BTC', params, function (err,data) {
+                                                if (err) {
+                                                    Helpers.showError(err);
+                                                    sending.delete(trans_data.hashX);
+                                                    Session.set(trans_data.crossAddress, null);
+                                                    Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                                pending['revoke'].filter(item => !sending.has(item.hashX)).forEach((trans_data) =>{
+                                    sending.add(trans_data.hashX);
+   
+                                    if(trans_data.tokenStand === 'E20' && Session.get(trans_data.from)) {
+                                        let trans = {
+                                            lockTxHash: trans_data.lockTxHash, 
+                                            amount: trans_data.contractValue.toString(10),
+                                            storemanGroup: trans_data.storeman, 
+                                            cross: trans_data.crossAddress,
+                                            x: trans_data.x, 
+                                            hashX: trans_data.hashX
+                                        };
+                                        if (trans_data.srcChainType === 'WAN') {
+                                            trans_data.tokenAddr = trans_data.dstChainAddr;
+                                            trans_data.tokenType = trans_data.dstChainType;
+                                            mist.WERC202ERC20(trans_data.tokenType).getGasPrice(trans_data.dstChainType, function (err, getGasPrice) {
+                                                if (err) {
+                                                    Helpers.showError(err);
+                                                    sending.delete(trans_data.hashX)
+                                                } else {
+                                                    getGas = getGasPrice.RevokeGas;
+                                                    gasPrice = getGasPrice.gasPrice;
+                                                    if (gasPrice < defaultGasprice) {
+                                                        gasPrice = defaultGasprice
+                                                    }
+                                                    trans.gasLimit = getGas;
+                                                    trans.gasPrice = gasPrice;
+                                                    let pwd = Session.get(trans_data.from);
+                                                    mist.WERC202ERC20(trans_data.tokenType).sendRevokeTrans(trans_data.tokenAddr,trans_data.tokenType,trans,pwd, function (err) {
+                                                        if (err) {
+                                                            Helpers.showError(err);
+                                                            sending.delete(trans_data.hashX);
+                                                            Session.set(trans_data.from, null);
+                                                            Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                        }
+                                                    });                    
+                                        
+                                                }
+                                            });
+                                        } else {
+                                            trans_data.tokenAddr = trans_data.srcChainAddr;
+                                            trans_data.tokenType = trans_data.srcChainType;
+                                            mist.ERC202WERC20(trans_data.tokenType).getGasPrice(trans_data.dstChainType, function (err, getGasPrice) {
+                                                if (err) {
+                                                    Helpers.showError(err);
+                                                    sending.delete(trans_data.hashX)
+                                                } else {
+                                                    trans.gasLimit = getGasPrice.RevokeGas;
+                                                    trans.gasPrice = getGasPrice.gasPrice;
+                                                    let pwd = Session.get(trans_data.from);
+                                                    mist.ERC202WERC20(trans_data.tokenType).sendRevokeTrans(trans_data.tokenAddr,trans_data.tokenType,trans,pwd, function (err) {
+                                                        if (err) {
+                                                            Helpers.showError(err);
+                                                            sending.delete(trans_data.hashX);
+                                                            Session.set(trans_data.from, null);
+                                                            Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                        }
+                                                    });                    
+                                        
+                                                }
+                                            });
+                                        }
+                                    }
+                                    if(trans_data.tokenStand === 'ETH' && Session.get(trans_data.from)) {
+                                        let trans = {
+                                            lockTxHash: trans_data.lockTxHash, 
+                                            amount: trans_data.contractValue.toString(10),
+                                            storemanGroup: trans_data.storeman, 
+                                            cross: trans_data.crossAddress,
+                                            x: trans_data.x, 
+                                            hashX: trans_data.hashX
+                                        };
+                                        if (trans_data.srcChainType === 'WAN') {
+                                            trans_data.tokenAddr = trans_data.dstChainAddr;
+                                            trans_data.tokenType = trans_data.dstChainType;
+                                            mist.WETH2ETH().getGasPrice('WAN', function (err, getGasPrice) {
+                                                if (err) {
+                                                    Helpers.showError(err);
+                                                    sending.delete(trans_data.hashX)
+                                                } else {
+                                                    getGas = getGasPrice.RevokeGas;
+                                                    gasPrice = getGasPrice.gasPrice;
+                                                    if (gasPrice < defaultGasprice) {
+                                                        gasPrice = defaultGasprice
+                                                    }
+                                                    trans.gasLimit = getGas;
+                                                    trans.gasPrice = gasPrice;
+                                                    let pwd = Session.get(trans_data.from);
+                                                    mist.WETH2ETH().sendRevokeTrans(trans,pwd, function (err) {
+                                                        if (err) {
+                                                            Helpers.showError(err);
+                                                            sending.delete(trans_data.hashX);
+                                                            Session.set(trans_data.from, null);
+                                                            Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                        }
+                                                    });                    
+                                        
+                                                }
+                                            });
+                                        } else {
+                                            trans_data.tokenAddr = trans_data.srcChainAddr;
+                                            trans_data.tokenType = trans_data.srcChainType;
+                                            mist.ETH2WETH().getGasPrice('ETH', function (err, getGasPrice) {
+                                                if (err) {
+                                                    Helpers.showError(err);
+                                                    sending.delete(trans_data.hashX)
+                                                } else {
+                                                    trans.gasLimit = getGasPrice.RevokeGas;
+                                                    trans.gasPrice = getGasPrice.gasPrice;
+                                                    let pwd = Session.get(trans_data.from);
+                                                    mist.ETH2WETH().sendRevokeTrans(trans, pwd, function (err) {
+                                                        if (err) {
+                                                            Helpers.showError(err);
+                                                            sending.delete(trans_data.hashX);
+                                                            Session.set(trans_data.from, null);
+                                                            Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                        }
+                                                    });                             
+                                                }
+                                            });
+                                        }
+                                    }
+                                    if(['WAN', 'BTC'].includes(trans_data.chain) && Session.get(trans_data.from)) {
+                                 
+                                        if(trans_data.chain === 'BTC') {
+                                            let params = {
+                                                from: trans_data.from,
+                                                HashX: trans_data.HashX,
+                                                btcPassword: Session.get(trans_data.from)
+                                            };
+                                            mist.BTC2WBTC().revokeBtc('BTC', params, function (err,data) {
+                                                if (err) {
+                                                    Helpers.showError(err);
+                                                    sending.delete(trans_data.hashX);
+                                                    Session.set(trans_data.from, null);
+                                                    Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                }
+                                            });
+                                        } else {
+                                            let params = {
+                                                from: trans_data.from, 
+                                                HashX: trans_data.HashX, 
+                                                X: trans_data.x,
+                                                btcPassword: Session.get(trans_data.from)
+                                            };                        
+                                            mist.BTC2WBTC().revokeWbtc('BTC', params, function (err,data) {
+                                                if (err) {
+                                                    Helpers.showError(err);
+                                                    sending.delete(trans_data.hashX);
+                                                    Session.set(trans_data.from, null);
+                                                    Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                }
+                                            });
+                                        }
                                     }
                                 });
                             } else {
-                                trans_data.tokenAddr = trans_data.srcChainAddr;
-                                trans_data.tokenType = trans_data.srcChainType;
-                                mist.ERC202WERC20(trans_data.tokenType).getGasPrice(trans_data.dstChainType, function (err, getGasPrice) {
-                                    if (err) {
-                                        Helpers.showError(err);
-                                        sending.delete(trans_data.hashX)
-                                    } else {
-                                        trans.gasLimit = getGasPrice.RevokeGas;
-                                        trans.gasPrice = getGasPrice.gasPrice;
-                                        let pwd = Session.get(trans_data.from);
-                                        mist.ERC202WERC20(trans_data.tokenType).sendRevokeTrans(trans_data.tokenAddr,trans_data.tokenType,trans,pwd, function (err) {
-                                            if (err) {
-                                                Helpers.showError(err);
-                                                sending.delete(trans_data.hashX);
-                                                Session.set(trans_data.from, null);
-                                                Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
-                                            }
-                                        });                    
-                            
-                                    }
-                                });
+                                console.log('listAllCrossTrans BTC err: ', err);
                             }
                         });
                     } else {
-                      console.log('listAllCrossTrans err: ', err);
+                      console.log('listAllCrossTrans ETH&ERC20 err: ', err);
                     }
                 })
-            }, 8000);
+            }, 10000);
         }        
     });
-
-
 });

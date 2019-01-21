@@ -2,6 +2,7 @@ Template['views_modals_unlockTransactionInfo'].onCreated(function(){
     var template = this;
     TemplateVar.set(template, 'isButton', false);
     TemplateVar.set(template, 'passwdType', 'Enter FROM account\'s password');
+    TemplateVar.set(template, 'passwdTypeTo', 'Enter TO account\'s password');
 });
 
 
@@ -14,12 +15,21 @@ Template['views_modals_unlockTransactionInfo'].events({
     'click .ok-cross': function () {
         EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
 
-        // console.log('data trans: ', this.trans);
         let password_input = document.getElementById('crosschain-psd').value;
+        let password_inputTo = document.getElementById('crosschain-psdTo').value;
+        Session.set(this.trans.from, password_input);
+        Session.set(this.trans.to, password_inputTo);
 
-        // console.log('password: ', password_input);
 
         if(!password_input) {
+            EthElements.Modal.hide();
+            return GlobalNotification.warning({
+                content: 'Empty password, please enter one',
+                duration: 2
+            });
+        }
+
+        if(!password_inputTo) {
             EthElements.Modal.hide();
             return GlobalNotification.warning({
                 content: 'Empty password, please enter one',

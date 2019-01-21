@@ -7,6 +7,7 @@ Template['views_modals_storepassword'].onDestroyed(function () {
 
 Template['views_modals_storepassword'].onCreated(function () {
     let self = this;
+    TemplateVar.set(self, 'template', self); 
     TemplateVar.set(self, 'needRedeem', self.data.needPwd['redeem']);
     TemplateVar.set(self, 'needRevoke', self.data.needPwd['revoke']);
     TemplateVar.set(self, 'redeemText', 'Transactions pending confirmation');
@@ -17,16 +18,30 @@ Template['views_modals_storepassword'].helpers({
     listRedeem: function() {
         let pwdCollection = [];
         _.each(TemplateVar.get('needRedeem'), function(value, index) {
-            pwdCollection.push({
-                index: `Tx${index+1}`,
-                time: value.sendTime?Helpers.timeStamp2String(Number(value.sendTime) * 1000) : "--",
-                amount: Helpers.tokenFromWei(value.contractValue, value.decimals),
-                from: value.srcChainAddr !== 'WAN' ? `${value.from} (${value.srcChainType})` : `${value.from} (WAN)`,
-                to: value.srcChainAddr !== 'WAN' ? `${value.to} (WAN)` : `${value.to} (${value.dstChainType})`,
-                symbol: value.tokenSymbol,
-                id: `redeem${index}`,
-                inputText: 'Enter TO account\'s password'
-            })
+            if(value.chain) {
+                pwdCollection.push({
+                    index: `Tx${index+1}`,
+                    time: Helpers.timeStamp2String(value.time),
+                    amount: web3.toBigNumber(value.value).div(100000000).toString(10),
+                    from: value.chain === 'BTC' ? `${value.from} (BTC)` : `${value.from} (WAN)`,
+                    to: value.chain === 'BTC' ? `0x${value.crossAddress} (WAN)` : `${value.crossAddress} (BTC)`,
+                    symbol: value.chain === 'BTC' ? 'BTC' : 'WBTC',
+                    id: `redeem${index}`,
+                    inputText: 'Enter TO account\'s password'
+                })
+            } else {
+                pwdCollection.push({
+                    index: `Tx${index+1}`,
+                    time: value.sendTime?Helpers.timeStamp2String(Number(value.sendTime) * 1000) : "--",
+                    amount: Helpers.tokenFromWei(value.contractValue, value.decimals),
+                    from: value.srcChainAddr !== 'WAN' ? `${value.from} (${value.srcChainType})` : `${value.from} (WAN)`,
+                    to: value.srcChainAddr !== 'WAN' ? `${value.to} (WAN)` : `${value.to} (${value.dstChainType})`,
+                    symbol: value.tokenSymbol,
+                    id: `redeem${index}`,
+                    inputText: 'Enter TO account\'s password'
+                })
+            }
+
         })
         return pwdCollection;
     },
@@ -34,16 +49,29 @@ Template['views_modals_storepassword'].helpers({
     listRevoke: function() {
         let pwdCollection = [];
         _.each(TemplateVar.get('needRevoke'), function(value, index) {
-            pwdCollection.push({
-                index: `Tx${index+1}`,
-                time: value.sendTime?Helpers.timeStamp2String(Number(value.sendTime) * 1000) : "--",
-                amount: Helpers.tokenFromWei(value.contractValue, value.decimals),
-                from: value.srcChainAddr !== 'WAN' ? `${value.from} (${value.srcChainType})` : `${value.from} (WAN)`,
-                to: value.srcChainAddr !== 'WAN' ? `${value.to} (WAN)` : `${value.to} (${value.dstChainType})`,
-                symbol: value.tokenSymbol,
-                id: `revoke${index}`,
-                inputText: 'Enter FROM account\'s password'
-            })
+            if(value.chain) {
+                pwdCollection.push({
+                    index: `Tx${index+1}`,
+                    time: Helpers.timeStamp2String(value.time),
+                    amount: web3.toBigNumber(value.value).div(100000000).toString(10),
+                    from: value.chain === 'BTC' ? `${value.from} (BTC)` : `${value.from} (WAN)`,
+                    to: value.chain === 'BTC' ? `0x${value.crossAddress} (WAN)` : `${value.crossAddress} (BTC)`,
+                    symbol: value.chain === 'BTC' ? 'BTC' : 'WBTC',
+                    id: `revoke${index}`,
+                    inputText: 'Enter FROM account\'s password'
+                })
+            } else {
+                pwdCollection.push({
+                    index: `Tx${index+1}`,
+                    time: value.sendTime?Helpers.timeStamp2String(Number(value.sendTime) * 1000) : "--",
+                    amount: Helpers.tokenFromWei(value.contractValue, value.decimals),
+                    from: value.srcChainAddr !== 'WAN' ? `${value.from} (${value.srcChainType})` : `${value.from} (WAN)`,
+                    to: value.srcChainAddr !== 'WAN' ? `${value.to} (WAN)` : `${value.to} (${value.dstChainType})`,
+                    symbol: value.tokenSymbol,
+                    id: `revoke${index}`,
+                    inputText: 'Enter FROM account\'s password'
+                })
+            }
         })
         return pwdCollection;
     }
@@ -57,8 +85,14 @@ Template['views_modals_storepassword'].events({
         Session.set('isShowModal', false);
         EthElements.Modal.hide();
     },
-    'click .closeBtn': function () {
-
+    'click .closeBtn': function (e) {
+        let id = e.target.id;
+        let type = id.substr(0,6);
+        let num = id.substr(6);
+        let self = TemplateVar.get('template')
+        let tmp = TemplateVar.get('needRedeem')
+        tmp.splice(num, 1)
+        TemplateVar.set(self, 'needRedeem', tmp)
     },
     'click .ok-cross': function () {
         // EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});
@@ -91,7 +125,11 @@ Template['views_modals_storepassword'].events({
 
         if(right === length) {
             TemplateVar.get('needRedeem').forEach(value => {
-                Session.set(`${value.to}`, value.pwd);
+                if(['WAN', 'BTC'].includes(value.chain)) {
+                    value.chain === 'BTC' ? Session.set(`0x${value.crossAddress}`, value.pwd): Session.set(`${value.crossAddress}`, value.pwd);
+                } else {
+                    Session.set(`${value.to}`, value.pwd);
+                }
             });
             TemplateVar.get('needRevoke').forEach(value => {
                 Session.set(`${value.from}`, value.pwd);
