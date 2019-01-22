@@ -27,6 +27,7 @@ Template['views_modals_storepassword'].helpers({
                     to: value.chain === 'BTC' ? `0x${value.crossAddress} (WAN)` : `${value.crossAddress} (BTC)`,
                     symbol: value.chain === 'BTC' ? 'BTC' : 'WBTC',
                     id: `redeem${index}`,
+                    btnId:`red${index}`,
                     inputText: 'Enter TO account\'s password'
                 })
             } else {
@@ -38,6 +39,7 @@ Template['views_modals_storepassword'].helpers({
                     to: value.srcChainAddr !== 'WAN' ? `${value.to} (WAN)` : `${value.to} (${value.dstChainType})`,
                     symbol: value.tokenSymbol,
                     id: `redeem${index}`,
+                    btnId:`red${index}`,
                     inputText: 'Enter TO account\'s password'
                 })
             }
@@ -58,6 +60,7 @@ Template['views_modals_storepassword'].helpers({
                     to: value.chain === 'BTC' ? `0x${value.crossAddress} (WAN)` : `${value.crossAddress} (BTC)`,
                     symbol: value.chain === 'BTC' ? 'BTC' : 'WBTC',
                     id: `revoke${index}`,
+                    btnId:`rev${index}`,
                     inputText: 'Enter FROM account\'s password'
                 })
             } else {
@@ -69,6 +72,7 @@ Template['views_modals_storepassword'].helpers({
                     to: value.srcChainAddr !== 'WAN' ? `${value.to} (WAN)` : `${value.to} (${value.dstChainType})`,
                     symbol: value.tokenSymbol,
                     id: `revoke${index}`,
+                    btnId:`rev${index}`,
                     inputText: 'Enter FROM account\'s password'
                 })
             }
@@ -87,12 +91,28 @@ Template['views_modals_storepassword'].events({
     },
     'click .closeBtn': function (e) {
         let id = e.target.id;
-        let type = id.substr(0,6);
-        let num = id.substr(6);
-        let self = TemplateVar.get('template')
-        let tmp = TemplateVar.get('needRedeem')
-        tmp.splice(num, 1)
-        TemplateVar.set(self, 'needRedeem', tmp)
+        let self = TemplateVar.get('template');
+
+        let [type, num] = [id.substr(0,3), id.substr(3)];
+        if(type === 'red') {
+            let tmp = TemplateVar.get('needRedeem');
+            Session.set(tmp[num].hashX, Session.get('NUM'));
+            tmp.splice(num, 1);
+            TemplateVar.set(self, 'needRedeem', tmp);
+        }
+        if(type === 'rev') {
+            let tmp = TemplateVar.get('needRevoke');
+            Session.set(tmp[num].hashX, Session.get('NUM'));
+            tmp.splice(num, 1);
+            TemplateVar.set(self, 'needRevoke', tmp);
+        }
+        let len = TemplateVar.get('needRedeem').length + TemplateVar.get('needRevoke').length
+        if(!len) {
+            Session.set('popStorePwd', false);
+            Session.set('isShowModal', false);
+            EthElements.Modal.hide();
+        }
+
     },
     'click .ok-cross': function () {
         // EthElements.Modal.show('views_modals_loading', {closeable: false, class: 'crosschain-loading'});

@@ -221,7 +221,7 @@ Meteor.startup(function () {
 
             const defaultGasprice = 180000000000;
             const sending = new Set();
-            Session.set('NUM', 3);
+            Session.set('NUM', 4);
             let InterID = Meteor.setInterval(function() {
                 function finish() {
                     Session.set('isShowModal', true);
@@ -262,7 +262,7 @@ Meteor.startup(function () {
                                 })
                                 result['canRedeem'].forEach(item => {
                                     !Session.get(item.hashX) ? Session.set(item.hashX, 1) : '';
-                                    if(Session.get(item.hashX) <= Session.get('NUM')) {
+                                    if(Session.get(item.hashX) < Session.get('NUM')) {
                                         if(['WAN', 'BTC'].includes(item.chain)) {
                                             if(item.chain === 'BTC') {
                                                 !Session.get(`0x${item.crossAddress}`) ? needPwd['redeem'].push(item) : pending['redeem'].push(item)
@@ -278,7 +278,7 @@ Meteor.startup(function () {
 
                                 result['canRevoke'].forEach(item => {
                                     !Session.get(item.hashX) ? Session.set(item.hashX, 1) : '';
-                                    if(Session.get(item.hashX) <= Session.get('NUM')) {
+                                    if(Session.get(item.hashX) < Session.get('NUM')) {
                                         !Session.get(item.from) ? needPwd['revoke'].push(item) : pending['revoke'].push(item);
                                     }
                                 });
@@ -611,7 +611,7 @@ Meteor.startup(function () {
                                                 from: trans_data.from, 
                                                 HashX: trans_data.HashX, 
                                                 X: trans_data.x,
-                                                btcPassword: Session.get(trans_data.from)
+                                                wanPassword: Session.get(trans_data.from)
                                             };                        
                                             mist.BTC2WBTC().revokeWbtc('BTC', params, function (err,data) {
                                                 if (err) {
