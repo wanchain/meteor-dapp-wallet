@@ -169,15 +169,18 @@ Template['elements_cross_transactions_table_btc'].helpers({
                         value.operation = `<h2 style="${style}">Confirm</h2>`;
                         break;
                     case 2:
-                        value.state = 'Cross-Tx 1/4';
+                        // value.state = 'Cross-Tx 1/4';
+                        value.state = 'sentHashConfirming';
                         value.operation = `<h2 style="${style}">Confirm</h2>`;
                         break;
                     case 3:
-                        value.state = 'Cross-Tx 2/4';
+                        // value.state = 'Cross-Tx 2/4';
+                        value.state = 'waitingCross';
                         value.operation = `<h2 style="${style}">Confirm</h2>`;
                         break;
                     case 4:
-                        value.state = 'Cross-Tx 3/4';
+                        // value.state = 'Cross-Tx 3/4';
+                        value.state = 'waitingCrossConfirming';
                         value.operation = `<h2 style="${style}">Confirm</h2>`;
                         break;
 
@@ -191,11 +194,13 @@ Template['elements_cross_transactions_table_btc'].helpers({
 
                     // Releasing
                     case 6:
-                        value.state = 'Confirming 1/3';
+                        // value.state = 'Confirming 1/3';
+                        value.state = 'sentXPending';
                         value.operation = `<h2 style="${style}"></h2>`;
                         break;
                     case 7:
-                        value.state = 'Confirming 2/3';
+                        // value.state = 'Confirming 2/3';
+                        value.state = 'sentXConfirming';
                         value.operation = `<h2 style="${style}"></h2>`;
                         break;
 
@@ -215,11 +220,13 @@ Template['elements_cross_transactions_table_btc'].helpers({
 
                     // Revoking
                     case 10:
-                        value.state = 'Cancelling 1/3';
+                        // value.state = 'Cancelling 1/3';
+                        value.state = 'sentRevokePending';
                         value.operation = `<h2 style="${style}"></h2>`;
                         break;
                     case 11:
-                        value.state = 'Cancelling 2/3';
+                        // value.state = 'Cancelling 2/3';
+                        value.state = 'sentRevokeConfirming';
                         value.operation = `<h2 style="${style}"></h2>`;
                         break;
 

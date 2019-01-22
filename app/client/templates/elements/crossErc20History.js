@@ -450,26 +450,30 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                         || value.status === stateDict.ApproveZeroSendFailAfterRetries
                     ) {
                         value.operation = `<h2 style="${style}"></h2>`;
-                        value.state = 'Failed';
+                        value.state = 'Approve Failed';
                     }
                     else if (value.status === stateDict.LockSending) {
                         value.operation = `<h2 style="${style}">Confirm</h2>`;
-                        value.state = 'Cross-Tx 1/4';
+                        // value.state = 'Cross-Tx 1/4';
+                        value.state = 'LockSending';
                     }
                     else if (value.status === stateDict.LockSendFail
                         || value.status === stateDict.LockSendFailAfterRetries
                         || value.status === stateDict.LockFail
                     ) {
                         value.operation = `<h2 style="${style}"></h2>`;
-                        value.state = 'Failed';
+                        value.state = 'Lock Send Failed';
                     }
                     else if (value.status === stateDict.LockSent) {
                         value.operation = `<h2 style="${style}">Confirm</h2>`;
-                        value.state = 'Cross-Tx 2/4';
+                        // value.state = 'Cross-Tx 2/4';
+                        value.state = 'LockSent';
                     }
                     else if (value.status === stateDict.Locked) {
                         value.operation = `<h2 style="${style}">Confirm</h2>`;
-                        value.state = 'Cross-Tx 3/4';
+                        // value.state = 'Cross-Tx 3/4';
+                        value.state = 'Locked';
+
 
                         if (isCanRevoke) {
                             style += 'color: #920b1c;';
@@ -502,7 +506,8 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                     }
                     else if (value.status === stateDict.RedeemSending) {
                         value.operation = `<h2 style="${style}"></h2>`;
-                        value.state = 'Confirming 1/3';
+                        // value.state = 'Confirming 1/3';
+                        value.state = 'RedeemSending';
 
                         if (isCanRevoke) {
                             style += 'color: #920b1c;';
@@ -533,7 +538,8 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                     }
                     else if (value.status === stateDict.RedeemSent) {
                         value.operation = `<h2 style="${style}"></h2>`;
-                        value.state = 'Confirming 2/3';
+                        // value.state = 'Confirming 2/3';
+                        value.state = 'RedeemSent';
 
                         if (isCanRevoke) {
                             style += 'color: #920b1c;';
@@ -547,7 +553,8 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                     }
                     else if (value.status === stateDict.RevokeSending) {
                         value.operation = `<h2 style="${style}"></h2>`;
-                        value.state = 'Cancelling 1/3';
+                        // value.state = 'Cancelling 1/3';
+                        value.state = 'RevokeSending';
                     }
                     else if (value.status === stateDict.RevokeSendFail
                         || value.status === stateDict.RevokeSendFailAfterRetries
@@ -559,7 +566,8 @@ Template['elements_cross_transactions_table_erc20'].helpers({
                     }
                     else if (value.status === stateDict.RevokeSent) {
                         value.operation = `<h2 style="${style}"></h2>`;
-                        value.state = 'Cancelling 2/3';
+                        // value.state = 'Cancelling 2/3';
+                        value.state = 'RevokeSent';
                     }
                     else if (value.status === stateDict.Revoked) {
                         value.operation = `<h2 style="${style}"></h2>`;
