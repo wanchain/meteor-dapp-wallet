@@ -299,7 +299,9 @@ Template['views_ethToweth'].events({
                                 data: getLockTransData.lockTransData,
                                 trans: trans,
                                 chain: 'ETH',
-                                symbol: 'ETH'
+                                symbol: 'ETH',
+                                fromL: '(ETH)',
+                                toL: '(WAN)'
                             },
                         },{
                             class: 'send-transaction-info',

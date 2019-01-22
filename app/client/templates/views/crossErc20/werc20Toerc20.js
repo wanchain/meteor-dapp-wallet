@@ -367,7 +367,9 @@ Template['views_werc20Toerc20'].events({
                                     trans: trans,
                                     chain: 'WAN',
                                     chainType:chainType,
-                                    symbol: wsymbol
+                                    symbol: wsymbol,
+                                    fromL: '(WAN)',
+                                    toL: '(ETH)'
                                 },
                             },{
                                 class: 'send-transaction-info',

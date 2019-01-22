@@ -15,11 +15,11 @@
 
             <tr>
                 <td>From:</td>
-                <td>{{from}}</td>
+                <td>{{from}} {{fromL}}</td>
             </tr>
             <tr>
                 <td>To：</td>
-                <td>{{to}}</td>
+                <td>{{to}} {{toL}}</td>
             </tr>
         </tbody>
     </table>
@@ -33,15 +33,6 @@
             <br>
             {{i18n "wallet.send.texts.estimatedGas"}} {{estimatedGas}}
         </small>
-    </p>
-
-    <p class="tx-info">
-        <small>Approve Data</small>
-        <pre>{{approveData}}</pre>
-    </p>
-    <p class="tx-info">
-        <small>Lock Data</small>
-        <pre>{{lockData}}</pre>
     </p>
 
     <input type="password" id="crosschain-psd"

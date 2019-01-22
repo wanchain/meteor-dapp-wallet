@@ -331,7 +331,9 @@ Template['views_erc20Towerc20'].events({
                                     trans: trans,
                                     chain: chainType,
                                     chainType:chainType,
-                                    symbol: symbol
+                                    symbol: symbol,
+                                    fromL: '(ETH)',
+                                    toL: '(WAN)'
                                 },
                             },{
                                 class: 'send-transaction-info',

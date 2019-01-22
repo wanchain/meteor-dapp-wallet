@@ -338,7 +338,9 @@ Template['views_wethToeth'].events({
                                 trans: trans,
                                 valueFee: valueFee,
                                 chain: 'WAN',
-                                symbol: 'WETH'
+                                symbol: 'WETH',
+                                fromL: '(WAN)',
+                                toL: '(ETH)'
                             },
                         },{
                             class: 'send-transaction-info',
