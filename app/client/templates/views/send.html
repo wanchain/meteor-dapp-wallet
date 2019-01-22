@@ -142,7 +142,7 @@
                                 <input type="text" name="amount" class="dapp-large" value="{{clearAmountFromChars (formatNumberByDecimals sendAllAmount tokenDecimals)}}" disabled style="margin-top: 5px; background-color: #f7f8fc;border: solid 0px #f7f8fc;">
                             {{/if}}
                         {{else}}
-                            <input type="text" min="0" step="any" name="amount" placeholder="0.0" class="dapp-large" pattern="[0-9\.,]*" style="height: 40px; line-height: 40px; font-size: 14px;  margin-top: 5px; background-color: #f7f8fc;border: solid 0px;" >
+                                <input type="text" min="0" step="any" name="amount" placeholder="0.0" class="dapp-large {{#if TemplateVar.get 'amountInvalid'}}dapp-error{{/if}}" pattern="[0-9\.,]*" style="height: 40px; line-height: 40px; font-size: 14px;  margin-top: 5px; background-color: #f7f8fc;border: solid 0px;" >
                         {{/if}}
 
                         <br>
