@@ -76,7 +76,7 @@ Template['views_modals_storepassword'].helpers({
                     inputText: 'Enter FROM account\'s password'
                 })
             }
-        })
+        });
         return pwdCollection;
     }
 });
@@ -92,7 +92,6 @@ Template['views_modals_storepassword'].events({
     'click .closeBtn': function (e) {
         let id = e.target.id;
         let self = TemplateVar.get('template');
-
         let [type, num] = [id.substr(0,3), id.substr(3)];
         if(type === 'red') {
             let tmp = TemplateVar.get('needRedeem');

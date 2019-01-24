@@ -17,9 +17,6 @@ Template['views_modals_unlockTransactionInfo'].events({
 
         let password_input = document.getElementById('crosschain-psd').value;
         let password_inputTo = document.getElementById('crosschain-psdTo').value;
-        Session.set(this.trans.from, password_input);
-        Session.set(this.trans.to, password_inputTo);
-
 
         if(!password_input) {
             EthElements.Modal.hide();
@@ -37,6 +34,8 @@ Template['views_modals_unlockTransactionInfo'].events({
             });
         }
 
+        Session.set(this.trans.from, password_input);
+        Session.set(this.trans.to, password_inputTo);
         TemplateVar.set('isButton', true);
         Session.set('isShowModal', false);
 
