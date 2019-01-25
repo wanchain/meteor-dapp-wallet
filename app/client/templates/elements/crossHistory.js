@@ -499,7 +499,7 @@ Template['elements_cross_transactions_table'].helpers({
                         || value.status === stateDict.RedeemFail
                     ) {
 
-                        if (isCanRefund) {
+                        if (isCanRedeem) {
                             style += 'color: #920b1c;';
                             value.operation = `<h2 class="crosschain-list" id = ${index} style="${style}">Confirm Again</h2>`;
                             value.state = 'To be confirmed again';
