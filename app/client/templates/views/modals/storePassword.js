@@ -12,6 +12,7 @@ Template['views_modals_storepassword'].onCreated(function () {
     TemplateVar.set(self, 'needRevoke', self.data.needPwd['revoke']);
     TemplateVar.set(self, 'redeemText', 'Transactions pending confirmation');
     TemplateVar.set(self, 'revokeText', 'Transactions pending cancellation');
+    TemplateVar.set(self, 'warningText', 'Wanwallet quit before all transactions have been done last session. Passwords required to Continue.')
 });
 
 Template['views_modals_storepassword'].helpers({
@@ -20,7 +21,7 @@ Template['views_modals_storepassword'].helpers({
         _.each(TemplateVar.get('needRedeem'), function(value, index) {
             if(value.chain) {
                 pwdCollection.push({
-                    index: `Tx${index+1}`,
+                    index: `No.${index+1}`,
                     time: Helpers.timeStamp2String(value.time),
                     amount: web3.toBigNumber(value.value).div(100000000).toString(10),
                     from: value.chain === 'BTC' ? `${value.from} (BTC)` : `${value.from} (WAN)`,
@@ -32,7 +33,7 @@ Template['views_modals_storepassword'].helpers({
                 })
             } else {
                 pwdCollection.push({
-                    index: `Tx${index+1}`,
+                    index: `No.${index+1}`,
                     time: value.sendTime?Helpers.timeStamp2String(Number(value.sendTime) * 1000) : "--",
                     amount: Helpers.tokenFromWei(value.contractValue, value.decimals),
                     from: value.srcChainAddr !== 'WAN' ? `${value.from} (${value.srcChainType})` : `${value.from} (WAN)`,
@@ -53,7 +54,7 @@ Template['views_modals_storepassword'].helpers({
         _.each(TemplateVar.get('needRevoke'), function(value, index) {
             if(value.chain) {
                 pwdCollection.push({
-                    index: `Tx${index+1}`,
+                    index: `No.${index+1}`,
                     time: Helpers.timeStamp2String(value.time),
                     amount: web3.toBigNumber(value.value).div(100000000).toString(10),
                     from: value.chain === 'BTC' ? `${value.from} (BTC)` : `${value.from} (WAN)`,
@@ -65,7 +66,7 @@ Template['views_modals_storepassword'].helpers({
                 })
             } else {
                 pwdCollection.push({
-                    index: `Tx${index+1}`,
+                    index: `No.${index+1}`,
                     time: value.sendTime?Helpers.timeStamp2String(Number(value.sendTime) * 1000) : "--",
                     amount: Helpers.tokenFromWei(value.contractValue, value.decimals),
                     from: value.srcChainAddr !== 'WAN' ? `${value.from} (${value.srcChainType})` : `${value.from} (WAN)`,
