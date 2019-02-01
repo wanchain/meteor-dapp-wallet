@@ -6,12 +6,7 @@
                 <td>Amount</td>
                 <td>{{amount}} {{symbol}}</td>
             </tr>
-            {{#if valueFee}}
-                <tr>
-                    <td>Transaction Fee</td>
-                    <td>{{valueFee}} WAN</td>
-                </tr>
-            {{/if}}
+
 
             <tr>
                 <td>From:</td>
@@ -26,6 +21,10 @@
     <hr>
 
     <p class="tx-info">
+        {{#if valueFee}}
+        <small>+ Outbound Tx fee</small> {{valueFee}} WAN
+        <br>
+        {{/if}}
         <small>+ {{i18n "wallet.send.estimatedFee"}}</small> {{fee}}
         <br>
         <small class="gas-price">
