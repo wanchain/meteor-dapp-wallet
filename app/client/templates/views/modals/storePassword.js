@@ -12,7 +12,7 @@ Template['views_modals_storepassword'].onCreated(function () {
     TemplateVar.set(self, 'needRevoke', self.data.needPwd['revoke']);
     TemplateVar.set(self, 'redeemText', 'Transactions pending confirmation');
     TemplateVar.set(self, 'revokeText', 'Transactions pending cancellation');
-    TemplateVar.set(self, 'warningText', 'Wanwallet quit before all transactions have been done last session. Passwords required to Continue.')
+    TemplateVar.set(self, 'warningText', 'Previous session has pending cross-chain transactions. Please enter password to finalize them or click X to process them in later sessions.')
 });
 
 Template['views_modals_storepassword'].helpers({
