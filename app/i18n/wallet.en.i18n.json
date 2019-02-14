@@ -289,7 +289,7 @@
             "addData": "Add data",
             "sendAll": "Send everything",
             "removeData": "Remove data",
-            "estimatedFee": "Estimated fee",
+            "estimatedFee": "Estimated gas fee",
             "createContract": "Create contract",
             "provideGas": "Provide gas",
             "transactionSent": "Transaction sent",
