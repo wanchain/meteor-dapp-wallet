@@ -261,8 +261,13 @@ Meteor.startup(function () {
                                     }
                                 })
                                 result['canRedeem'].forEach(item => {
-                                    !Session.get(item.hashX) ? Session.set(item.hashX, 1) : '';
+                                    // 
+                                    if (!item.redeemTryCount) {
+                                        item.redeemTryCount = 1;
+                                    }
+                                    !Session.get(item.hashX) ? Session.set(item.hashX, item.redeemTryCount) : '';
                                     if(Session.get(item.hashX) < Session.get('NUM')) {
+                                    //if(item.redeemTryCount < Session.get('NUM')) {
                                         if(['WAN', 'BTC'].includes(item.chain)) {
                                             if(item.chain === 'BTC') {
                                                 !Session.get(`0x${item.crossAddress}`) ? needPwd['redeem'].push(item) : pending['redeem'].push(item)
@@ -277,8 +282,12 @@ Meteor.startup(function () {
                                 });
 
                                 result['canRevoke'].forEach(item => {
-                                    !Session.get(item.hashX) ? Session.set(item.hashX, 1) : '';
+                                    if (!item.revokeTryCount) {
+                                        item.revokeTryCount = 1;
+                                    }
+                                    !Session.get(item.hashX) ? Session.set(item.hashX, item.revokeTryCount) : '';
                                     if(Session.get(item.hashX) < Session.get('NUM')) {
+                                    //if(item.revokeTryCount < Session.get('NUM')) {
                                         !Session.get(item.from) ? needPwd['revoke'].push(item) : pending['revoke'].push(item);
                                     }
                                 });
@@ -347,6 +356,11 @@ Meteor.startup(function () {
                                                             sending.delete(trans_data.hashX);
                                                             Session.set(trans_data.to, null);
                                                             Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                            mist.ERC202WERC20().increaseFailedRetryCount(trans_data.hashX, trans_data.redeemTryCount+1, true, function (err) {
+                                                                if (err) {
+                                                                    console.log("Increase redeem retry count failed");
+                                                                }
+                                                            });
                                                         }
                                                     });
             
@@ -369,6 +383,11 @@ Meteor.startup(function () {
                                                             sending.delete(trans_data.hashX);
                                                             Session.set(trans_data.to, null);
                                                             Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                            mist.ERC202WERC20().increaseFailedRetryCount(trans_data.hashX, trans_data.redeemTryCount+1, true, function (err) {
+                                                                if (err) {
+                                                                    console.log("Increase redeem retry count failed");
+                                                                }
+                                                            });
                                                         }
                                                     });
                                                 }
@@ -407,6 +426,11 @@ Meteor.startup(function () {
                                                             sending.delete(trans_data.hashX);
                                                             Session.set(trans_data.to, null);
                                                             Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                            mist.ERC202WERC20().increaseFailedRetryCount(trans_data.hashX, trans_data.redeemTryCount+1, true, function (err) {
+                                                                if (err) {
+                                                                    console.log("Increase redeem retry count failed");
+                                                                }
+                                                            });
                                                         }
                                                     });
             
@@ -429,6 +453,11 @@ Meteor.startup(function () {
                                                             sending.delete(trans_data.hashX);
                                                             Session.set(trans_data.to, null);
                                                             Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                            mist.ERC202WERC20().increaseFailedRetryCount(trans_data.hashX, trans_data.redeemTryCount+1, true, function (err) {
+                                                                if (err) {
+                                                                    console.log("Increase redeem retry count failed");
+                                                                }
+                                                            });
                                                         }
                                                     });
                                                 }
@@ -448,6 +477,11 @@ Meteor.startup(function () {
                                                     sending.delete(trans_data.hashX);
                                                     Session.set(`0x${trans_data.crossAddress}`, null);
                                                     Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                    mist.BTC2WBTC().increaseFailedRetryCount('BTC', trans_data.hashX, trans_data.redeemTryCount+1, true, function(err, data) {
+                                                       if (err) {
+                                                           console.log("Increase redeem retry count failed");
+                                                       }
+                                                    });
                                                 }
                                             });
                                         } else if(trans_data.chain === 'WAN' && Session.get(trans_data.crossAddress)) {
@@ -463,6 +497,11 @@ Meteor.startup(function () {
                                                     sending.delete(trans_data.hashX);
                                                     Session.set(trans_data.crossAddress, null);
                                                     Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                    mist.BTC2WBTC().increaseFailedRetryCount('BTC', trans_data.hashX, trans_data.redeemTryCount+1, true, function(err, data) {
+                                                       if (err) {
+                                                           console.log("Increase redeem retry count failed");
+                                                       }
+                                                    });
                                                 }
                                             });
                                         }
@@ -502,6 +541,11 @@ Meteor.startup(function () {
                                                             sending.delete(trans_data.hashX);
                                                             Session.set(trans_data.from, null);
                                                             Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                            mist.ERC202WERC20().increaseFailedRetryCount(trans_data.hashX, trans_data.revokeTryCount+1, false, function (err) {
+                                                                if (err) {
+                                                                    console.log("Increase revoke retry count failed");
+                                                                }
+                                                            });
                                                         }
                                                     });                    
                                         
@@ -524,6 +568,11 @@ Meteor.startup(function () {
                                                             sending.delete(trans_data.hashX);
                                                             Session.set(trans_data.from, null);
                                                             Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                            mist.ERC202WERC20().increaseFailedRetryCount(trans_data.hashX, trans_data.revokeTryCount+1, false, function (err) {
+                                                                if (err) {
+                                                                    console.log("Increase revoke retry count failed");
+                                                                }
+                                                            });
                                                         }
                                                     });                    
                                         
@@ -562,6 +611,11 @@ Meteor.startup(function () {
                                                             sending.delete(trans_data.hashX);
                                                             Session.set(trans_data.from, null);
                                                             Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                            mist.ERC202WERC20().increaseFailedRetryCount(trans_data.hashX, trans_data.revokeTryCount+1, false, function (err) {
+                                                                if (err) {
+                                                                    console.log("Increase revoke retry count failed");
+                                                                }
+                                                            });
                                                         }
                                                     });                    
                                         
@@ -584,6 +638,11 @@ Meteor.startup(function () {
                                                             sending.delete(trans_data.hashX);
                                                             Session.set(trans_data.from, null);
                                                             Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                            mist.ERC202WERC20().increaseFailedRetryCount(trans_data.hashX, trans_data.revokeTryCount+1, false, function (err) {
+                                                                if (err) {
+                                                                    console.log("Increase revoke retry count failed");
+                                                                }
+                                                            });
                                                         }
                                                     });                             
                                                 }
@@ -604,6 +663,11 @@ Meteor.startup(function () {
                                                     sending.delete(trans_data.hashX);
                                                     Session.set(trans_data.from, null);
                                                     Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                    mist.BTC2WBTC().increaseFailedRetryCount('BTC', trans_data.hashX, trans_data.revokeTryCount+1, false, function(err, data) {
+                                                       if (err) {
+                                                           console.log("Increase revoke retry count failed");
+                                                       }
+                                                    });
                                                 }
                                             });
                                         } else {
@@ -619,6 +683,11 @@ Meteor.startup(function () {
                                                     sending.delete(trans_data.hashX);
                                                     Session.set(trans_data.from, null);
                                                     Session.set(trans_data.hashX, Session.get(trans_data.hashX) + 1);
+                                                    mist.BTC2WBTC().increaseFailedRetryCount('BTC', trans_data.hashX, trans_data.revokeTryCount+1, false, function(err, data) {
+                                                       if (err) {
+                                                           console.log("Increase revoke retry count failed");
+                                                       }
+                                                    });
                                                 }
                                             });
                                         }

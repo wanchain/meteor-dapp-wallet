@@ -86,6 +86,9 @@ class crossBtcOperators{
     listHistory(chainType,callback){
         this.invokeOperator(new crossOperator('listTransactions',{},chainType,callback));
     };
+    increaseFailedRetryCount(chainType,hashX, toCount, isRedeem, callback){
+        this.invokeOperator(new crossOperator('increaseFailedRetryCount',{"hashX": hashX, "toCount":toCount, "isRedeem":isRedeem},chainType,callback));
+    };
 
     listWbtcBalance(chainType,callback) {
         this.invokeOperator(new crossOperator('listWbtcBalance',{},chainType,callback));

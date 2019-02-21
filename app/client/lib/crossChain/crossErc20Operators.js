@@ -128,6 +128,9 @@ class crossChainOperators{
     listAllCrossTrans(callback){
         this.invokeOperator(new crossOperator('listAllCrossTrans',[],this.getOriginChainType(),callback));
     }
+    increaseFailedRetryCount(hashX, toCount, isRedeem, callback){
+        this.invokeOperator(new crossOperator('increaseFailedRetryCount',{"hashX":hashX, "toCount":toCount, "isRedeem":isRedeem},this.getOriginChainType(),callback));
+    }
     getRegErc20Tokens(callback){
         this.invokeOperator(new crossOperator('getRegErc20Tokens',{},this.getOriginChainType(),callback));
     }
