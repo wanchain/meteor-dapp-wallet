@@ -262,8 +262,8 @@ Meteor.startup(function () {
                                 })
                                 result['canRedeem'].forEach(item => {
                                     // 
-                                    if (!item.redeemTryCount) {
-                                        item.redeemTryCount = 1;
+                                    if (!item.hasOwnProperty('redeemTryCount')) {
+                                        item['redeemTryCount'] = 1;
                                     }
                                     !Session.get(item.hashX) ? Session.set(item.hashX, item.redeemTryCount) : '';
                                     if(Session.get(item.hashX) < Session.get('NUM')) {
@@ -282,8 +282,8 @@ Meteor.startup(function () {
                                 });
 
                                 result['canRevoke'].forEach(item => {
-                                    if (!item.revokeTryCount) {
-                                        item.revokeTryCount = 1;
+                                    if (!item.hasOwnProperty('revokeTryCount')) {
+                                        item['revokeTryCount'] = 1;
                                     }
                                     !Session.get(item.hashX) ? Session.set(item.hashX, item.revokeTryCount) : '';
                                     if(Session.get(item.hashX) < Session.get('NUM')) {
