@@ -699,23 +699,23 @@ Helpers.showError = function(error) {
     if (error && error.error) {
         return GlobalNotification.warning({
             content: error.error,
-            duration: 2
+            duration: 3
         });
     } else if(error && JSON.stringify(error) === '{}') {
         return GlobalNotification.warning({
             content: "unknown error",
-            duration: 2
+            duration: 3
         });
     } else {
         if (error === 'Error: could not decrypt key with given passphrase') {
             return GlobalNotification.warning({
                 content: 'wrong password',
-                duration: 2
+                duration: 3
             });
         }
         return GlobalNotification.warning({
             content: error,
-            duration: 2
+            duration: 3
         });
     }
 };
